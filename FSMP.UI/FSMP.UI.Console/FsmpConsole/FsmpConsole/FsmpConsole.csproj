@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
-    <ProjectReference Include="..\..\..\FSMP.lib\FsmpLibrary\FsmpLibrary\FsmpLibrary.csproj" />
+    <ProjectReference Include="..\..\..\..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
+    <ProjectReference Include="..\..\..\..\FSMP.lib\FsmpLibrary\FsmpLibrary\FsmpLibrary.csproj" />
   </ItemGroup>
 
 </Project>
