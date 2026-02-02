@@ -362,5 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# accout spasific data
-**/*.FsmpProject\res\sampleMusic
+# account specific data
+res/sampleMusic/
