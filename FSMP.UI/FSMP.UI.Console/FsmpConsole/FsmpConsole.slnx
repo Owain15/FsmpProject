@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="../../../FSMP.db/entity/FsmpDataAcsses/FsmpDataAcsses/FsmpDataAcsses.csproj" />
   <Project Path="../../../FSMP.lib/FsmpLibrary/FsmpLibrary/FsmpLibrary.csproj" />
+  <Project Path="../../../FSMP.Tests/FSMP.Tests.csproj" />
   <Project Path="FsmpConsole/FsmpConsole.csproj" />
 </Solution>

@@ -3,7 +3,10 @@
     "allow": [
       "Bash(dir:*)",
       "Bash(git -C \"c:\\\\Users\\\\Admin\\\\source\\\\repos\\\\FsmpProject\" log --all --oneline --decorate)",
-      "Bash(git -C \"c:\\\\Users\\\\Admin\\\\source\\\\repos\\\\FsmpProject\" log --all --format=\"%H %s\")"
+      "Bash(git -C \"c:\\\\Users\\\\Admin\\\\source\\\\repos\\\\FsmpProject\" log --all --format=\"%H %s\")",
+      "Bash(dotnet sln:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet list:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Admin\\source\\repos\\FsmpProject"

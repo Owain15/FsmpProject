@@ -10,6 +10,10 @@ using System.Linq;
 //foo = foo.Substring(0, (foo.IndexOf("FsmpProject" + 12)));
 //foo += @"res\sampleMusic";
 
+//string testFileRoot = @".\FsmpProject\res\sampleMusic";
+//string testFileRoot = @"~\FsmpProject\res\sampleMusic";
+
+// Temporarily commented out until proper configuration service is implemented
 string testFileRoot = @"C:\Users\Admin\source\repos\FsmpProject\res\sampleMusic";
 
 while (true)
