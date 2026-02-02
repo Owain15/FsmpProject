@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(git -C \"c:\\\\Users\\\\Admin\\\\source\\\\repos\\\\FsmpProject\" log --all --oneline --decorate)",
+      "Bash(git -C \"c:\\\\Users\\\\Admin\\\\source\\\\repos\\\\FsmpProject\" log --all --format=\"%H %s\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Admin\\source\\repos\\FsmpProject"
+    ]
+  }
+}
