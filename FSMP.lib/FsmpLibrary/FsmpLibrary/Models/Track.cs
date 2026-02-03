@@ -56,6 +56,11 @@ public class Track
     /// </summary>
     public int? SampleRate { get; set; }
 
+    /// <summary>
+    /// Whether the track contains explicit content.
+    /// </summary>
+    public bool IsExplicit { get; set; }
+
     // Custom metadata fields (non-destructive overrides)
 
     /// <summary>
@@ -77,11 +82,6 @@ public class Track
     /// Custom year override (stored in database, does not modify file).
     /// </summary>
     public int? CustomYear { get; set; }
-
-    /// <summary>
-    /// Custom genre override (stored in database, does not modify file).
-    /// </summary>
-    public string? CustomGenre { get; set; }
 
     /// <summary>
     /// User comment or notes about the track.
@@ -160,6 +160,7 @@ public class Track
     /// Navigation property to all playback history records for this track.
     /// </summary>
     public ICollection<PlaybackHistory> PlaybackHistories { get; set; } = new List<PlaybackHistory>();
+    public ICollection<Genre> Genres { get; set; } = new List<Genre>();
 
     /// <summary>
     /// Gets the display title, preferring custom title over file metadata.

@@ -8,7 +8,6 @@ public class Album
     public int AlbumId { get; set; }
     public string Title { get; set; } = string.Empty;
     public int? Year { get; set; }
-    public string? Genre { get; set; }
     public string? AlbumArtistName { get; set; }
     public int? ArtistId { get; set; }
     public byte[]? AlbumArt { get; set; }
@@ -19,4 +18,5 @@ public class Album
     // Navigation properties
     public Artist? Artist { get; set; }
     public ICollection<Track> Tracks { get; set; } = new List<Track>();
+    public ICollection<Genre> Genres { get; set; } = new List<Genre>();
 }

@@ -41,11 +41,39 @@
 
 ---
 
+## ✅ Slice 2a: Track — IsExplicit Flag (COMPLETE)
+
+**What it delivers**: Explicit-content boolean on Track
+
+- [x] Add `IsExplicit` bool property to Track.cs (after SampleRate, defaults false)
+- [x] Update TrackTests.cs — default assertion + set-all assertion
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 17/17 passing
+
+---
+
+## ✅ Slice 2b: Genre Lookup Model (COMPLETE)
+
+**What it delivers**: Genre as a DB lookup entity with many-to-many relationships to Album, Track, and Artist. New genres can be added by inserting a row — no code or migration change required.
+
+- [x] Create Genre.cs — GenreId (PK), Name; back-references to Album, Track, Artist
+- [x] Album.cs — removed `string? Genre`, added `ICollection<Genre> Genres`
+- [x] Track.cs — removed `string? CustomGenre`, added `ICollection<Genre> Genres`
+- [x] Artist.cs — added `ICollection<Genre> Genres`
+- [x] TrackTests.cs — replaced CustomGenre assertions with Genres equivalents
+- [x] Seed values planned: Rock, Jazz, Classic, Metal, Comedy (wire into DbContext in Slice 7)
+- [x] EF Core will create implicit junction tables (AlbumGenre, TrackGenre, ArtistGenre) when DbContext is configured
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 17/17 passing
+
+---
+
 ## 🔄 Slice 3: Album Model Complete
 
 **What it delivers**: Fully tested Album entity model with artist relationships
 
-- [x] Create Album.cs with all properties (Title, Year, Genre, AlbumArt, etc.)
+- [x] Create Album.cs with all properties (Title, Year, AlbumArt, etc.)
+- [x] Genre changed from `string?` to `ICollection<Genre>` (done in Slice 2b)
 - [ ] Enhance Album.cs with missing fields from plan:
   - [ ] Add AlbumArtistName property
   - [ ] Add AlbumArtPath property
@@ -69,6 +97,7 @@
 **What it delivers**: Fully tested Artist entity model with album/track relationships
 
 - [x] Create Artist.cs with basic properties
+- [x] Added `ICollection<Genre> Genres` nav property (done in Slice 2b)
 - [ ] Enhance Artist.cs with missing fields from plan:
   - [ ] Add Biography property
   - [ ] Add CreatedAt property
@@ -79,6 +108,7 @@
   - [ ] Test SortName nullable behavior
   - [ ] Test navigation to Albums collection
   - [ ] Test navigation to Tracks collection
+  - [ ] Test navigation to Genres collection
   - [ ] Test Biography storage
 - [ ] **Build**: ✅ Pass
 - [ ] **Tests**: All Artist tests passing
@@ -145,17 +175,21 @@
   - [ ] Add DbSet<Track> Tracks
   - [ ] Add DbSet<Album> Albums
   - [ ] Add DbSet<Artist> Artists
+  - [ ] Add DbSet<Genre> Genres
   - [ ] Add DbSet<PlaybackHistory> PlaybackHistories
   - [ ] Add DbSet<LibraryPath> LibraryPaths
   - [ ] Add constructor with DbContextOptions
+  - [ ] Seed Genre lookup rows: Rock, Jazz, Classic, Metal, Comedy
 - [ ] Create FsmpDbContextTests.cs
   - [ ] Test all DbSets are not null
   - [ ] Test in-memory database creation
   - [ ] Test can add and retrieve entities
+  - [ ] Test Genre seed data present after migration
 - [ ] Add OnModelCreating configuration
   - [ ] Configure Track: FilePath unique index, FileHash index, relationships
-  - [ ] Configure Album: relationship to Artist, relationship to Tracks
-  - [ ] Configure Artist: indexes on Name, relationships
+  - [ ] Configure Album: relationship to Artist, relationship to Tracks, many-to-many to Genre
+  - [ ] Configure Artist: indexes on Name, relationships, many-to-many to Genre
+  - [ ] Configure Track: many-to-many to Genre (implicit junction table TrackGenre)
   - [ ] Configure PlaybackHistory: cascade delete, relationship to Track
   - [ ] Configure LibraryPath: unique Path constraint
 - [ ] Create EntityConfigurationTests.cs
@@ -780,8 +814,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 2 / 26
-**Next Up**: Slice 3 - Album Model Complete
+**Completed Slices**: 2 + 2a (IsExplicit) + 2b (Genre lookup) / 26
+**Next Up**: Slice 3 - Album Model Complete (Genre nav property already done)
 
 Each ✅ checkbox represents a deliverable step. Work one slice at a time, updating checkboxes immediately after completion.
 

@@ -15,4 +15,5 @@ public class Artist
     // Navigation properties
     public ICollection<Album> Albums { get; set; } = new List<Album>();
     public ICollection<Track> Tracks { get; set; } = new List<Track>();
+    public ICollection<Genre> Genres { get; set; } = new List<Genre>();
 }
