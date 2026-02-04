@@ -68,17 +68,76 @@
 
 ---
 
+## ✅ Slice 2c: FileExtension Lookup Model (COMPLETE)
+
+**What it delivers**: FileExtension as a DB lookup entity replacing the free-text `Track.FileFormat` string. Seed values (`wav`, `wma`, `mp3`) wired into DbContext in Slice 7 alongside Genre.
+
+- [x] Create FileExtension.cs — FileExtensionId (PK), Extension; back-reference to Track
+- [x] Track.cs — removed `string FileFormat`, added `int? FileExtensionId` (FK) + `FileExtension?` nav property
+- [x] TrackTests.cs — updated 4 FileFormat references to use new FK + nav property
+- [x] Seed values planned: wav, wma, mp3 (wire into DbContext in Slice 7)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 17/17 passing
+
+---
+
+## ✅ Slice 2d: DI Infrastructure (COMPLETE)
+
+**What it delivers**: Dependency injection container in the console app. Establishes the pattern that DbContext, UoW, and future services register into.
+
+- [x] Create `IAudioService` interface in `FsmpLibrary/Services/`
+- [x] Create `AudioService` implementation — thin wrapper delegating to static `Fsmp` class
+- [x] Add `Microsoft.Extensions.DependencyInjection 9.0.0` to `FsmpConsole.csproj`
+- [x] Rewrite `Program.cs` — `ServiceCollection` → resolve `IAudioService` → main loop
+- [x] Create `data-access-checklist.md` at project root (standalone startup guide for Slice 7+)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 17/17 passing
+
+---
+
+## ✅ Slice 2e: LibVLCSharp Audio Migration (COMPLETE)
+
+**What it delivers**: Cross-platform audio playback via LibVLCSharp replacing WMPLib COM interop and System.Media.SoundPlayer.
+
+- [x] Add LibVLCSharp 3.9.5 and VideoLAN.LibVLC.Windows 3.0.21 NuGet packages
+- [x] Create `IAudioPlayer` interface with Load/Play/Pause/Stop/Seek + events
+- [x] Create `IAudioPlayerFactory` interface for DI
+- [x] Create `PlaybackState` enum and event args classes
+- [x] Implement `LibVlcAudioPlayer` using LibVLCSharp
+- [x] Implement `LibVlcAudioPlayerFactory`
+- [x] Expand `IAudioService` with PlayTrackAsync, PlayFileAsync, Volume, etc.
+- [x] Refactor `AudioService` to use IAudioPlayerFactory via constructor injection
+- [x] Update Program.cs DI registration with factory pattern
+- [x] Remove WMPLib COM reference from FsmpLibrary.csproj
+- [x] Remove System.Windows.Extensions package
+- [x] Mark legacy `Fsmp` static class as `[Obsolete]`
+- [x] Create `MockAudioPlayer` and `MockAudioPlayerFactory` test helpers
+- [x] Create `MockAudioPlayerTests.cs` (14 tests)
+- [x] Create `AudioServiceTests.cs` (20 tests)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 51/51 passing
+
+**Key files created:**
+- `Interfaces/IAudioPlayer.cs`, `IAudioPlayerFactory.cs`, `PlaybackState.cs`
+- `Interfaces/EventArgs/*.cs` (4 event args classes)
+- `Audio/LibVlcAudioPlayer.cs`, `LibVlcAudioPlayerFactory.cs`
+- `FSMP.Tests/TestHelpers/MockAudioPlayer.cs`, `MockAudioPlayerFactory.cs`
+- `FSMP.Tests/Audio/MockAudioPlayerTests.cs`
+- `FSMP.Tests/Services/AudioServiceTests.cs`
+
+---
+
 ## 🔄 Slice 3: Album Model Complete
 
 **What it delivers**: Fully tested Album entity model with artist relationships
 
 - [x] Create Album.cs with all properties (Title, Year, AlbumArt, etc.)
 - [x] Genre changed from `string?` to `ICollection<Genre>` (done in Slice 2b)
-- [ ] Enhance Album.cs with missing fields from plan:
-  - [ ] Add AlbumArtistName property
-  - [ ] Add AlbumArtPath property
-  - [ ] Add CreatedAt property
-  - [ ] Add UpdatedAt property
+- [x] Enhance Album.cs with missing fields from plan:
+  - [x] Add AlbumArtistName property
+  - [x] Add AlbumArtPath property
+  - [x] Add CreatedAt property
+  - [x] Add UpdatedAt property
 - [ ] Create AlbumTests.cs with comprehensive tests
   - [ ] Test default initialization
   - [ ] Test all property setters
@@ -98,10 +157,10 @@
 
 - [x] Create Artist.cs with basic properties
 - [x] Added `ICollection<Genre> Genres` nav property (done in Slice 2b)
-- [ ] Enhance Artist.cs with missing fields from plan:
-  - [ ] Add Biography property
-  - [ ] Add CreatedAt property
-  - [ ] Add UpdatedAt property
+- [x] Enhance Artist.cs with missing fields from plan:
+  - [x] Add Biography property
+  - [x] Add CreatedAt property
+  - [x] Add UpdatedAt property
 - [ ] Create ArtistTests.cs with comprehensive tests
   - [ ] Test default initialization
   - [ ] Test all property setters
@@ -180,6 +239,7 @@
   - [ ] Add DbSet<LibraryPath> LibraryPaths
   - [ ] Add constructor with DbContextOptions
   - [ ] Seed Genre lookup rows: Rock, Jazz, Classic, Metal, Comedy
+  - [ ] Seed FileExtension lookup rows: wav, wma, mp3
 - [ ] Create FsmpDbContextTests.cs
   - [ ] Test all DbSets are not null
   - [ ] Test in-memory database creation
@@ -814,8 +874,10 @@
 
 ## Progress Summary
 
-**Completed Slices**: 2 + 2a (IsExplicit) + 2b (Genre lookup) / 26
-**Next Up**: Slice 3 - Album Model Complete (Genre nav property already done)
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d / 26
+**Next Up**: Slice 3 — AlbumTests.cs (model enhancements already in code, only tests remain)
+
+**Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
 Each ✅ checkbox represents a deliverable step. Work one slice at a time, updating checkboxes immediately after completion.
 

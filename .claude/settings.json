@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cmd /c:*)"
+      "Bash(cmd /c:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(cmd.exe /c \"\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\"\" \"\"c:\\\\Users\\\\ojdav\\\\source\\\\repos\\\\FsmpProject\\\\FSMP.UI\\\\FSMP.UI.Console\\\\FsmpConsole\\\\FsmpConsole.slnx\"\" -t:Build -p:Configuration=Debug -restore\")"
     ]
   }
 }

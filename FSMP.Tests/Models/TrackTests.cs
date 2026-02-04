@@ -15,7 +15,8 @@ public class TrackTests
         track.TrackId.Should().Be(0);
         track.Title.Should().BeEmpty();
         track.FilePath.Should().BeEmpty();
-        track.FileFormat.Should().BeEmpty();
+        track.FileExtensionId.Should().BeNull();
+        track.FileExtension.Should().BeNull();
         track.FileSizeBytes.Should().Be(0);
         track.TrackNumber.Should().BeNull();
         track.DiscNumber.Should().BeNull();
@@ -55,7 +56,8 @@ public class TrackTests
         track.TrackId = 1;
         track.Title = "Test Track";
         track.FilePath = @"C:\Music\test.mp3";
-        track.FileFormat = "MP3";
+        track.FileExtensionId = 3;
+        track.FileExtension = new FileExtension { FileExtensionId = 3, Extension = "mp3" };
         track.FileSizeBytes = 5242880; // 5 MB
         track.TrackNumber = 3;
         track.DiscNumber = 1;
@@ -84,7 +86,8 @@ public class TrackTests
         track.TrackId.Should().Be(1);
         track.Title.Should().Be("Test Track");
         track.FilePath.Should().Be(@"C:\Music\test.mp3");
-        track.FileFormat.Should().Be("MP3");
+        track.FileExtensionId.Should().Be(3);
+        track.FileExtension!.Extension.Should().Be("mp3");
         track.FileSizeBytes.Should().Be(5242880);
         track.TrackNumber.Should().Be(3);
         track.DiscNumber.Should().Be(1);
@@ -255,16 +258,19 @@ public class TrackTests
     }
 
     [Fact]
-    public void FileFormat_ShouldStoreUppercaseExtensions()
+    public void FileExtension_ShouldStoreExtensionViaNavProperty()
     {
         // Arrange
         var track = new Track();
+        var ext = new FileExtension { FileExtensionId = 1, Extension = "wav" };
 
         // Act
-        track.FileFormat = "MP3";
+        track.FileExtensionId = ext.FileExtensionId;
+        track.FileExtension = ext;
 
         // Assert
-        track.FileFormat.Should().Be("MP3");
+        track.FileExtensionId.Should().Be(1);
+        track.FileExtension.Extension.Should().Be("wav");
     }
 
     [Fact]

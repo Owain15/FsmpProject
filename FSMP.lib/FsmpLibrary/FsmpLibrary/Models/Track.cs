@@ -22,9 +22,14 @@ public class Track
     public string FilePath { get; set; } = string.Empty;
 
     /// <summary>
-    /// File format/extension (WAV, WMA, MP3).
+    /// Foreign key to FileExtension lookup (wav, wma, mp3).
     /// </summary>
-    public string FileFormat { get; set; } = string.Empty;
+    public int? FileExtensionId { get; set; }
+
+    /// <summary>
+    /// Navigation property to the associated FileExtension.
+    /// </summary>
+    public FileExtension? FileExtension { get; set; }
 
     /// <summary>
     /// File size in bytes.
