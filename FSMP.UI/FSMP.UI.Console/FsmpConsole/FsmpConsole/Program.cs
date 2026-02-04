@@ -19,11 +19,14 @@ var audioService = services.GetRequiredService<IAudioService>();
 // Find and play the first available audio file
 var firstTrack = FindFirstAudioFile(musicRoot);
 
-Print.NewDisplay();
+
 
 while (true)
-{
+{ 
+    Print.NewDisplay();
+    
     var input = Console.ReadLine();
+    
     if (string.IsNullOrEmpty(input)) continue;
 
     // Basic playback controls

@@ -127,7 +127,7 @@
 
 ---
 
-## 🔄 Slice 3: Album Model Complete
+## ✅ Slice 3: Album Model Complete (COMPLETE)
 
 **What it delivers**: Fully tested Album entity model with artist relationships
 
@@ -138,20 +138,24 @@
   - [x] Add AlbumArtPath property
   - [x] Add CreatedAt property
   - [x] Add UpdatedAt property
-- [ ] Create AlbumTests.cs with comprehensive tests
-  - [ ] Test default initialization
-  - [ ] Test all property setters
-  - [ ] Test navigation to Artist (nullable)
-  - [ ] Test navigation to Tracks collection
-  - [ ] Test AlbumArt byte array storage
-  - [ ] Test Year nullable behavior
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Album tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create AlbumTests.cs with comprehensive tests
+  - [x] Test default initialization
+  - [x] Test all property setters
+  - [x] Test navigation to Artist (nullable)
+  - [x] Test navigation to Tracks collection
+  - [x] Test AlbumArt byte array storage
+  - [x] Test Year nullable behavior
+  - [x] Test Genres collection (many-to-many)
+  - [x] Test AlbumArtistName independent of Artist nav property
+  - [x] Test CreatedAt/UpdatedAt DateTime storage
+  - [x] Test AlbumArtPath nullable behavior
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 58/58 passing (19 new Album tests)
+- [x] **Coverage**: ≥80%
 
 ---
 
-## Slice 4: Artist Model Complete
+## ✅ Slice 4: Artist Model Complete (COMPLETE)
 
 **What it delivers**: Fully tested Artist entity model with album/track relationships
 
@@ -161,68 +165,74 @@
   - [x] Add Biography property
   - [x] Add CreatedAt property
   - [x] Add UpdatedAt property
-- [ ] Create ArtistTests.cs with comprehensive tests
-  - [ ] Test default initialization
-  - [ ] Test all property setters
-  - [ ] Test SortName nullable behavior
-  - [ ] Test navigation to Albums collection
-  - [ ] Test navigation to Tracks collection
-  - [ ] Test navigation to Genres collection
-  - [ ] Test Biography storage
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Artist tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create ArtistTests.cs with comprehensive tests
+  - [x] Test default initialization
+  - [x] Test all property setters
+  - [x] Test SortName nullable behavior
+  - [x] Test navigation to Albums collection
+  - [x] Test navigation to Tracks collection
+  - [x] Test navigation to Genres collection
+  - [x] Test Biography storage (including long text)
+  - [x] Test CreatedAt/UpdatedAt DateTime storage
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 16 Artist tests passing
+- [x] **Coverage**: ≥80%
 
 ---
 
-## Slice 5: PlaybackHistory Model Complete
+## ✅ Slice 5: PlaybackHistory Model Complete (COMPLETE)
 
 **What it delivers**: Fully tested PlaybackHistory entity for tracking plays
 
 - [x] Create PlaybackHistory.cs with basic properties
-- [ ] Create PlaybackHistoryTests.cs with comprehensive tests
-  - [ ] Test default initialization
-  - [ ] Test all property setters
-  - [ ] Test PlayedAt timestamp
-  - [ ] Test PlayDuration nullable behavior
-  - [ ] Test CompletedPlayback flag
-  - [ ] Test WasSkipped flag
-  - [ ] Test navigation to Track (non-null)
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All PlaybackHistory tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create PlaybackHistoryTests.cs with comprehensive tests
+  - [x] Test default initialization
+  - [x] Test all property setters
+  - [x] Test PlayedAt timestamp
+  - [x] Test PlayDuration nullable behavior
+  - [x] Test CompletedPlayback flag
+  - [x] Test WasSkipped flag
+  - [x] Test navigation to Track
+  - [x] Test edge cases (short/long durations, both flags true)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 14 PlaybackHistory tests passing
+- [x] **Coverage**: ≥80%
 
 ---
 
-## Slice 6: Configuration Models Complete
+## ✅ Slice 6: Configuration Models Complete (COMPLETE)
 
 **What it delivers**: Fully tested LibraryPath and Configuration entities
 
-- [ ] Create LibraryPath.cs in Models/
-  - [ ] LibraryPathId (PK)
-  - [ ] Path (string, unique)
-  - [ ] IsActive (bool)
-  - [ ] AddedAt (DateTime)
-  - [ ] LastScannedAt (DateTime?)
-  - [ ] TrackCount (int, cached)
-- [ ] Create LibraryPathTests.cs
-  - [ ] Test default initialization
-  - [ ] Test all property setters
-  - [ ] Test LastScannedAt nullable
-- [ ] Create Configuration.cs in Models/
-  - [ ] LibraryPaths (List<string>)
-  - [ ] DatabasePath (string)
-  - [ ] AutoScanOnStartup (bool)
-  - [ ] DefaultVolume (int)
-  - [ ] RememberLastPlayed (bool)
-  - [ ] LastPlayedTrackPath (string?)
-- [ ] Create ConfigurationTests.cs
-  - [ ] Test default initialization
-  - [ ] Test LibraryPaths collection initialization
-  - [ ] Test all property setters
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Configuration model tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create LibraryPath.cs in Models/
+  - [x] LibraryPathId (PK)
+  - [x] Path (string)
+  - [x] IsActive (bool, default true)
+  - [x] AddedAt (DateTime)
+  - [x] LastScannedAt (DateTime?)
+  - [x] TrackCount (int, cached)
+- [x] Create LibraryPathTests.cs
+  - [x] Test default initialization
+  - [x] Test all property setters
+  - [x] Test LastScannedAt nullable
+  - [x] Test IsActive default and settable
+  - [x] Test Windows and network paths
+- [x] Create Configuration.cs in Models/
+  - [x] LibraryPaths (List<string>)
+  - [x] DatabasePath (string)
+  - [x] AutoScanOnStartup (bool)
+  - [x] DefaultVolume (int)
+  - [x] RememberLastPlayed (bool)
+  - [x] LastPlayedTrackPath (string?)
+- [x] Create ConfigurationTests.cs
+  - [x] Test default initialization
+  - [x] Test LibraryPaths collection initialization
+  - [x] Test all property setters
+  - [x] Test add/remove paths
+  - [x] Test volume values
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 11 LibraryPath + 17 Configuration tests passing
+- [x] **Coverage**: ≥80%
 
 ---
 
@@ -874,8 +884,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d / 26
-**Next Up**: Slice 3 — AlbumTests.cs (model enhancements already in code, only tests remain)
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6 / 26
+**Next Up**: Slice 7 — FsmpDbContext with entity relationships and seed data
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 

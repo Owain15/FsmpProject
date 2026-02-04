@@ -12,14 +12,7 @@ namespace FsmpConsole
 
 		public static void NewDisplay()
 		{
-			try
-			{
-				Console.Clear();
-			}
-			catch (IOException)
-			{
-				// Console.Clear() fails when no console is attached (e.g., redirected output)
-			}
+			Console.Clear();	
 
 			Console.WriteLine(title);
 
