@@ -236,41 +236,51 @@
 
 ---
 
-## Slice 7: Database Context Foundation
+## ✅ Slice 7: Database Context Foundation (COMPLETE)
 
 **What it delivers**: Working FsmpDbContext with all entity relationships configured
 
-- [ ] Create FsmpDbContext.cs in FsmpDataAcsses/
-  - [ ] Add DbSet<Track> Tracks
-  - [ ] Add DbSet<Album> Albums
-  - [ ] Add DbSet<Artist> Artists
-  - [ ] Add DbSet<Genre> Genres
-  - [ ] Add DbSet<PlaybackHistory> PlaybackHistories
-  - [ ] Add DbSet<LibraryPath> LibraryPaths
-  - [ ] Add constructor with DbContextOptions
-  - [ ] Seed Genre lookup rows: Rock, Jazz, Classic, Metal, Comedy
-  - [ ] Seed FileExtension lookup rows: wav, wma, mp3
-- [ ] Create FsmpDbContextTests.cs
-  - [ ] Test all DbSets are not null
-  - [ ] Test in-memory database creation
-  - [ ] Test can add and retrieve entities
-  - [ ] Test Genre seed data present after migration
-- [ ] Add OnModelCreating configuration
-  - [ ] Configure Track: FilePath unique index, FileHash index, relationships
-  - [ ] Configure Album: relationship to Artist, relationship to Tracks, many-to-many to Genre
-  - [ ] Configure Artist: indexes on Name, relationships, many-to-many to Genre
-  - [ ] Configure Track: many-to-many to Genre (implicit junction table TrackGenre)
-  - [ ] Configure PlaybackHistory: cascade delete, relationship to Track
-  - [ ] Configure LibraryPath: unique Path constraint
-- [ ] Create EntityConfigurationTests.cs
-  - [ ] Test Track.FilePath unique constraint
-  - [ ] Test Album.Artist relationship (nullable)
-  - [ ] Test Track.Album relationship (nullable)
-  - [ ] Test PlaybackHistory.Track cascade delete
-  - [ ] Test LibraryPath.Path unique constraint
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All DbContext tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create FsmpDbContext.cs in FsmpDataAcsses/
+  - [x] Add DbSet<Track> Tracks
+  - [x] Add DbSet<Album> Albums
+  - [x] Add DbSet<Artist> Artists
+  - [x] Add DbSet<Genre> Genres
+  - [x] Add DbSet<PlaybackHistory> PlaybackHistories
+  - [x] Add DbSet<LibraryPath> LibraryPaths
+  - [x] Add DbSet<FileExtension> FileExtensions
+  - [x] Add constructor with DbContextOptions
+  - [x] Seed Genre lookup rows: Rock, Jazz, Classic, Metal, Comedy
+  - [x] Seed FileExtension lookup rows: wav, wma, mp3
+- [x] Create FsmpDbContextTests.cs
+  - [x] Test all DbSets are not null (7 tests)
+  - [x] Test in-memory database creation
+  - [x] Test can add and retrieve entities (Track, Album, Artist, PlaybackHistory, LibraryPath)
+  - [x] Test Genre seed data present (5 genres)
+  - [x] Test FileExtension seed data present (3 extensions)
+- [x] Add OnModelCreating configuration
+  - [x] Configure Track: FilePath unique index, FileHash index, relationships
+  - [x] Configure Album: relationship to Artist, relationship to Tracks, many-to-many to Genre
+  - [x] Configure Artist: indexes on Name, relationships, many-to-many to Genre
+  - [x] Configure Track: many-to-many to Genre (implicit junction table TrackGenre)
+  - [x] Configure PlaybackHistory: cascade delete, relationship to Track
+  - [x] Configure LibraryPath: unique Path constraint
+  - [x] Configure Genre: unique Name constraint
+  - [x] Configure FileExtension: unique Extension constraint
+- [x] Create EntityConfigurationTests.cs
+  - [x] Test Track.FilePath unique constraint (SQLite)
+  - [x] Test Album.Artist relationship (nullable + when set)
+  - [x] Test Track.Album relationship (nullable + when set)
+  - [x] Test PlaybackHistory.Track cascade delete
+  - [x] Test LibraryPath.Path unique constraint (SQLite)
+  - [x] Test Track-Genre many-to-many
+  - [x] Test Album-Genre many-to-many
+  - [x] Test Artist-Genre many-to-many
+  - [x] Test Track-FileExtension relationship
+  - [x] Test Genre.Name unique constraint (SQLite)
+  - [x] Test FileExtension.Extension unique constraint (SQLite)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 141/141 passing (28 new DbContext/entity tests)
+- [x] **Coverage**: ≥80%
 
 ---
 
@@ -884,8 +894,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6 / 26
-**Next Up**: Slice 7 — FsmpDbContext with entity relationships and seed data
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7 / 26
+**Next Up**: Slice 8 — Repository pattern base (IRepository<T> + Repository<T>)
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
