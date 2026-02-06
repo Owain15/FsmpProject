@@ -486,35 +486,53 @@
 
 ---
 
-## Slice 14: Metadata Reading Service 🎉
+## ✅ Slice 14: Metadata Reading Service 🎉 (COMPLETE)
 
 **What it delivers**: Read metadata from WAV/WMA/MP3 files using TagLibSharp
 
 **Checkpoint**: Can extract title, artist, album, duration, album art from sample files
 
-- [ ] Create TrackMetadata.cs POCO in Services/
-  - [ ] Properties: Title, Artist, Album, Year, Genre, Duration, BitRate, SampleRate, AlbumArt
-- [ ] Create MetadataService.cs in Services/
-  - [ ] Constructor()
-  - [ ] TrackMetadata ReadMetadata(string filePath)
-  - [ ] byte[]? ExtractAlbumArt(string filePath)
-  - [ ] TimeSpan? GetDuration(string filePath)
-  - [ ] AudioProperties GetAudioProperties(string filePath) (BitRate, SampleRate)
-  - [ ] Handle TagLib exceptions (corrupt files, unsupported formats)
-- [ ] Create MetadataServiceTests.cs
-  - [ ] Copy sample audio files to test resources (WAV, WMA, MP3)
-  - [ ] Test ReadMetadata extracts title from WAV
-  - [ ] Test ReadMetadata extracts artist from WMA
-  - [ ] Test ReadMetadata extracts album from MP3
-  - [ ] Test ExtractAlbumArt returns byte[] for file with art
-  - [ ] Test GetDuration returns correct TimeSpan
-  - [ ] Test GetAudioProperties returns BitRate and SampleRate
-  - [ ] Test error handling with corrupt file (returns null/defaults)
-  - [ ] Test error handling with missing file (throws)
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All MetadataService tests passing
-- [ ] **Coverage**: ≥80%
-- [ ] **Manual Verification**: Run on sample music files, verify metadata extracted correctly
+- [x] Create TrackMetadata.cs POCO in Services/
+  - [x] Properties: Title, Artist, Album, Year, Genre, Duration, BitRate, SampleRate, AlbumArt, TrackNumber, DiscNumber
+- [x] Create AudioProperties.cs POCO in Services/
+  - [x] Properties: BitRate, SampleRate, Channels, BitsPerSample
+- [x] Create IMetadataService.cs interface in Services/
+- [x] Create MetadataService.cs in Services/
+  - [x] Constructor()
+  - [x] TrackMetadata ReadMetadata(string filePath)
+  - [x] byte[]? ExtractAlbumArt(string filePath)
+  - [x] TimeSpan? GetDuration(string filePath)
+  - [x] AudioProperties GetAudioProperties(string filePath) (BitRate, SampleRate)
+  - [x] Handle TagLib exceptions (corrupt files, unsupported formats)
+- [x] Create MetadataServiceTests.cs
+  - [x] WAV files created programmatically in test fixture; sample MP3/WMA from repo
+  - [x] Test ReadMetadata extracts title from WAV
+  - [x] Test ReadMetadata extracts artist from WMA
+  - [x] Test ReadMetadata extracts album from MP3
+  - [x] Test ReadMetadata extracts multiple fields from WAV
+  - [x] Test ReadMetadata returns nulls for file with no tags
+  - [x] Test ReadMetadata extracts duration from WAV
+  - [x] Test ReadMetadata extracts BitRate and SampleRate
+  - [x] Test ExtractAlbumArt returns byte[] for file with art
+  - [x] Test ExtractAlbumArt returns null when no art
+  - [x] Test GetDuration returns correct TimeSpan
+  - [x] Test GetDuration returns duration from MP3
+  - [x] Test GetAudioProperties returns BitRate and SampleRate
+  - [x] Test GetAudioProperties returns properties from MP3
+  - [x] Test error handling with corrupt file (returns null/defaults) — ReadMetadata, ExtractAlbumArt, GetDuration, GetAudioProperties
+  - [x] Test error handling with missing file (throws FileNotFoundException)
+  - [x] Test error handling with null path (throws ArgumentNullException)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 246/246 passing (29 MetadataService tests: 23 unit + 6 integration with real MP3/WMA)
+- [x] **Coverage**: ✅ ≥80% (overall 91.07%, MetadataService 86.2%)
+- [x] **Manual Verification**: ✅ Verified on sample MP3 (Bonobo - Kerala) and WMA (AC/DC - Highway to Hell) — title, artist, album, duration, bit rate, sample rate all extracted correctly
+
+**Key files created:**
+- `FsmpLibrary/Services/TrackMetadata.cs` — metadata POCO
+- `FsmpLibrary/Services/AudioProperties.cs` — audio properties POCO
+- `FsmpLibrary/Services/IMetadataService.cs` — interface
+- `FsmpLibrary/Services/MetadataService.cs` — TagLibSharp implementation
+- `FSMP.Tests/Services/MetadataServiceTests.cs` — 23 tests
 
 ---
 
@@ -926,8 +944,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 / 26
-**Next Up**: Slice 14 — Metadata Reading Service
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 / 26
+**Next Up**: Slice 15 — Library Scanning (End-to-End)
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 

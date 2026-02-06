@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="readme.txt" />
+  </Folder>
+  <Project Path="FSMO/FSMO.csproj" />
+</Solution>
