@@ -318,26 +318,30 @@
 
 ---
 
-## Slice 9: Track Repository Specialized
+## ✅ Slice 9: Track Repository Specialized (COMPLETE)
 
 **What it delivers**: TrackRepository with specialized queries for tracks
 
-- [ ] Create TrackRepository.cs in Repositories/
-  - [ ] Inherit from Repository<Track>
-  - [ ] Task<Track?> GetByFilePathAsync(string filePath)
-  - [ ] Task<IEnumerable<Track>> GetFavoritesAsync()
-  - [ ] Task<IEnumerable<Track>> GetMostPlayedAsync(int count)
-  - [ ] Task<IEnumerable<Track>> GetRecentlyPlayedAsync(int count)
-  - [ ] Task<Track?> GetByFileHashAsync(string fileHash)
-- [ ] Create TrackRepositoryTests.cs
-  - [ ] Test GetByFilePathAsync finds by path
-  - [ ] Test GetFavoritesAsync filters IsFavorite=true
-  - [ ] Test GetMostPlayedAsync orders by PlayCount DESC
-  - [ ] Test GetRecentlyPlayedAsync orders by LastPlayedAt DESC
-  - [ ] Test GetByFileHashAsync finds by hash (deduplication)
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All TrackRepository tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create TrackRepository.cs in Repositories/
+  - [x] Inherit from Repository<Track>
+  - [x] Task<Track?> GetByFilePathAsync(string filePath)
+  - [x] Task<IEnumerable<Track>> GetFavoritesAsync()
+  - [x] Task<IEnumerable<Track>> GetMostPlayedAsync(int count)
+  - [x] Task<IEnumerable<Track>> GetRecentlyPlayedAsync(int count)
+  - [x] Task<Track?> GetByFileHashAsync(string fileHash)
+- [x] Create TrackRepositoryTests.cs
+  - [x] Test GetByFilePathAsync finds by path
+  - [x] Test GetByFilePathAsync returns null when not found
+  - [x] Test GetFavoritesAsync filters IsFavorite=true
+  - [x] Test GetMostPlayedAsync orders by PlayCount DESC
+  - [x] Test GetMostPlayedAsync respects count parameter
+  - [x] Test GetRecentlyPlayedAsync orders by LastPlayedAt DESC
+  - [x] Test GetRecentlyPlayedAsync excludes never-played tracks
+  - [x] Test GetByFileHashAsync finds by hash (deduplication)
+  - [x] Test GetByFileHashAsync returns null when not found
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 162/162 passing (9 new TrackRepository tests)
+- [x] **Coverage**: ≥80%
 
 ---
 
@@ -898,8 +902,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8 / 26
-**Next Up**: Slice 9 — Track Repository with specialized queries
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9 / 26
+**Next Up**: Slice 10 — Album & Artist Repositories
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
