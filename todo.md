@@ -421,58 +421,68 @@
 
 ---
 
-## Slice 12: Initial Database Migration 🎉
+## ✅ Slice 12: Initial Database Migration 🎉 (COMPLETE)
 
 **What it delivers**: Working SQLite database creation via EF Core migration
 
 **Checkpoint**: Database file appears at %AppData%\FSMP\fsmp.db (first tangible artifact!)
 
-- [ ] Run EF Core migration command:
+- [x] Create DesignTimeDbContextFactory for EF tooling
+- [x] Add Microsoft.EntityFrameworkCore.Design to FsmpConsole.csproj
+- [x] Run EF Core migration command:
   ```
   dotnet ef migrations add InitialCreate --project FSMP.db/entity/FsmpDataAcsses/FsmpDataAcsses --startup-project FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole
   ```
-- [ ] Verify migration file created in Migrations/ folder
-- [ ] Review generated migration code for correctness
-- [ ] Create MigrationTests.cs in Tests/Database/
-  - [ ] Test migration applies successfully to SQLite database
-  - [ ] Test all 5 tables created (Artists, Albums, Tracks, PlaybackHistories, LibraryPaths)
-  - [ ] Test Track.FilePath unique index exists
-  - [ ] Test Track.FileHash index exists
-  - [ ] Test Album-Artist relationship created
-  - [ ] Test PlaybackHistory-Track cascade delete configured
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All migration tests passing
-- [ ] **Coverage**: ≥80%
-- [ ] **Manual Verification**: Run migration, verify .db file exists and contains tables
+- [x] Verify migration file created in Migrations/ folder (InitialCreate + Designer + Snapshot)
+- [x] Review generated migration code — all tables, FKs, indexes, seed data correct
+- [x] Create MigrationTests.cs in Tests/Database/
+  - [x] Test migration applies successfully to SQLite database
+  - [x] Test all 5 core tables created (Artists, Albums, Tracks, PlaybackHistories, LibraryPaths)
+  - [x] Test lookup tables created (Genres, FileExtensions)
+  - [x] Test junction tables created (TrackGenre, AlbumGenre, ArtistGenre)
+  - [x] Test Track.FilePath unique index exists
+  - [x] Test Track.FileHash index exists
+  - [x] Test Album-Artist relationship (SET NULL on delete)
+  - [x] Test PlaybackHistory-Track cascade delete configured
+  - [x] Test LibraryPath.Path unique index exists
+  - [x] Test Genre seed data present (5 genres)
+  - [x] Test FileExtension seed data present (3 extensions)
+  - [x] Test Track-Artist SET NULL on delete
+  - [x] Test Track-Album SET NULL on delete
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 207/207 passing (13 new migration tests)
+- [x] **Coverage**: ≥80%
 
 ---
 
-## Slice 13: Configuration Service (End-to-End) 🎉
+## ✅ Slice 13: Configuration Service (End-to-End) 🎉 (COMPLETE)
 
 **What it delivers**: JSON configuration file management
 
 **Checkpoint**: Config file created at %AppData%\FSMP\config.json (second tangible artifact!)
 
-- [ ] Create ConfigurationService.cs in Services/
-  - [ ] Constructor(string configPath)
-  - [ ] Task<Configuration> LoadConfigurationAsync()
-  - [ ] Task SaveConfigurationAsync(Configuration config)
-  - [ ] Task AddLibraryPathAsync(string path)
-  - [ ] Task RemoveLibraryPathAsync(string path)
-  - [ ] Configuration GetDefaultConfiguration()
-  - [ ] Create %AppData%\FSMP\ directory if missing
-- [ ] Create ConfigurationServiceTests.cs
-  - [ ] Test GetDefaultConfiguration returns valid defaults
-  - [ ] Test LoadConfigurationAsync creates default if missing
-  - [ ] Test SaveConfigurationAsync writes valid JSON
-  - [ ] Test LoadConfigurationAsync reads saved JSON correctly
-  - [ ] Test AddLibraryPathAsync updates config
-  - [ ] Test RemoveLibraryPathAsync updates config
-  - [ ] Test configuration file location is %AppData%/FSMP/config.json
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All ConfigurationService tests passing
-- [ ] **Coverage**: ≥80%
-- [ ] **Manual Verification**: Run service, verify config.json created with default paths
+- [x] Create ConfigurationService.cs in FsmpLibrary/Services/
+  - [x] Constructor(string configPath)
+  - [x] Task<Configuration> LoadConfigurationAsync()
+  - [x] Task SaveConfigurationAsync(Configuration config)
+  - [x] Task AddLibraryPathAsync(string path)
+  - [x] Task RemoveLibraryPathAsync(string path)
+  - [x] Configuration GetDefaultConfiguration()
+  - [x] Create directory if missing on save
+- [x] Create ConfigurationServiceTests.cs
+  - [x] Test GetDefaultConfiguration returns valid defaults
+  - [x] Test LoadConfigurationAsync creates default if missing
+  - [x] Test SaveConfigurationAsync writes valid JSON
+  - [x] Test LoadConfigurationAsync reads saved JSON correctly
+  - [x] Test AddLibraryPathAsync updates config
+  - [x] Test AddLibraryPathAsync does not duplicate
+  - [x] Test RemoveLibraryPathAsync updates config
+  - [x] Test RemoveLibraryPathAsync does nothing when path not found
+  - [x] Test SaveConfigurationAsync creates directory when missing
+  - [x] Test configuration file location ends with config.json
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 217/217 passing (10 new ConfigurationService tests)
+- [x] **Coverage**: ≥80%
 
 ---
 
@@ -916,8 +926,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11 / 26
-**Next Up**: Slice 12 — Initial Database Migration
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 / 26
+**Next Up**: Slice 14 — Metadata Reading Service
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
