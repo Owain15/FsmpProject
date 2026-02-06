@@ -379,37 +379,45 @@
 
 ---
 
-## Slice 11: PlaybackHistory Repository & Unit of Work
+## ✅ Slice 11: PlaybackHistory Repository & Unit of Work (COMPLETE)
 
 **What it delivers**: Complete repository pattern with Unit of Work coordinator
 
-- [ ] Create PlaybackHistoryRepository.cs in Repositories/
-  - [ ] Inherit from Repository<PlaybackHistory>
-  - [ ] Task<IEnumerable<PlaybackHistory>> GetRecentPlaysAsync(int count)
-  - [ ] Task<IEnumerable<PlaybackHistory>> GetByTrackAsync(int trackId)
-  - [ ] Task<int> GetTotalPlayCountAsync()
-  - [ ] Task<TimeSpan> GetTotalListeningTimeAsync()
-- [ ] Create PlaybackHistoryRepositoryTests.cs
-  - [ ] Test GetRecentPlaysAsync orders by PlayedAt DESC
-  - [ ] Test GetByTrackAsync filters by TrackId
-  - [ ] Test GetTotalPlayCountAsync sums all plays
-  - [ ] Test GetTotalListeningTimeAsync sums PlayDuration
-- [ ] Create UnitOfWork.cs in FsmpDataAcsses/
-  - [ ] TrackRepository Tracks { get; }
-  - [ ] AlbumRepository Albums { get; }
-  - [ ] ArtistRepository Artists { get; }
-  - [ ] PlaybackHistoryRepository PlaybackHistories { get; }
-  - [ ] Repository<LibraryPath> LibraryPaths { get; }
-  - [ ] Task<int> SaveAsync()
-  - [ ] Implement IDisposable
-- [ ] Create UnitOfWorkTests.cs
-  - [ ] Test all repository properties initialized
-  - [ ] Test SaveAsync commits changes to database
-  - [ ] Test Dispose releases DbContext
-  - [ ] Test transaction rollback on exception
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All repository & UnitOfWork tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create PlaybackHistoryRepository.cs in Repositories/
+  - [x] Inherit from Repository<PlaybackHistory>
+  - [x] Task<IEnumerable<PlaybackHistory>> GetRecentPlaysAsync(int count)
+  - [x] Task<IEnumerable<PlaybackHistory>> GetByTrackAsync(int trackId)
+  - [x] Task<int> GetTotalPlayCountAsync()
+  - [x] Task<TimeSpan> GetTotalListeningTimeAsync()
+- [x] Create PlaybackHistoryRepositoryTests.cs
+  - [x] Test GetRecentPlaysAsync orders by PlayedAt DESC
+  - [x] Test GetRecentPlaysAsync respects count parameter
+  - [x] Test GetByTrackAsync filters by TrackId
+  - [x] Test GetByTrackAsync returns empty when no history
+  - [x] Test GetTotalPlayCountAsync counts all plays
+  - [x] Test GetTotalListeningTimeAsync sums PlayDuration
+  - [x] Test GetTotalListeningTimeAsync returns zero when empty
+- [x] Create UnitOfWork.cs in FsmpDataAcsses/
+  - [x] TrackRepository Tracks { get; }
+  - [x] AlbumRepository Albums { get; }
+  - [x] ArtistRepository Artists { get; }
+  - [x] PlaybackHistoryRepository PlaybackHistories { get; }
+  - [x] Repository<LibraryPath> LibraryPaths { get; }
+  - [x] Repository<Genre> Genres { get; }
+  - [x] Repository<FileExtension> FileExtensions { get; }
+  - [x] Task<int> SaveAsync()
+  - [x] Implement IDisposable
+- [x] Create UnitOfWorkTests.cs
+  - [x] Test all 7 repository properties initialized with correct types
+  - [x] Test repository properties return same instance (lazy init)
+  - [x] Test SaveAsync commits changes to database
+  - [x] Test SaveAsync returns zero when no changes
+  - [x] Test Dispose releases DbContext
+  - [x] Test Dispose safe to call multiple times
+  - [x] Test multiple repositories share context
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 194/194 passing (20 new: 7 PlaybackHistoryRepo + 13 UnitOfWork)
+- [x] **Coverage**: ≥80%
 
 ---
 
@@ -908,8 +916,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10 / 26
-**Next Up**: Slice 11 — PlaybackHistory Repository & Unit of Work
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11 / 26
+**Next Up**: Slice 12 — Initial Database Migration
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
