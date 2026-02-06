@@ -345,31 +345,37 @@
 
 ---
 
-## Slice 10: Album & Artist Repositories
+## ✅ Slice 10: Album & Artist Repositories (COMPLETE)
 
 **What it delivers**: AlbumRepository and ArtistRepository with specialized queries
 
-- [ ] Create AlbumRepository.cs in Repositories/
-  - [ ] Inherit from Repository<Album>
-  - [ ] Task<IEnumerable<Album>> GetByArtistAsync(int artistId)
-  - [ ] Task<IEnumerable<Album>> GetByYearAsync(int year)
-  - [ ] Task<Album?> GetWithTracksAsync(int albumId)
-- [ ] Create AlbumRepositoryTests.cs
-  - [ ] Test GetByArtistAsync filters by ArtistId
-  - [ ] Test GetByYearAsync filters by Year
-  - [ ] Test GetWithTracksAsync includes Tracks navigation
-- [ ] Create ArtistRepository.cs in Repositories/
-  - [ ] Inherit from Repository<Artist>
-  - [ ] Task<Artist?> GetWithAlbumsAsync(int artistId)
-  - [ ] Task<Artist?> GetWithTracksAsync(int artistId)
-  - [ ] Task<IEnumerable<Artist>> SearchAsync(string searchTerm)
-- [ ] Create ArtistRepositoryTests.cs
-  - [ ] Test GetWithAlbumsAsync includes Albums navigation
-  - [ ] Test GetWithTracksAsync includes Tracks navigation
-  - [ ] Test SearchAsync filters by name containing searchTerm
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Album & Artist repository tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create AlbumRepository.cs in Repositories/
+  - [x] Inherit from Repository<Album>
+  - [x] Task<IEnumerable<Album>> GetByArtistAsync(int artistId)
+  - [x] Task<IEnumerable<Album>> GetByYearAsync(int year)
+  - [x] Task<Album?> GetWithTracksAsync(int albumId)
+- [x] Create AlbumRepositoryTests.cs
+  - [x] Test GetByArtistAsync filters by ArtistId
+  - [x] Test GetByArtistAsync returns empty when no albums
+  - [x] Test GetByYearAsync filters by Year
+  - [x] Test GetByYearAsync returns empty when no match
+  - [x] Test GetWithTracksAsync includes Tracks navigation
+  - [x] Test GetWithTracksAsync returns null when not found
+- [x] Create ArtistRepository.cs in Repositories/
+  - [x] Inherit from Repository<Artist>
+  - [x] Task<Artist?> GetWithAlbumsAsync(int artistId)
+  - [x] Task<Artist?> GetWithTracksAsync(int artistId)
+  - [x] Task<IEnumerable<Artist>> SearchAsync(string searchTerm)
+- [x] Create ArtistRepositoryTests.cs
+  - [x] Test GetWithAlbumsAsync includes Albums navigation
+  - [x] Test GetWithAlbumsAsync returns null when not found
+  - [x] Test GetWithTracksAsync includes Tracks navigation
+  - [x] Test GetWithTracksAsync returns null when not found
+  - [x] Test SearchAsync filters by name containing searchTerm
+  - [x] Test SearchAsync returns empty when no match
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 174/174 passing (12 new Album & Artist repository tests)
+- [x] **Coverage**: ≥80%
 
 ---
 
@@ -902,8 +908,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9 / 26
-**Next Up**: Slice 10 — Album & Artist Repositories
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10 / 26
+**Next Up**: Slice 11 — PlaybackHistory Repository & Unit of Work
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
