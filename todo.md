@@ -284,33 +284,37 @@
 
 ---
 
-## Slice 8: Repository Pattern Base
+## ✅ Slice 8: Repository Pattern Base (COMPLETE)
 
 **What it delivers**: Generic repository pattern foundation for all entities
 
-- [ ] Create IRepository<T>.cs interface in Repositories/
-  - [ ] Task<T?> GetByIdAsync(int id)
-  - [ ] Task<IEnumerable<T>> GetAllAsync()
-  - [ ] Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
-  - [ ] Task AddAsync(T entity)
-  - [ ] Task AddRangeAsync(IEnumerable<T> entities)
-  - [ ] void Update(T entity)
-  - [ ] void Remove(T entity)
-  - [ ] Task<int> CountAsync()
-- [ ] Create Repository<T>.cs base implementation in Repositories/
-  - [ ] Implement all IRepository<T> methods using DbContext
-- [ ] Create RepositoryTests.cs
-  - [ ] Test GetByIdAsync with in-memory database
-  - [ ] Test GetAllAsync returns all entities
-  - [ ] Test FindAsync with predicate filters correctly
-  - [ ] Test AddAsync adds entity
-  - [ ] Test AddRangeAsync adds multiple entities
-  - [ ] Test Update modifies entity
-  - [ ] Test Remove deletes entity
-  - [ ] Test CountAsync returns correct count
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Repository tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create IRepository<T>.cs interface in Repositories/
+  - [x] Task<T?> GetByIdAsync(int id)
+  - [x] Task<IEnumerable<T>> GetAllAsync()
+  - [x] Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+  - [x] Task AddAsync(T entity)
+  - [x] Task AddRangeAsync(IEnumerable<T> entities)
+  - [x] void Update(T entity)
+  - [x] void Remove(T entity)
+  - [x] Task<int> CountAsync()
+- [x] Create Repository<T>.cs base implementation in Repositories/
+  - [x] Implement all IRepository<T> methods using DbContext
+- [x] Create RepositoryTests.cs
+  - [x] Test GetByIdAsync with in-memory database
+  - [x] Test GetByIdAsync returns null when not found
+  - [x] Test GetAllAsync returns all entities
+  - [x] Test GetAllAsync returns empty when no entities
+  - [x] Test FindAsync with predicate filters correctly
+  - [x] Test FindAsync returns empty when no match
+  - [x] Test AddAsync adds entity
+  - [x] Test AddRangeAsync adds multiple entities
+  - [x] Test Update modifies entity
+  - [x] Test Remove deletes entity
+  - [x] Test CountAsync returns correct count
+  - [x] Test CountAsync returns zero when empty
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 153/153 passing (12 new repository tests)
+- [x] **Coverage**: ≥80%
 
 ---
 
@@ -894,8 +898,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7 / 26
-**Next Up**: Slice 8 — Repository pattern base (IRepository<T> + Repository<T>)
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8 / 26
+**Next Up**: Slice 9 — Track Repository with specialized queries
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
