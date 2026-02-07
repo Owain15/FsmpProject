@@ -607,36 +607,49 @@
 
 ---
 
-## Slice 17: Playback Tracking Service 🎉
+## Slice 17: Playback Tracking Service ✅ COMPLETE
 
 **What it delivers**: Playback history tracked in database, play counts increment
 
 **Checkpoint**: Every play creates PlaybackHistory record and updates Track statistics
 
-- [ ] Create PlaybackService.cs in Services/
-  - [ ] Constructor(UnitOfWork unitOfWork)
-  - [ ] Task PlayTrackAsync(Track track)
-  - [ ] void Stop()
-  - [ ] void Pause()
-  - [ ] void Resume()
-  - [ ] Task RecordPlaybackAsync(Track track, TimeSpan playDuration, bool completed, bool skipped)
-  - [ ] Route to Fsmp.PlayWav/PlayWma/PlayMp3 based on FileFormat
-  - [ ] Increment Track.PlayCount on completed playback
-  - [ ] Update Track.LastPlayedAt
-  - [ ] Increment Track.SkipCount if skipped
-- [ ] Create PlaybackServiceTests.cs
-  - [ ] Mock UnitOfWork and repositories
-  - [ ] Test PlayTrackAsync calls Fsmp.PlayWav for .wav format
-  - [ ] Test PlayTrackAsync calls Fsmp.PlayWma for .wma format
-  - [ ] Test PlayTrackAsync calls Fsmp.PlayMp3 for .mp3 format
-  - [ ] Test RecordPlaybackAsync creates PlaybackHistory record
-  - [ ] Test RecordPlaybackAsync increments Track.PlayCount when completed=true
-  - [ ] Test RecordPlaybackAsync updates Track.LastPlayedAt
-  - [ ] Test RecordPlaybackAsync increments Track.SkipCount when skipped=true
-  - [ ] Test RecordPlaybackAsync doesn't increment PlayCount when completed=false
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All PlaybackService tests passing
-- [ ] **Coverage**: ≥80%
+**NOTE**: Adapted from original plan — audio playback routing (Play/Pause/Stop/Resume) is handled by AudioService (Slice 2e). PlaybackTrackingService focuses on the DB-side: recording history and updating statistics.
+
+- [x] Create PlaybackTrackingService.cs in FsmpDataAcsses/Services/
+  - [x] Constructor(UnitOfWork unitOfWork) with null guard
+  - [x] Task RecordPlaybackAsync(Track track, TimeSpan playDuration, bool completed, bool skipped)
+  - [x] Creates PlaybackHistory record in database
+  - [x] Increment Track.PlayCount on completed playback
+  - [x] Update Track.LastPlayedAt
+  - [x] Increment Track.SkipCount if skipped
+  - [x] Update Track.UpdatedAt timestamp
+  - [x] Task GetTrackHistoryAsync(int trackId)
+  - [x] Task GetRecentPlaysAsync(int count) with validation
+- [x] Create PlaybackTrackingServiceTests.cs (18 tests)
+  - [x] Test constructor null guard
+  - [x] Test RecordPlaybackAsync null track throws
+  - [x] Test RecordPlaybackAsync creates PlaybackHistory record
+  - [x] Test RecordPlaybackAsync increments Track.PlayCount when completed=true
+  - [x] Test RecordPlaybackAsync doesn't increment PlayCount when completed=false
+  - [x] Test RecordPlaybackAsync increments Track.SkipCount when skipped=true
+  - [x] Test RecordPlaybackAsync doesn't increment SkipCount when not skipped
+  - [x] Test RecordPlaybackAsync updates Track.LastPlayedAt
+  - [x] Test RecordPlaybackAsync updates Track.UpdatedAt
+  - [x] Test RecordPlaybackAsync accumulates multiple plays
+  - [x] Test completed+skipped increments both counters
+  - [x] Test GetTrackHistoryAsync returns history for track
+  - [x] Test GetTrackHistoryAsync returns empty for no history
+  - [x] Test GetTrackHistoryAsync doesn't return other tracks' history
+  - [x] Test GetRecentPlaysAsync returns most recent
+  - [x] Test GetRecentPlaysAsync returns empty when no history
+  - [x] Test GetRecentPlaysAsync throws on zero/negative count
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 292/292 passing (18 new PlaybackTrackingService tests)
+- [x] **Coverage**: ✅ ≥80% (overall 91.68%, FsmpDataAcsses 98.08%)
+
+**Key files created:**
+- `FsmpDataAcsses/Services/PlaybackTrackingService.cs` — records history, updates track stats
+- `FSMP.Tests/Services/PlaybackTrackingServiceTests.cs` — 18 tests
 
 ---
 
@@ -951,8 +964,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 / 26
-**Next Up**: Slice 17 — Playback Tracking Service
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 / 26
+**Next Up**: Slice 18 — Statistics Service
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
