@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cmd /c:*)",
       "Bash(powershell -Command:*)",
-      "Bash(cmd.exe /c \"\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\"\" \"\"c:\\\\Users\\\\ojdav\\\\source\\\\repos\\\\FsmpProject\\\\FSMP.UI\\\\FSMP.UI.Console\\\\FsmpConsole\\\\FsmpConsole.slnx\"\" -t:Build -p:Configuration=Debug -restore\")"
+      "Bash(cmd.exe /c \"\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\"\" \"\"c:\\\\Users\\\\ojdav\\\\source\\\\repos\\\\FsmpProject\\\\FSMP.UI\\\\FSMP.UI.Console\\\\FsmpConsole\\\\FsmpConsole.slnx\"\" -t:Build -p:Configuration=Debug -restore\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\ojdav\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-ojdav-source-repos-FsmpProject\\\\3adc02d2-ca68-4c5d-b1e3-7fdd4bceed1a\\\\scratchpad\\\\parse-coverage.ps1\")"
     ]
   }
 }

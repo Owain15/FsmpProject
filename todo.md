@@ -653,33 +653,41 @@
 
 ---
 
-## Slice 18: Statistics Service 🎉
+## Slice 18: Statistics Service ✅ COMPLETE
 
 **What it delivers**: Query play counts, favorites, most played, recently played
 
 **Checkpoint**: Can retrieve statistics from database (most played, recently played, etc.)
 
-- [ ] Create StatisticsService.cs in Services/
-  - [ ] Constructor(UnitOfWork unitOfWork)
-  - [ ] Task<IEnumerable<Track>> GetMostPlayedTracksAsync(int count)
-  - [ ] Task<IEnumerable<Track>> GetRecentlyPlayedTracksAsync(int count)
-  - [ ] Task<IEnumerable<Track>> GetFavoritesAsync()
-  - [ ] Task<Dictionary<string, int>> GetGenreStatisticsAsync()
-  - [ ] Task<int> GetTotalPlayCountAsync()
-  - [ ] Task<TimeSpan> GetTotalListeningTimeAsync()
-  - [ ] Task<int> GetTotalTrackCountAsync()
-- [ ] Create StatisticsServiceTests.cs
-  - [ ] Mock UnitOfWork with test data (tracks with various play counts)
-  - [ ] Test GetMostPlayedTracksAsync returns top N by PlayCount DESC
-  - [ ] Test GetRecentlyPlayedTracksAsync returns top N by LastPlayedAt DESC
-  - [ ] Test GetFavoritesAsync returns only IsFavorite=true tracks
-  - [ ] Test GetGenreStatisticsAsync aggregates counts by genre
-  - [ ] Test GetTotalPlayCountAsync sums all Track.PlayCount values
-  - [ ] Test GetTotalListeningTimeAsync sums PlaybackHistory.PlayDuration
-  - [ ] Test GetTotalTrackCountAsync returns correct count
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All StatisticsService tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create StatisticsService.cs in FsmpDataAcsses/Services/
+  - [x] Constructor(UnitOfWork unitOfWork) with null guard
+  - [x] Task<IEnumerable<Track>> GetMostPlayedTracksAsync(int count)
+  - [x] Task<IEnumerable<Track>> GetRecentlyPlayedTracksAsync(int count)
+  - [x] Task<IEnumerable<Track>> GetFavoritesAsync()
+  - [x] Task<Dictionary<string, int>> GetGenreStatisticsAsync()
+  - [x] Task<int> GetTotalPlayCountAsync()
+  - [x] Task<TimeSpan> GetTotalListeningTimeAsync()
+  - [x] Task<int> GetTotalTrackCountAsync()
+- [x] Create StatisticsServiceTests.cs (19 tests)
+  - [x] Test constructor null guard
+  - [x] Test GetMostPlayedTracksAsync returns top N by PlayCount DESC
+  - [x] Test GetMostPlayedTracksAsync empty/zero/negative edge cases
+  - [x] Test GetRecentlyPlayedTracksAsync returns top N by LastPlayedAt DESC
+  - [x] Test GetRecentlyPlayedTracksAsync excludes never-played, empty/zero edge cases
+  - [x] Test GetFavoritesAsync returns only IsFavorite=true tracks
+  - [x] Test GetFavoritesAsync returns empty when no favorites
+  - [x] Test GetGenreStatisticsAsync aggregates counts by genre
+  - [x] Test GetGenreStatisticsAsync returns empty when no genre assignments
+  - [x] Test GetTotalPlayCountAsync returns total history count (and zero)
+  - [x] Test GetTotalListeningTimeAsync sums PlaybackHistory.PlayDuration (and zero)
+  - [x] Test GetTotalTrackCountAsync returns correct count (and zero)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 311/311 passing (19 new StatisticsService tests)
+- [x] **Coverage**: ✅ ≥80% (overall 91.82%, FsmpDataAcsses 98.12%)
+
+**Key files created:**
+- `FsmpDataAcsses/Services/StatisticsService.cs` — library & playback statistics queries
+- `FSMP.Tests/Services/StatisticsServiceTests.cs` — 19 tests
 
 ---
 
