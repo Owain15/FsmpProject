@@ -924,34 +924,42 @@
 
 ---
 
-## Slice 24: Program.cs Integration 🎉🎉🎉
+## Slice 24: Program.cs Integration ✅ COMPLETE
 
 **What it delivers**: COMPLETE END-TO-END APPLICATION with all features working!
 
 **Checkpoint**: USER-VISIBLE MAJOR MILESTONE - Full music player experience!
 
-- [ ] Refactor Program.cs in FsmpConsole/
-  - [ ] Remove undefined `testFileRoot` variable
-  - [ ] Initialize ConfigurationService
-  - [ ] Load or create configuration
-  - [ ] Initialize DbContext with connection string from config
-  - [ ] Run EF migrations: `context.Database.Migrate()`
-  - [ ] Initialize UnitOfWork with DbContext
-  - [ ] Initialize all services (MetadataService, LibraryScanService, PlaybackService, StatisticsService)
-  - [ ] Auto-scan libraries if AutoScanOnStartup=true
-  - [ ] Initialize and launch MenuSystem.RunAsync()
-  - [ ] Proper error handling and logging
-- [ ] Create ProgramIntegrationTests.cs
-  - [ ] Test application startup sequence
-  - [ ] Test config file created at %AppData%/FSMP/config.json
-  - [ ] Test database created at %AppData%/FSMP/fsmp.db
-  - [ ] Test migrations applied successfully
-  - [ ] Test auto-scan executes if enabled
-  - [ ] Test services initialized correctly
-  - [ ] Test menu system launches
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Program integration tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create AppStartup.cs in FsmpConsole/ (extracted from Program.cs for testability)
+  - [x] Constructor(TextReader, TextWriter, configPathOverride?, dbPathOverride?)
+  - [x] GetConfigPath() — resolves %AppData%\FSMP\config.json or override
+  - [x] GetDatabasePath(Configuration?) — resolves DB path from config or override
+  - [x] Task RunAsync() — full startup sequence:
+    - [x] Load or create configuration via ConfigurationService
+    - [x] Initialize SQLite DbContext with Pooling=False for clean disposal
+    - [x] Run EF migrations via MigrateAsync()
+    - [x] Wire up all services (UnitOfWork, MetadataService, LibraryScanService, StatisticsService, AudioService)
+    - [x] Auto-scan libraries if AutoScanOnStartup=true and paths configured
+    - [x] Launch MenuSystem.RunAsync()
+- [x] Refactor Program.cs to 4-line delegate to AppStartup
+- [x] Fix PlaybackHistoryRepository.GetTotalListeningTimeAsync() — use client evaluation for SQLite compatibility
+- [x] Create AppStartupTests.cs (17 tests)
+  - [x] 2 constructor null guard tests
+  - [x] 2 GetConfigPath tests (override vs default)
+  - [x] 3 GetDatabasePath tests (override vs config vs default)
+  - [x] Test RunAsync creates config file
+  - [x] Test RunAsync creates database file
+  - [x] Test RunAsync applies migrations
+  - [x] Test RunAsync shows welcome message
+  - [x] Test RunAsync displays menu and accepts exit
+  - [x] Test RunAsync skips auto-scan when no paths configured
+  - [x] Test RunAsync idempotent (run twice on same DB)
+  - [x] Test RunAsync View Statistics shows empty stats
+  - [x] Test RunAsync Scan Libraries no paths shows message
+  - [x] Test RunAsync Browse & Play empty library shows no artists
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 483/483 passing (17 new AppStartup tests)
+- [x] **Coverage**: ✅ ≥80% (overall 92.26%, FsmpConsole 93.54%, FsmpDataAcsses 98.12%)
 - [ ] **Manual End-to-End Test**:
   - [ ] Run application fresh (delete %AppData%/FSMP/)
   - [ ] Verify config.json created with default paths
@@ -966,6 +974,14 @@
   - [ ] View statistics, verify play counts
   - [ ] Restart application, verify data persists
   - [ ] Verify custom metadata displays correctly
+
+**Key files created:**
+- `FsmpConsole/AppStartup.cs` — testable application startup with config, DB, DI, auto-scan, menu
+- `FSMP.Tests/UI/AppStartupTests.cs` — 17 integration tests with real SQLite
+
+**Key files modified:**
+- `FsmpConsole/Program.cs` — simplified to 4-line delegate to AppStartup
+- `PlaybackHistoryRepository.cs` — fixed GetTotalListeningTimeAsync for SQLite compatibility
 
 ---
 
@@ -1049,8 +1065,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 / 26
-**Next Up**: Slice 24 — Program.cs Integration
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 / 26
+**Next Up**: Slice 25 — End-to-End Testing
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 

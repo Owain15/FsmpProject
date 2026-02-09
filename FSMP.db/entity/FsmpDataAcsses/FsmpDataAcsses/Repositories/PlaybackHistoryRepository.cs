@@ -35,10 +35,12 @@ public class PlaybackHistoryRepository : Repository<PlaybackHistory>
 
     public async Task<TimeSpan> GetTotalListeningTimeAsync()
     {
-        var totalTicks = await DbSet
+        var durations = await DbSet
             .Where(ph => ph.PlayDuration != null)
-            .SumAsync(ph => ph.PlayDuration!.Value.Ticks);
+            .Select(ph => ph.PlayDuration!.Value)
+            .ToListAsync();
 
+        var totalTicks = durations.Sum(d => d.Ticks);
         return TimeSpan.FromTicks(totalTicks);
     }
 }
