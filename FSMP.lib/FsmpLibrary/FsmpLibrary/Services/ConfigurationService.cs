@@ -43,9 +43,19 @@ public class ConfigurationService
             return defaultConfig;
         }
 
-        var json = await File.ReadAllTextAsync(_configPath);
-        return JsonSerializer.Deserialize<Configuration>(json, JsonOptions)
-               ?? GetDefaultConfiguration();
+        try
+        {
+            var json = await File.ReadAllTextAsync(_configPath);
+            return JsonSerializer.Deserialize<Configuration>(json, JsonOptions)
+                   ?? GetDefaultConfiguration();
+        }
+        catch (JsonException)
+        {
+            // Corrupt config file — overwrite with defaults
+            var defaultConfig = GetDefaultConfiguration();
+            await SaveConfigurationAsync(defaultConfig);
+            return defaultConfig;
+        }
     }
 
     public async Task SaveConfigurationAsync(Configuration config)

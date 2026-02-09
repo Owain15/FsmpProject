@@ -34,11 +34,18 @@ public class LibraryScanService
 
         foreach (var path in libraryPaths)
         {
-            var result = await ScanLibraryAsync(path);
-            aggregate.TracksAdded += result.TracksAdded;
-            aggregate.TracksUpdated += result.TracksUpdated;
-            aggregate.TracksRemoved += result.TracksRemoved;
-            aggregate.Errors.AddRange(result.Errors);
+            try
+            {
+                var result = await ScanLibraryAsync(path);
+                aggregate.TracksAdded += result.TracksAdded;
+                aggregate.TracksUpdated += result.TracksUpdated;
+                aggregate.TracksRemoved += result.TracksRemoved;
+                aggregate.Errors.AddRange(result.Errors);
+            }
+            catch (Exception ex)
+            {
+                aggregate.Errors.Add($"{path}: {ex.Message}");
+            }
         }
 
         sw.Stop();
