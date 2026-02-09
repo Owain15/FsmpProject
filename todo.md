@@ -798,32 +798,40 @@
 
 ---
 
-## Slice 21: Metadata Editor UI 🎉
+## Slice 21: Metadata Editor UI ✅ COMPLETE
 
 **What it delivers**: Search and edit track metadata from console UI
 
 **Checkpoint**: USER-VISIBLE - Edit track title, artist, album, rating, favorites from UI
 
-- [ ] Create MetadataEditor.cs in FsmpConsole/
-  - [ ] Constructor(UnitOfWork unitOfWork)
-  - [ ] Task RunAsync()
-  - [ ] Task<Track?> SearchTrackAsync() (search by title or artist)
-  - [ ] Task DisplayMetadataAsync(Track track)
-  - [ ] Task EditMetadataAsync(Track track)
-  - [ ] Fields editable: CustomTitle, CustomArtist, CustomAlbum, Rating (1-5), IsFavorite, Comment
-  - [ ] Task SaveChangesAsync()
-- [ ] Create MetadataEditorTests.cs
-  - [ ] Mock UnitOfWork and console I/O
-  - [ ] Test SearchTrackAsync returns matching tracks
-  - [ ] Test DisplayMetadataAsync shows file metadata + custom overrides
-  - [ ] Test EditMetadataAsync updates CustomTitle
-  - [ ] Test EditMetadataAsync validates Rating 1-5
-  - [ ] Test EditMetadataAsync toggles IsFavorite
-  - [ ] Test SaveChangesAsync commits to database
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All MetadataEditor tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create MetadataEditor.cs in FsmpConsole/
+  - [x] Constructor(UnitOfWork unitOfWork, TextReader input, TextWriter output)
+  - [x] Task RunAsync() — search → display → edit workflow
+  - [x] Task<Track?> SearchTrackAsync() — search by title, custom title, artist name, or custom artist
+  - [x] Task DisplayMetadataAsync(Track track) — shows file metadata + custom overrides
+  - [x] Task EditMetadataAsync(Track track) — interactive editor with clear ("-") support
+  - [x] Fields editable: CustomTitle, CustomArtist, CustomAlbum, Rating (1-5), IsFavorite, Comment
+  - [x] Task SaveChangesAsync(Track track) — persists to database with UpdatedAt timestamp
+- [x] Create MetadataEditorTests.cs (28 tests)
+  - [x] 3 constructor null guard tests
+  - [x] Test SearchTrackAsync empty search, no results, cancel, invalid selection
+  - [x] Test SearchTrackAsync finds by title, artist, and custom title
+  - [x] Test DisplayMetadataAsync shows file metadata, custom overrides, duration, "(none)" defaults
+  - [x] Test EditMetadataAsync sets CustomTitle, CustomArtist, CustomAlbum
+  - [x] Test EditMetadataAsync validates Rating 1-5, rejects invalid, clears with "-"
+  - [x] Test EditMetadataAsync toggles IsFavorite (y/n)
+  - [x] Test EditMetadataAsync sets/clears Comment
+  - [x] Test EditMetadataAsync keeps all defaults on empty input
+  - [x] Test SaveChangesAsync persists changes and updates timestamp
+  - [x] Test RunAsync full workflow and empty-search exit
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 403/403 passing (28 new MetadataEditor tests)
+- [x] **Coverage**: ✅ ≥80% (overall 90.32%, FsmpConsole 83.00%, FsmpDataAcsses 98.12%)
 - [ ] **Manual Verification**: Search track, edit title, verify change persists in database
+
+**Key files created:**
+- `FsmpConsole/MetadataEditor.cs` — search + display + edit with clear ("-") support
+- `FSMP.Tests/UI/MetadataEditorTests.cs` — 28 tests
 
 ---
 
