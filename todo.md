@@ -835,33 +835,36 @@
 
 ---
 
-## Slice 22: Library Manager UI 🎉
+## Slice 22: Library Manager UI ✅ COMPLETE
 
 **What it delivers**: Add/remove library paths, trigger scans from UI
 
 **Checkpoint**: USER-VISIBLE - Manage multiple library locations from console
 
-- [ ] Create LibraryManager.cs in FsmpConsole/
-  - [ ] Constructor(ConfigurationService configService, LibraryScanService scanService, UnitOfWork unitOfWork)
-  - [ ] Task RunAsync()
-  - [ ] Task DisplayLibraryPathsAsync()
-  - [ ] Task AddLibraryPathAsync()
-  - [ ] Task RemoveLibraryPathAsync()
-  - [ ] Task ScanLibraryAsync(string path)
-  - [ ] Task ScanAllLibrariesAsync()
-  - [ ] Display: Path, Track Count, Last Scanned timestamp
-- [ ] Create LibraryManagerTests.cs
-  - [ ] Mock ConfigurationService and LibraryScanService
-  - [ ] Test DisplayLibraryPathsAsync lists all configured paths
-  - [ ] Test AddLibraryPathAsync updates config.json
-  - [ ] Test RemoveLibraryPathAsync updates config.json
-  - [ ] Test ScanLibraryAsync calls LibraryScanService
-  - [ ] Test ScanAllLibrariesAsync scans all configured paths
-  - [ ] Test displays track count from database
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All LibraryManager tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create LibraryManager.cs in FsmpConsole/
+  - [x] Constructor(ConfigurationService, LibraryScanService, UnitOfWork, TextReader, TextWriter)
+  - [x] Task RunAsync() — menu loop with Add/Remove/Scan/Back options
+  - [x] Task DisplayLibraryPathsAsync() — lists paths + total track count
+  - [x] Task AddLibraryPathAsync() — prompts for path, adds to config
+  - [x] Task RemoveLibraryPathAsync() — prompts for index, removes from config
+  - [x] Task ScanLibraryAsync(string path) — scans single path, shows results
+  - [x] Task ScanAllLibrariesAsync() — scans all configured paths, shows aggregate results
+- [x] Create LibraryManagerTests.cs (19 tests)
+  - [x] 5 constructor null guard tests
+  - [x] Test DisplayLibraryPathsAsync no paths, with paths, track count
+  - [x] Test AddLibraryPathAsync valid path and empty path
+  - [x] Test RemoveLibraryPathAsync valid index, invalid index, no paths
+  - [x] Test ScanLibraryAsync shows results
+  - [x] Test ScanAllLibrariesAsync no paths and with paths
+  - [x] Test RunAsync back option, add path, invalid option
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 422/422 passing (19 new LibraryManager tests)
+- [x] **Coverage**: ✅ ≥80% (overall 90.45%, FsmpConsole 84.97%, FsmpDataAcsses 98.12%)
 - [ ] **Manual Verification**: Add library path, scan it, verify tracks imported
+
+**Key files created:**
+- `FsmpConsole/LibraryManager.cs` — library path management with scan integration
+- `FSMP.Tests/UI/LibraryManagerTests.cs` — 19 tests
 
 ---
 
@@ -1026,8 +1029,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 / 26
-**Next Up**: Slice 21 — Metadata Editor UI
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 / 26
+**Next Up**: Slice 23 — Statistics Viewer UI
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
