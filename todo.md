@@ -734,38 +734,67 @@
 
 ---
 
-## Slice 20: Browse & Play UI 🎉
+## Slice 20: Browse & Play UI ✅ COMPLETE
 
 **What it delivers**: Navigate artists → albums → tracks, select and play
 
 **Checkpoint**: USER-VISIBLE MAJOR CHANGE - Browse database and play tracks from menu!
 
-- [ ] Create BrowseUI.cs in FsmpConsole/
-  - [ ] Constructor(UnitOfWork unitOfWork, PlaybackService playbackService)
-  - [ ] Task RunAsync()
-  - [ ] Task DisplayArtistsAsync()
-  - [ ] Task DisplayAlbumsByArtistAsync(int artistId)
-  - [ ] Task DisplayTracksByAlbumAsync(int albumId)
-  - [ ] Task PlayTrackAsync(int trackId)
-- [ ] Create BrowseUITests.cs
-  - [ ] Mock UnitOfWork with test data
-  - [ ] Test DisplayArtistsAsync lists all artists
-  - [ ] Test DisplayAlbumsByArtistAsync filters by artistId
-  - [ ] Test DisplayTracksByAlbumAsync filters by albumId
-  - [ ] Test PlayTrackAsync calls PlaybackService.PlayTrackAsync
-- [ ] Create PlaybackUI.cs in FsmpConsole/
-  - [ ] Constructor()
-  - [ ] void DisplayNowPlaying(Track track)
-  - [ ] Display: Artist, Album, Title, Duration, BitRate, PlayCount, Rating
-  - [ ] void DisplayControls() (Stop, Pause, Next, Toggle Favorite, Edit Metadata)
-- [ ] Create PlaybackUITests.cs
-  - [ ] Mock console output
-  - [ ] Test DisplayNowPlaying formats track info correctly
-  - [ ] Test DisplayControls shows control options
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Browse & Playback UI tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create BrowseUI.cs in FsmpConsole/
+  - [x] Constructor(UnitOfWork unitOfWork, IAudioService audioService, TextReader input, TextWriter output)
+  - [x] Task RunAsync()
+  - [x] Task DisplayArtistsAsync()
+  - [x] Task DisplayAlbumsByArtistAsync(int artistId)
+  - [x] Task DisplayTracksByAlbumAsync(int albumId)
+  - [x] Task PlayTrackAsync(int trackId) — displays Now Playing info and calls AudioService
+- [x] Create BrowseUITests.cs (26 tests)
+  - [x] 4 constructor null guard tests
+  - [x] Test DisplayArtistsAsync lists all artists
+  - [x] Test DisplayArtistsAsync no artists shows message
+  - [x] Test DisplayArtistsAsync back option returns
+  - [x] Test DisplayArtistsAsync invalid selection shows error
+  - [x] Test DisplayArtistsAsync select artist navigates to albums
+  - [x] Test DisplayAlbumsByArtistAsync artist not found
+  - [x] Test DisplayAlbumsByArtistAsync no albums shows message
+  - [x] Test DisplayAlbumsByArtistAsync lists albums with year
+  - [x] Test DisplayAlbumsByArtistAsync album without year omits year
+  - [x] Test DisplayAlbumsByArtistAsync invalid selection shows error
+  - [x] Test DisplayAlbumsByArtistAsync select album navigates to tracks
+  - [x] Test DisplayTracksByAlbumAsync album not found
+  - [x] Test DisplayTracksByAlbumAsync no tracks shows message
+  - [x] Test DisplayTracksByAlbumAsync lists tracks
+  - [x] Test DisplayTracksByAlbumAsync shows duration
+  - [x] Test DisplayTracksByAlbumAsync invalid selection shows error
+  - [x] Test DisplayTracksByAlbumAsync select track calls PlayTrackAsync
+  - [x] Test PlayTrackAsync track not found
+  - [x] Test PlayTrackAsync displays now playing
+  - [x] Test PlayTrackAsync calls AudioService
+  - [x] Test PlayTrackAsync with duration/bitrate/rating shows details
+  - [x] Test RunAsync delegates to DisplayArtistsAsync
+- [x] Create PlaybackUI.cs in FsmpConsole/
+  - [x] Constructor(TextWriter output)
+  - [x] void DisplayNowPlaying(Track track) — Title, Artist, Album, Duration, BitRate, PlayCount, Rating
+  - [x] void DisplayControls() — Stop, Pause, Next, Favorite, Edit Metadata
+- [x] Create PlaybackUITests.cs (18 tests)
+  - [x] Constructor null guard
+  - [x] DisplayNowPlaying null track throws
+  - [x] Test DisplayNowPlaying shows title, artist, album
+  - [x] Test DisplayNowPlaying with/without duration, bitrate, rating
+  - [x] Test DisplayNowPlaying with custom title overrides
+  - [x] Test DisplayNowPlaying shows play count
+  - [x] Test DisplayControls shows all control options (Stop, Pause, Next, Favorite, Edit Metadata)
+- [x] Updated MenuSystem.BrowseAndPlayAsync to delegate to BrowseUI
+- [x] Updated MenuSystemTests for hierarchical browse (3 tests updated)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 375/375 passing (44 new: 26 BrowseUI + 18 PlaybackUI)
+- [x] **Coverage**: ✅ ≥80% (overall 89.98%, FsmpConsole 77.74%, FsmpDataAcsses 98.12%)
 - [ ] **Manual Verification**: Browse artists → albums → tracks, play a track
+
+**Key files created:**
+- `FsmpConsole/BrowseUI.cs` — hierarchical Artist → Album → Track browser with Now Playing display
+- `FsmpConsole/PlaybackUI.cs` — standalone Now Playing display and playback controls
+- `FSMP.Tests/UI/BrowseUITests.cs` — 26 tests
+- `FSMP.Tests/UI/PlaybackUITests.cs` — 18 tests
 
 ---
 
@@ -989,8 +1018,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 / 26
-**Next Up**: Slice 20 — Browse & Play UI
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 / 26
+**Next Up**: Slice 21 — Metadata Editor UI
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 

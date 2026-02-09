@@ -105,6 +105,42 @@ public class MenuSystemTests : IDisposable
         return track;
     }
 
+    private async Task<Track> CreateTrackWithAlbumAsync(string title, string artist, string albumTitle)
+    {
+        var artistEntity = new Artist
+        {
+            Name = artist,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await _unitOfWork.Artists.AddAsync(artistEntity);
+        await _unitOfWork.SaveAsync();
+
+        var album = new Album
+        {
+            Title = albumTitle,
+            ArtistId = artistEntity.ArtistId,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await _unitOfWork.Albums.AddAsync(album);
+        await _unitOfWork.SaveAsync();
+
+        var track = new Track
+        {
+            Title = title,
+            FilePath = $@"C:\Music\{title}.mp3",
+            FileHash = Guid.NewGuid().ToString(),
+            ArtistId = artistEntity.ArtistId,
+            AlbumId = album.AlbumId,
+            ImportedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await _unitOfWork.Tracks.AddAsync(track);
+        await _unitOfWork.SaveAsync();
+        return track;
+    }
+
     // ========== Constructor Tests ==========
 
     [Fact]
@@ -246,34 +282,36 @@ public class MenuSystemTests : IDisposable
 
         await menu.RunAsync();
 
-        output.ToString().Should().Contain("No tracks in library");
+        output.ToString().Should().Contain("No artists in library");
     }
 
     [Fact]
-    public async Task RunAsync_BrowseAndPlay_ShouldListTracks()
+    public async Task RunAsync_BrowseAndPlay_ShouldListArtists()
     {
         await CreateTrackAsync("Kerala");
 
+        // Browse → see artists → back → exit
         var (menu, output) = CreateMenuWithOutput("1\n0\n6\n");
 
         await menu.RunAsync();
 
-        output.ToString().Should().Contain("Kerala");
+        output.ToString().Should().Contain("Test Artist");
     }
 
     [Fact]
     public async Task RunAsync_BrowseAndPlay_SelectTrack_ShouldCallPlayTrackAsync()
     {
-        var track = await CreateTrackAsync("Kerala");
+        var track = await CreateTrackWithAlbumAsync("Kerala", "Test Artist", "Migration");
 
-        var (menu, output) = CreateMenuWithOutput("1\n1\n6\n");
+        // Browse → select artist → select album → select track → exit
+        var (menu, output) = CreateMenuWithOutput("1\n1\n1\n1\n6\n");
 
         await menu.RunAsync();
 
         _audioMock.Verify(a => a.PlayTrackAsync(
             It.Is<Track>(t => t.TrackId == track.TrackId),
             It.IsAny<CancellationToken>()), Times.Once);
-        output.ToString().Should().Contain("Playing:");
+        output.ToString().Should().Contain("Now Playing");
     }
 
     [Fact]

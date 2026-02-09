@@ -96,38 +96,8 @@ public class MenuSystem
 
     private async Task BrowseAndPlayAsync()
     {
-        var tracks = (await _unitOfWork.Tracks.GetAllAsync()).ToList();
-
-        if (tracks.Count == 0)
-        {
-            _output.WriteLine("No tracks in library. Scan a library first.");
-            return;
-        }
-
-        _output.WriteLine();
-        _output.WriteLine("== Library Tracks ==");
-        for (int i = 0; i < tracks.Count; i++)
-        {
-            var t = tracks[i];
-            _output.WriteLine($"  {i + 1}) {t.DisplayTitle} - {t.DisplayArtist}");
-        }
-        _output.WriteLine("  0) Back");
-        _output.Write("Select track: ");
-
-        var input = _input.ReadLine()?.Trim();
-        if (input == "0" || string.IsNullOrEmpty(input))
-            return;
-
-        if (int.TryParse(input, out var index) && index >= 1 && index <= tracks.Count)
-        {
-            var track = tracks[index - 1];
-            _output.WriteLine($"Playing: {track.DisplayTitle} - {track.DisplayArtist}");
-            await _audioService.PlayTrackAsync(track);
-        }
-        else
-        {
-            _output.WriteLine("Invalid selection.");
-        }
+        var browseUI = new BrowseUI(_unitOfWork, _audioService, _input, _output);
+        await browseUI.RunAsync();
     }
 
     private async Task ScanLibrariesAsync()
