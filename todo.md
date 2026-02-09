@@ -868,39 +868,59 @@
 
 ---
 
-## Slice 23: Statistics Viewer UI 🎉
+## Slice 23: Statistics Viewer UI ✅ COMPLETE
 
 **What it delivers**: View play statistics from console UI
 
 **Checkpoint**: USER-VISIBLE - See most played, recently played, favorites, total stats
 
-- [ ] Create StatisticsViewer.cs in FsmpConsole/
-  - [ ] Constructor(StatisticsService statsService)
-  - [ ] Task RunAsync()
-  - [ ] Task DisplayMostPlayedAsync()
-  - [ ] Task DisplayRecentlyPlayedAsync()
-  - [ ] Task DisplayFavoritesAsync()
-  - [ ] Task DisplayTotalStatisticsAsync()
-  - [ ] Format: Artist - Album - Title | Play Count | Last Played
-- [ ] Enhance Print.cs in FsmpConsole/
-  - [ ] Add FormatTable(List<object> data, List<string> headers) method
-  - [ ] Add FormatProgressBar(int current, int total, int width) method
-  - [ ] Add FormatMetadataCard(Track track) method
-- [ ] Create StatisticsViewerTests.cs
-  - [ ] Mock StatisticsService
-  - [ ] Test DisplayMostPlayedAsync formats correctly
-  - [ ] Test DisplayRecentlyPlayedAsync formats correctly
-  - [ ] Test DisplayFavoritesAsync filters correctly
-  - [ ] Test DisplayTotalStatisticsAsync shows counts
-  - [ ] Test empty library displays friendly message
-- [ ] Create PrintTests.cs
-  - [ ] Test FormatTable creates aligned columns
-  - [ ] Test FormatProgressBar renders correctly
-  - [ ] Test FormatMetadataCard displays track info
-- [ ] **Build**: ✅ Pass
-- [ ] **Tests**: All Statistics Viewer & Print tests passing
-- [ ] **Coverage**: ≥80%
+- [x] Create StatisticsViewer.cs in FsmpConsole/
+  - [x] Constructor(StatisticsService statsService, TextReader input, TextWriter output)
+  - [x] Task RunAsync() — menu loop with Overview/MostPlayed/RecentlyPlayed/Favorites/Genre/Back
+  - [x] Task DisplayMostPlayedAsync() — top 10 by play count
+  - [x] Task DisplayRecentlyPlayedAsync() — top 10 by last played date
+  - [x] Task DisplayFavoritesAsync() — all favorites with ratings
+  - [x] Task DisplayTotalStatisticsAsync() — track count, play count, listening time
+  - [x] Task DisplayGenreBreakdownAsync() — genre track counts
+  - [x] Format: Artist - Title | Play Count / Last Played / Rating
+- [x] Enhance Print.cs in FsmpConsole/
+  - [x] Made Print class public (was internal) for testability
+  - [x] Add FormatTable(List<string[]> rows, List<string> headers) method
+  - [x] Add FormatProgressBar(int current, int total, int width) method
+  - [x] Add FormatMetadataCard(Track track) method
+- [x] Create StatisticsViewerTests.cs (25 tests)
+  - [x] 3 constructor null guard tests
+  - [x] Test DisplayTotalStatisticsAsync empty library shows zeros
+  - [x] Test DisplayTotalStatisticsAsync with data shows counts
+  - [x] Test DisplayTotalStatisticsAsync large listening time shows hours
+  - [x] Test DisplayMostPlayedAsync empty shows message
+  - [x] Test DisplayMostPlayedAsync formats correctly with play counts
+  - [x] Test DisplayMostPlayedAsync orders by play count descending
+  - [x] Test DisplayRecentlyPlayedAsync empty shows message
+  - [x] Test DisplayRecentlyPlayedAsync shows last played date
+  - [x] Test DisplayRecentlyPlayedAsync orders by most recent
+  - [x] Test DisplayFavoritesAsync no favorites shows message
+  - [x] Test DisplayFavoritesAsync lists favorites with ratings
+  - [x] Test DisplayFavoritesAsync without rating omits rating
+  - [x] Test DisplayGenreBreakdownAsync no data shows message
+  - [x] Test DisplayGenreBreakdownAsync shows genre counts
+  - [x] Test RunAsync back/empty/overview/most-played/recent/favorites/genre/invalid (8 tests)
+- [x] Create PrintTests.cs (19 tests)
+  - [x] Test FormatTable aligned columns, padding, empty rows, empty headers, null guards (6 tests)
+  - [x] Test FormatProgressBar half/full/empty/zero-total/over-max (5 tests)
+  - [x] Test FormatMetadataCard basic/duration/bitrate/rating/favorite/not-favorite/custom/null (8 tests)
+- [x] **Build**: ✅ Pass
+- [x] **Tests**: ✅ 466/466 passing (25 StatisticsViewer + 19 Print = 44 new)
+- [x] **Coverage**: ✅ ≥80% (overall 91.04%, FsmpConsole 88.69%, FsmpDataAcsses 98.12%)
 - [ ] **Manual Verification**: View statistics, verify display matches database
+
+**Key files created:**
+- `FsmpConsole/StatisticsViewer.cs` — statistics menu with overview, most played, recent, favorites, genre breakdown
+- `FSMP.Tests/UI/StatisticsViewerTests.cs` — 25 tests
+- `FSMP.Tests/UI/PrintTests.cs` — 19 tests
+
+**Key files modified:**
+- `FsmpConsole/Print.cs` — added FormatTable, FormatProgressBar, FormatMetadataCard; made public
 
 ---
 
@@ -1029,8 +1049,8 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 / 26
-**Next Up**: Slice 23 — Statistics Viewer UI
+**Completed Slices**: 1, 2, 2a, 2b, 2c, 2d, 2e, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 / 26
+**Next Up**: Slice 24 — Program.cs Integration
 
 **Standalone reference**: `data-access-checklist.md` — ordered startup guide for getting FsmpDataAcsses from stub to working DbContext (covers prerequisites through migration).
 
