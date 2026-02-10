@@ -7,16 +7,20 @@ FSMP is a Windows console application for playing and managing audio files
 Features
 --------
 - Browse & Play    : Navigate artists, albums and tracks; play audio files.
+
 - Library Scanning : Point FSMP at one or more music folders and it imports
                      every supported file into a local SQLite database,
                      reading metadata (title, artist, album, duration, etc.)
                      via TagLibSharp.
+
 - Metadata Editing : Search for a track and override its title, artist,
                      album, rating (1-5), favourite flag or comment.
                      Overrides are stored in the database; original files
                      are never modified.
+
 - Statistics       : View total track count, play counts, most played,
                      recently played, favourites and genre breakdown.
+                     
 - Configuration    : Settings are stored in a JSON file at
                      %AppData%\FSMP\config.json (library paths, default
                      volume, auto-scan on startup, etc.).
