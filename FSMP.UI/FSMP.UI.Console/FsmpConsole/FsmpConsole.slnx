@@ -1,6 +1,5 @@
 <Solution>
   <Configurations>
-    <Platform Name="Any CPU" />
     <Platform Name="ARM64" />
   </Configurations>
   <Project Path="../../../FSMP.db/entity/FsmpDataAcsses/FsmpDataAcsses/FsmpDataAcsses.csproj">

@@ -7,7 +7,7 @@ call build.cmd
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
 echo Running tests...
-dotnet test FSMP.Tests\FSMP.Tests.csproj --no-build --verbosity normal
+dotnet test FSMP.Tests\FSMP.Tests.csproj --no-build --verbosity normal -- RunConfiguration.TargetPlatform=ARM64
 
 if %ERRORLEVEL% NEQ 0 (
     echo Tests failed!

@@ -6,7 +6,7 @@ call build.cmd
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
 echo Running tests with coverage...
-dotnet test FSMP.Tests\FSMP.Tests.csproj --no-build --collect:"XPlat Code Coverage" --results-directory:.\coverage
+dotnet test FSMP.Tests\FSMP.Tests.csproj --no-build --collect:"XPlat Code Coverage" --results-directory:.\coverage -- RunConfiguration.TargetPlatform=ARM64
 
 if %ERRORLEVEL% NEQ 0 (
     echo Tests failed!

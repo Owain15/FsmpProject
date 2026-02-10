@@ -1,0 +1,83 @@
+# FSMP.Tests - Test Suite
+
+Comprehensive test project covering all FSMP solution projects using xUnit, Moq, FluentAssertions, and Coverlet.
+
+## Completed Work Summary
+
+### Test Infrastructure
+
+- xUnit 2.9.3, Moq 4.20.72, FluentAssertions 8.8.0, Coverlet
+- Microsoft.EntityFrameworkCore.InMemory 9.0.0 for database testing
+- `coverlet.runsettings` with 80% coverage threshold
+- Helper scripts: `build.cmd`, `test.cmd`, `test-with-coverage.cmd`
+
+### Test Helpers (`TestHelpers/`)
+
+- `MockAudioPlayer.cs` -- IAudioPlayer mock implementation for unit testing
+- `MockAudioPlayerFactory.cs` -- IAudioPlayerFactory mock implementation
+
+### Test Files by Directory
+
+**Models/** (6 files, ~85 tests):
+- `TrackTests.cs`, `AlbumTests.cs`, `ArtistTests.cs`
+- `PlaybackHistoryTests.cs`, `LibraryPathTests.cs`, `ConfigurationTests.cs`
+
+**Services/** (6 files, ~114 tests):
+- `AudioServiceTests.cs`, `ConfigurationServiceTests.cs`, `MetadataServiceTests.cs`
+- `LibraryScanServiceTests.cs`, `PlaybackTrackingServiceTests.cs`, `StatisticsServiceTests.cs`
+
+**Repositories/** (6 files, ~56 tests):
+- `RepositoryTests.cs`, `TrackRepositoryTests.cs`, `AlbumRepositoryTests.cs`
+- `ArtistRepositoryTests.cs`, `PlaybackHistoryRepositoryTests.cs`, `UnitOfWorkTests.cs`
+
+**Database/** (3 files, ~41 tests):
+- `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs`, `MigrationTests.cs`
+
+**UI/** (8 files, ~175 tests):
+- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlaybackUITests.cs`
+- `MetadataEditorTests.cs`, `LibraryManagerTests.cs`, `StatisticsViewerTests.cs`
+- `PrintTests.cs`, `AppStartupTests.cs`
+
+**Integration/** (1 file, 12 tests):
+- `EndToEndTests.cs` -- Full-stack E2E workflows with real SQLite
+
+**ErrorHandling/** (1 file, 18 tests):
+- `ErrorHandlingTests.cs` -- Corrupt files, missing paths, recovery scenarios
+
+## Current Status
+
+**Status**: Complete (v1) | **Tests**: 513 passing | **Overall Coverage**: 92.49%
+
+| Project | Coverage |
+|---------|----------|
+| FsmpConsole | 94.20% |
+| FsmpDataAcsses | 98.18% |
+| FsmpLibrary | 65.74% |
+
+---
+
+## Future Work
+
+### FSMO Tests (when FSMO implementation begins)
+
+- [ ] Create `FSMP.Tests/FSMO/` directory
+- [ ] Tests will be tracked in the [FSMO todo](../FSMP.lib/FSMO/todo.md) alongside their implementation slices
+
+### Coverage Improvement
+
+- [ ] Improve FsmpLibrary coverage from 65.74% toward 80%+
+- [ ] Add LibVlcAudioPlayer integration tests (requires LibVLC runtime)
+
+### Cross-Platform Migration Tests (when migration begins)
+
+- [ ] Create `FSMP.Tests/Core/` directory for FSMP.Core tests
+- [ ] Create `FSMP.Tests/Platform.Windows/` for Windows-specific tests
+- [ ] Create `FSMP.Tests/Platform.Android/` for Android-specific tests
+- [ ] Expand EndToEndTests.cs for cross-platform scenarios
+
+---
+
+## Progress Summary
+
+**Status**: Complete (v1)
+**Next Action**: FSMO test directory setup (when FSMO Slice 1 begins)

@@ -6,7 +6,7 @@ set MSBUILD="C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curre
 set SOLUTION="FSMP.UI\FSMP.UI.Console\FsmpConsole\FsmpConsole.slnx"
 
 echo Building FSMP solution...
-%MSBUILD% %SOLUTION% -t:Build -p:Configuration=Debug -v:minimal
+%MSBUILD% %SOLUTION% -t:Build -p:Configuration=Debug -p:Platform=ARM64 -v:minimal
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build failed!

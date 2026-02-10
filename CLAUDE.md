@@ -8,19 +8,43 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 When implementing features:
 1. **Work in small batches** - Complete one small task at a time (e.g., one model, one test file)
-2. **Update todo.md frequently** - Check off items immediately after completion
+2. **Update ALL relevant todo.md files after each task** - This solution uses a multi-file todo structure. After completing any task, update:
+   - The **per-project todo.md** for each project touched (check off items, update status)
+   - The **solution-level todo.md** (root) dashboard (update status, coverage, test count)
+   - See the "Todo File Locations" section below for file paths
 3. **Build frequently** - Run `build.cmd` after each meaningful change
 4. **Test frequently** - Run `test.cmd` after each test file is created
 5. **Check coverage frequently** - Verify 80%+ coverage is maintained at each step
 6. **NEVER commit to git** - Git commits are the user's responsibility. When you reach a natural checkpoint where you would normally commit, PAUSE and ask the user to review your work instead.
 
 Example workflow:
-- Create one model file → Update todo.md → Build → Pass
-- Create tests for that model → Update todo.md → Build & Test → Pass
-- Verify coverage for that model → Update todo.md → Coverage ≥ 80%
-- Move to next model
+- Create one model file → Update project todo.md → Build → Pass
+- Create tests for that model → Update project todo.md → Build & Test → Pass
+- Verify coverage → Update project todo.md + solution todo.md (coverage/test counts) → Coverage ≥ 80%
+- Move to next task
 
 Do NOT create multiple files/models/tests without verifying each step builds and tests pass.
+
+## Todo File Locations
+
+The solution uses a multi-file todo structure. Each project has its own todo.md, and the root todo.md serves as a solution-level dashboard.
+
+**IMPORTANT: After completing any task, update ALL relevant todo.md files to reflect the current state.**
+
+| File | Purpose |
+|------|---------|
+| [todo.md](todo.md) | Solution-level dashboard — project status table, coverage, test counts, milestones |
+| [FSMP.lib/FsmpLibrary/todo.md](FSMP.lib/FsmpLibrary/todo.md) | FsmpLibrary project tasks |
+| [FSMP.db/entity/FsmpDataAcsses/todo.md](FSMP.db/entity/FsmpDataAcsses/todo.md) | FsmpDataAcsses project tasks |
+| [FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) | FsmpConsole project tasks |
+| [FSMP.lib/FSMO/todo.md](FSMP.lib/FSMO/todo.md) | FSMO project tasks |
+| [FSMP.Tests/todo.md](FSMP.Tests/todo.md) | Test suite tasks |
+
+**Update rules:**
+1. After completing a task, update the todo.md for **every project affected** — not just the one you worked in. For example, adding tests for FSMO requires updating the FSMO todo.md (check off test task), the FSMP.Tests todo.md (new test files/counts), and the solution dashboard (test count, coverage)
+2. After build/test/coverage runs, update the solution dashboard (root todo.md) with current numbers
+3. When starting a new slice or phase, add it to the relevant project todo.md
+4. When a project's status changes (e.g., "Not started" → "In progress"), update the solution dashboard table
 
 ## Project Overview
 
