@@ -14,7 +14,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Generating coverage report...
-dotnet tool install -g dotnet-reportgenerator-globaltool 2>nul
+dotnet tool install -g dotnet-reportgenerator-globaltool 2>NUL:
 reportgenerator -reports:".\coverage\**\coverage.cobertura.xml" -targetdir:".\coverage\report" -reporttypes:Html
 
 echo.
