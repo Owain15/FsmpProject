@@ -67,10 +67,10 @@ public class MenuSystem
                     await SettingsAsync();
                     break;
                 case "6":
-                    _output.WriteLine("Goodbye!");
+					_output.WriteLine(""); _output.WriteLine("Goodbye!");
                     return;
                 default:
-                    _output.WriteLine("Invalid option. Please enter 1-6.");
+					_output.WriteLine(""); _output.WriteLine("Invalid option. Please enter 1-6.");
                     break;
             }
         }

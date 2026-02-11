@@ -61,16 +61,18 @@ public class AppStartup
     public async Task RunAsync()
     {
         _output.WriteLine("\nFSMP - File System Music Player\n\n");
-        //_output.WriteLine();
+		//_output.WriteLine();
 
-        // 1. Load configuration
-        var configPath = GetConfigPath();
+		// 1. Load configuration
+		_output.WriteLine("Getting Config...");
+		var configPath = GetConfigPath();
         var configService = new ConfigurationService(configPath);
         var config = await configService.LoadConfigurationAsync();
         _output.WriteLine($"Config loaded from: {configPath}");
 
-        // 2. Initialize database
-        var dbPath = GetDatabasePath(config);
+		// 2. Initialize database
+		_output.WriteLine($"Getting Data Source...");
+		var dbPath = GetDatabasePath(config);
         var dbDir = Path.GetDirectoryName(dbPath);
         if (!string.IsNullOrEmpty(dbDir))
             Directory.CreateDirectory(dbDir);
