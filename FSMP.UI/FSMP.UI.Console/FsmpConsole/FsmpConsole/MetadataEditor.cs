@@ -61,15 +61,9 @@ public class MetadataEditor
             return null;
         }
 
-        _output.WriteLine();
-        _output.WriteLine($"== Search Results ({results.Count} found) ==");
-        for (int i = 0; i < results.Count; i++)
-        {
-            var t = results[i];
-            _output.WriteLine($"  {i + 1}) {t.DisplayTitle} - {t.DisplayArtist}");
-        }
-        _output.WriteLine("  0) Cancel");
-        _output.Write("Select track: ");
+        Print.WriteSelectionMenu(_output, $"Search Results ({results.Count} found)",
+            results.Select(t => $"{t.DisplayTitle} - {t.DisplayArtist}").ToList(),
+            "Select track", "Cancel");
 
         var input = _input.ReadLine()?.Trim();
         if (input == "0" || string.IsNullOrEmpty(input))
@@ -94,24 +88,27 @@ public class MetadataEditor
         if (loaded != null)
             track = loaded;
 
-        _output.WriteLine();
-        _output.WriteLine("== Track Metadata ==");
-        _output.WriteLine($"  Title:    {track.Title}");
-        _output.WriteLine($"  Artist:   {track.Artist?.Name ?? "Unknown"}");
-        _output.WriteLine($"  Album:    {track.Album?.Title ?? "Unknown"}");
-        _output.WriteLine($"  File:     {track.FilePath}");
-
+        var fields = new List<(string Label, string Value)>
+        {
+            ("Title:", track.Title),
+            ("Artist:", track.Artist?.Name ?? "Unknown"),
+            ("Album:", track.Album?.Title ?? "Unknown"),
+            ("File:", track.FilePath)
+        };
         if (track.Duration.HasValue)
-            _output.WriteLine($"  Duration: {track.Duration.Value.Minutes}:{track.Duration.Value.Seconds:D2}");
+            fields.Add(("Duration:", $"{track.Duration.Value.Minutes}:{track.Duration.Value.Seconds:D2}"));
 
-        _output.WriteLine();
-        _output.WriteLine("  Custom Overrides:");
-        _output.WriteLine($"    Title:    {track.CustomTitle ?? "(none)"}");
-        _output.WriteLine($"    Artist:   {track.CustomArtist ?? "(none)"}");
-        _output.WriteLine($"    Album:    {track.CustomAlbum ?? "(none)"}");
-        _output.WriteLine($"    Rating:   {(track.Rating.HasValue ? $"{track.Rating}/5" : "(none)")}");
-        _output.WriteLine($"    Favorite: {(track.IsFavorite ? "Yes" : "No")}");
-        _output.WriteLine($"    Comment:  {track.Comment ?? "(none)"}");
+        Print.WriteDetailCard(_output, "Track Metadata", fields);
+
+        Print.WriteDetailCard(_output, "Custom Overrides", new List<(string Label, string Value)>
+        {
+            ("Title:", track.CustomTitle ?? "(none)"),
+            ("Artist:", track.CustomArtist ?? "(none)"),
+            ("Album:", track.CustomAlbum ?? "(none)"),
+            ("Rating:", track.Rating.HasValue ? $"{track.Rating}/5" : "(none)"),
+            ("Favorite:", track.IsFavorite ? "Yes" : "No"),
+            ("Comment:", track.Comment ?? "(none)")
+        });
     }
 
     /// <summary>
@@ -124,6 +121,7 @@ public class MetadataEditor
 
         _output.WriteLine();
         _output.WriteLine("== Edit Metadata (Enter to keep, '-' to clear) ==");
+        _output.WriteLine();
 
         // CustomTitle
         _output.Write($"  Title [{track.CustomTitle ?? track.Title}]: ");

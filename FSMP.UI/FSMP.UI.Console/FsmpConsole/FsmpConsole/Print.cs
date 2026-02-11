@@ -32,6 +32,83 @@ namespace FsmpConsole
 		}
 
 		/// <summary>
+		/// Writes a numbered selection menu with consistent formatting.
+		/// Items are numbered 1..N, with a "0) Back" option (unless backLabel is null).
+		/// </summary>
+		public static void WriteSelectionMenu(
+			TextWriter output,
+			string title,
+			IList<string> items,
+			string prompt = "Select",
+			string? backLabel = "Back")
+		{
+			ArgumentNullException.ThrowIfNull(output);
+			ArgumentNullException.ThrowIfNull(title);
+			ArgumentNullException.ThrowIfNull(items);
+
+			output.WriteLine();                        // space
+			output.WriteLine($"== {title} ==");        // title
+			output.WriteLine();                        // space
+			for (int i = 0; i < items.Count; i++)
+				output.WriteLine($"  {i + 1}) {items[i]}");
+			if (backLabel != null)
+				output.WriteLine($"  0) {backLabel}");
+			output.WriteLine();                        // space
+			output.Write($"{prompt}: ");               // prompt
+		}
+
+		/// <summary>
+		/// Writes a detail card with aligned label: value fields.
+		/// </summary>
+		public static void WriteDetailCard(
+			TextWriter output,
+			string title,
+			IList<(string Label, string Value)> fields)
+		{
+			ArgumentNullException.ThrowIfNull(output);
+			ArgumentNullException.ThrowIfNull(title);
+			ArgumentNullException.ThrowIfNull(fields);
+
+			output.WriteLine();                        // space
+			output.WriteLine($"== {title} ==");        // title
+			output.WriteLine();                        // space
+			if (fields.Count == 0) return;
+
+			int maxLabel = 0;
+			foreach (var (label, _) in fields)
+				if (label.Length > maxLabel) maxLabel = label.Length;
+
+			foreach (var (label, value) in fields)
+				output.WriteLine($"  {label.PadRight(maxLabel)} {value}");
+		}
+
+		/// <summary>
+		/// Writes a read-only numbered data list (no selection prompt).
+		/// </summary>
+		public static void WriteDataList(
+			TextWriter output,
+			string title,
+			IList<string> items,
+			string emptyMessage = "No items.")
+		{
+			ArgumentNullException.ThrowIfNull(output);
+			ArgumentNullException.ThrowIfNull(title);
+			ArgumentNullException.ThrowIfNull(items);
+
+			output.WriteLine();                        // space
+			output.WriteLine($"== {title} ==");        // title
+			output.WriteLine();                        // space
+			if (items.Count == 0)
+			{
+				output.WriteLine($"  {emptyMessage}");
+				return;
+			}
+
+			for (int i = 0; i < items.Count; i++)
+				output.WriteLine($"  {i + 1,2}) {items[i]}");
+		}
+
+		/// <summary>
 		/// Formats data into an aligned text table with headers.
 		/// </summary>
 		public static string FormatTable(List<string[]> rows, List<string> headers)

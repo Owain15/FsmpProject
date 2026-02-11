@@ -22,22 +22,21 @@ public class PlaybackUI
     {
         ArgumentNullException.ThrowIfNull(track);
 
-        _output.WriteLine();
-        _output.WriteLine("== Now Playing ==");
-        _output.WriteLine($"  Title:  {track.DisplayTitle}");
-        _output.WriteLine($"  Artist: {track.DisplayArtist}");
-        _output.WriteLine($"  Album:  {track.DisplayAlbum}");
-
+        var fields = new List<(string Label, string Value)>
+        {
+            ("Title:", track.DisplayTitle),
+            ("Artist:", track.DisplayArtist),
+            ("Album:", track.DisplayAlbum)
+        };
         if (track.Duration.HasValue)
-            _output.WriteLine($"  Duration: {track.Duration.Value.Minutes}:{track.Duration.Value.Seconds:D2}");
-
+            fields.Add(("Duration:", $"{track.Duration.Value.Minutes}:{track.Duration.Value.Seconds:D2}"));
         if (track.BitRate.HasValue)
-            _output.WriteLine($"  BitRate:  {track.BitRate}kbps");
-
-        _output.WriteLine($"  Plays:  {track.PlayCount}");
-
+            fields.Add(("BitRate:", $"{track.BitRate}kbps"));
+        fields.Add(("Plays:", track.PlayCount.ToString()));
         if (track.Rating.HasValue)
-            _output.WriteLine($"  Rating: {track.Rating}/5");
+            fields.Add(("Rating:", $"{track.Rating}/5"));
+
+        Print.WriteDetailCard(_output, "Now Playing", fields);
     }
 
     /// <summary>

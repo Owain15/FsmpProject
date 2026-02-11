@@ -60,8 +60,8 @@ public class AppStartup
     /// </summary>
     public async Task RunAsync()
     {
-        _output.WriteLine("FSMP - File System Music Player");
-        _output.WriteLine();
+        _output.WriteLine("\nFSMP - File System Music Player\n\n");
+        //_output.WriteLine();
 
         // 1. Load configuration
         var configPath = GetConfigPath();
@@ -104,7 +104,7 @@ public class AppStartup
         }
 
         // 5. Launch menu
-        _output.WriteLine();
+        //_output.WriteLine();
         var menu = new MenuSystem(audioService, configService, statsService, scanService, unitOfWork, _input, _output);
         await menu.RunAsync();
     }

@@ -81,17 +81,9 @@ public class MenuSystem
     /// </summary>
     public void DisplayMainMenu()
     {
-        _output.WriteLine();
-        _output.WriteLine("== FSMP - File System Music Player ==");
-        _output.WriteLine();
-        _output.WriteLine("  1) Browse & Play");
-        _output.WriteLine("  2) Scan Libraries");
-        _output.WriteLine("  3) View Statistics");
-        _output.WriteLine("  4) Manage Libraries");
-        _output.WriteLine("  5) Settings");
-        _output.WriteLine("  6) Exit");
-        _output.WriteLine();
-        _output.Write("Select option: ");
+        Print.WriteSelectionMenu(_output, "FSMP - File System Music Player",
+            new[] { "Browse & Play", "Scan Libraries", "View Statistics", "Manage Libraries", "Settings", "Exit" },
+            "Select option", backLabel: null);
     }
 
     private async Task BrowseAndPlayAsync()
@@ -125,11 +117,12 @@ public class MenuSystem
         var totalPlays = await _statsService.GetTotalPlayCountAsync();
         var totalTime = await _statsService.GetTotalListeningTimeAsync();
 
-        _output.WriteLine();
-        _output.WriteLine("== Library Statistics ==");
-        _output.WriteLine($"  Total tracks: {totalTracks}");
-        _output.WriteLine($"  Total plays:  {totalPlays}");
-        _output.WriteLine($"  Listen time:  {totalTime.Hours}h {totalTime.Minutes}m");
+        Print.WriteDetailCard(_output, "Library Statistics", new List<(string Label, string Value)>
+        {
+            ("Total tracks:", totalTracks.ToString()),
+            ("Total plays:", totalPlays.ToString()),
+            ("Listen time:", $"{totalTime.Hours}h {totalTime.Minutes}m")
+        });
 
         var mostPlayed = (await _statsService.GetMostPlayedTracksAsync(5)).ToList();
         if (mostPlayed.Count > 0)
@@ -147,6 +140,7 @@ public class MenuSystem
 
         _output.WriteLine();
         _output.WriteLine("== Library Paths ==");
+        _output.WriteLine();
         if (config.LibraryPaths.Count == 0)
         {
             _output.WriteLine("  (none configured)");
@@ -156,11 +150,11 @@ public class MenuSystem
             for (int i = 0; i < config.LibraryPaths.Count; i++)
                 _output.WriteLine($"  {i + 1}) {config.LibraryPaths[i]}");
         }
-
         _output.WriteLine();
         _output.WriteLine("  A) Add path");
         _output.WriteLine("  R) Remove path");
         _output.WriteLine("  0) Back");
+        _output.WriteLine();
         _output.Write("Select: ");
 
         var input = _input.ReadLine()?.Trim()?.ToLowerInvariant();
@@ -193,13 +187,15 @@ public class MenuSystem
     {
         var config = await _configService.LoadConfigurationAsync();
 
-        _output.WriteLine();
-        _output.WriteLine("== Settings ==");
-        _output.WriteLine($"  Volume:          {config.DefaultVolume}%");
-        _output.WriteLine($"  Auto-scan:       {(config.AutoScanOnStartup ? "On" : "Off")}");
-        _output.WriteLine($"  Database path:   {config.DatabasePath}");
+        Print.WriteDetailCard(_output, "Settings", new List<(string Label, string Value)>
+        {
+            ("Volume:", $"{config.DefaultVolume}%"),
+            ("Auto-scan:", config.AutoScanOnStartup ? "On" : "Off"),
+            ("Database path:", config.DatabasePath)
+        });
         _output.WriteLine();
         _output.WriteLine("  0) Back");
+        _output.WriteLine();
         _output.Write("Select: ");
         _input.ReadLine(); // consume input
     }

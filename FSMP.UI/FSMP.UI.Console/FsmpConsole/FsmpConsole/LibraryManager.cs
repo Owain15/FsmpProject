@@ -43,6 +43,7 @@ public class LibraryManager
             _output.WriteLine("  R) Remove path");
             _output.WriteLine("  S) Scan all libraries");
             _output.WriteLine("  0) Back");
+            _output.WriteLine();
             _output.Write("Select: ");
 
             var choice = _input.ReadLine()?.Trim()?.ToLowerInvariant();
@@ -75,22 +76,11 @@ public class LibraryManager
     public async Task DisplayLibraryPathsAsync()
     {
         var config = await _configService.LoadConfigurationAsync();
-
-        _output.WriteLine();
-        _output.WriteLine("== Library Paths ==");
-
-        if (config.LibraryPaths.Count == 0)
-        {
-            _output.WriteLine("  (none configured)");
-            return;
-        }
-
         var totalTracks = await _unitOfWork.Tracks.CountAsync();
 
-        for (int i = 0; i < config.LibraryPaths.Count; i++)
-        {
-            _output.WriteLine($"  {i + 1}) {config.LibraryPaths[i]}");
-        }
+        Print.WriteDataList(_output, "Library Paths",
+            config.LibraryPaths.ToList(),
+            "(none configured)");
 
         _output.WriteLine($"  Total tracks in database: {totalTracks}");
     }

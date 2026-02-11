@@ -26,16 +26,9 @@ public class StatisticsViewer
     {
         while (true)
         {
-            _output.WriteLine();
-            _output.WriteLine("== Statistics ==");
-            _output.WriteLine();
-            _output.WriteLine("  1) Overview");
-            _output.WriteLine("  2) Most Played");
-            _output.WriteLine("  3) Recently Played");
-            _output.WriteLine("  4) Favorites");
-            _output.WriteLine("  5) Genre Breakdown");
-            _output.WriteLine("  0) Back");
-            _output.Write("Select: ");
+            Print.WriteSelectionMenu(_output, "Statistics",
+                new[] { "Overview", "Most Played", "Recently Played", "Favorites", "Genre Breakdown" },
+                "Select");
 
             var choice = _input.ReadLine()?.Trim();
 
@@ -76,11 +69,12 @@ public class StatisticsViewer
         var totalPlays = await _statsService.GetTotalPlayCountAsync();
         var totalTime = await _statsService.GetTotalListeningTimeAsync();
 
-        _output.WriteLine();
-        _output.WriteLine("== Library Overview ==");
-        _output.WriteLine($"  Total tracks:     {totalTracks}");
-        _output.WriteLine($"  Total plays:      {totalPlays}");
-        _output.WriteLine($"  Listening time:   {FormatTimeSpan(totalTime)}");
+        Print.WriteDetailCard(_output, "Library Overview", new List<(string Label, string Value)>
+        {
+            ("Total tracks:", totalTracks.ToString()),
+            ("Total plays:", totalPlays.ToString()),
+            ("Listening time:", FormatTimeSpan(totalTime))
+        });
     }
 
     /// <summary>
@@ -90,20 +84,9 @@ public class StatisticsViewer
     {
         var tracks = (await _statsService.GetMostPlayedTracksAsync(10)).ToList();
 
-        _output.WriteLine();
-        _output.WriteLine("== Most Played ==");
-
-        if (tracks.Count == 0)
-        {
-            _output.WriteLine("  No playback history yet.");
-            return;
-        }
-
-        for (int i = 0; i < tracks.Count; i++)
-        {
-            var t = tracks[i];
-            _output.WriteLine($"  {i + 1,2}) {FormatTrackLine(t)} | {t.PlayCount} plays");
-        }
+        Print.WriteDataList(_output, "Most Played",
+            tracks.Select(t => $"{FormatTrackLine(t)} | {t.PlayCount} plays").ToList(),
+            "No playback history yet.");
     }
 
     /// <summary>
@@ -113,21 +96,13 @@ public class StatisticsViewer
     {
         var tracks = (await _statsService.GetRecentlyPlayedTracksAsync(10)).ToList();
 
-        _output.WriteLine();
-        _output.WriteLine("== Recently Played ==");
-
-        if (tracks.Count == 0)
-        {
-            _output.WriteLine("  No playback history yet.");
-            return;
-        }
-
-        for (int i = 0; i < tracks.Count; i++)
-        {
-            var t = tracks[i];
-            var lastPlayed = t.LastPlayedAt?.ToString("yyyy-MM-dd HH:mm") ?? "Never";
-            _output.WriteLine($"  {i + 1,2}) {FormatTrackLine(t)} | {lastPlayed}");
-        }
+        Print.WriteDataList(_output, "Recently Played",
+            tracks.Select(t =>
+            {
+                var lastPlayed = t.LastPlayedAt?.ToString("yyyy-MM-dd HH:mm") ?? "Never";
+                return $"{FormatTrackLine(t)} | {lastPlayed}";
+            }).ToList(),
+            "No playback history yet.");
     }
 
     /// <summary>
@@ -137,21 +112,13 @@ public class StatisticsViewer
     {
         var tracks = (await _statsService.GetFavoritesAsync()).ToList();
 
-        _output.WriteLine();
-        _output.WriteLine("== Favorites ==");
-
-        if (tracks.Count == 0)
-        {
-            _output.WriteLine("  No favorites yet. Mark tracks as favorites from the metadata editor.");
-            return;
-        }
-
-        for (int i = 0; i < tracks.Count; i++)
-        {
-            var t = tracks[i];
-            var rating = t.Rating.HasValue ? new string('*', t.Rating.Value) : "";
-            _output.WriteLine($"  {i + 1,2}) {FormatTrackLine(t)}{(rating.Length > 0 ? $" | {rating}" : "")}");
-        }
+        Print.WriteDataList(_output, "Favorites",
+            tracks.Select(t =>
+            {
+                var rating = t.Rating.HasValue ? new string('*', t.Rating.Value) : "";
+                return $"{FormatTrackLine(t)}{(rating.Length > 0 ? $" | {rating}" : "")}";
+            }).ToList(),
+            "No favorites yet. Mark tracks as favorites from the metadata editor.");
     }
 
     /// <summary>
@@ -161,19 +128,11 @@ public class StatisticsViewer
     {
         var genres = await _statsService.GetGenreStatisticsAsync();
 
-        _output.WriteLine();
-        _output.WriteLine("== Genre Breakdown ==");
-
-        if (genres.Count == 0)
-        {
-            _output.WriteLine("  No genre data available.");
-            return;
-        }
-
-        foreach (var kvp in genres.OrderByDescending(g => g.Value))
-        {
-            _output.WriteLine($"  {kvp.Key,-15} {kvp.Value} tracks");
-        }
+        Print.WriteDataList(_output, "Genre Breakdown",
+            genres.OrderByDescending(g => g.Value)
+                .Select(kvp => $"{kvp.Key,-15} {kvp.Value} tracks")
+                .ToList(),
+            "No genre data available.");
     }
 
     private static string FormatTrackLine(Track track)

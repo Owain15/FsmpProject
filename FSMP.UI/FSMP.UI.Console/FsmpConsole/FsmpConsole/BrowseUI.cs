@@ -40,18 +40,13 @@ public class BrowseUI
 
         if (artists.Count == 0)
         {
-            _output.WriteLine("No artists in library. Scan a library first.");
+            _output.WriteLine("\nNo artists in library. Scan a library first.");
             return;
         }
 
-        _output.WriteLine();
-        _output.WriteLine("== Artists ==");
-        for (int i = 0; i < artists.Count; i++)
-        {
-            _output.WriteLine($"  {i + 1}) {artists[i].Name}");
-        }
-        _output.WriteLine("  0) Back");
-        _output.Write("Select artist: ");
+        Print.WriteSelectionMenu(_output, "Artists",
+            artists.Select(a => a.Name).ToList(),
+            "Select artist");
 
         var input = _input.ReadLine()?.Trim();
         if (input == "0" || string.IsNullOrEmpty(input))
@@ -77,26 +72,26 @@ public class BrowseUI
 
         if (artist == null)
         {
-            _output.WriteLine("Artist not found.");
+            _output.WriteLine("\nArtist not found.");
             return;
         }
 
-        _output.WriteLine();
-        _output.WriteLine($"== Albums by {artist.Name} ==");
-
         if (albums.Count == 0)
         {
+            _output.WriteLine();
+            _output.WriteLine($"== Albums by {artist.Name} ==");
+            _output.WriteLine();
             _output.WriteLine("  No albums found.");
             return;
         }
 
-        for (int i = 0; i < albums.Count; i++)
-        {
-            var yearStr = albums[i].Year.HasValue ? $" ({albums[i].Year})" : "";
-            _output.WriteLine($"  {i + 1}) {albums[i].Title}{yearStr}");
-        }
-        _output.WriteLine("  0) Back");
-        _output.Write("Select album: ");
+        Print.WriteSelectionMenu(_output, $"Albums by {artist.Name}",
+            albums.Select(a =>
+            {
+                var yearStr = a.Year.HasValue ? $" ({a.Year})" : "";
+                return $"{a.Title}{yearStr}";
+            }).ToList(),
+            "Select album");
 
         var input = _input.ReadLine()?.Trim();
         if (input == "0" || string.IsNullOrEmpty(input))
@@ -127,25 +122,24 @@ public class BrowseUI
 
         var tracks = album.Tracks.ToList();
 
-        _output.WriteLine();
-        _output.WriteLine($"== {album.Title} ==");
-
         if (tracks.Count == 0)
         {
+            _output.WriteLine();
+            _output.WriteLine($"== {album.Title} ==");
+            _output.WriteLine();
             _output.WriteLine("  No tracks in this album.");
             return;
         }
 
-        for (int i = 0; i < tracks.Count; i++)
-        {
-            var t = tracks[i];
-            var durationStr = t.Duration.HasValue
-                ? $" [{t.Duration.Value.Minutes}:{t.Duration.Value.Seconds:D2}]"
-                : "";
-            _output.WriteLine($"  {i + 1}) {t.DisplayTitle}{durationStr}");
-        }
-        _output.WriteLine("  0) Back");
-        _output.Write("Select track: ");
+        Print.WriteSelectionMenu(_output, album.Title,
+            tracks.Select(t =>
+            {
+                var durationStr = t.Duration.HasValue
+                    ? $" [{t.Duration.Value.Minutes}:{t.Duration.Value.Seconds:D2}]"
+                    : "";
+                return $"{t.DisplayTitle}{durationStr}";
+            }).ToList(),
+            "Select track");
 
         var input = _input.ReadLine()?.Trim();
         if (input == "0" || string.IsNullOrEmpty(input))
@@ -174,18 +168,21 @@ public class BrowseUI
             return;
         }
 
-        _output.WriteLine();
-        _output.WriteLine("== Now Playing ==");
-        _output.WriteLine($"  Title:  {track.DisplayTitle}");
-        _output.WriteLine($"  Artist: {track.DisplayArtist}");
-        _output.WriteLine($"  Album:  {track.DisplayAlbum}");
+        var fields = new List<(string Label, string Value)>
+        {
+            ("Title:", track.DisplayTitle),
+            ("Artist:", track.DisplayArtist),
+            ("Album:", track.DisplayAlbum)
+        };
         if (track.Duration.HasValue)
-            _output.WriteLine($"  Duration: {track.Duration.Value.Minutes}:{track.Duration.Value.Seconds:D2}");
+            fields.Add(("Duration:", $"{track.Duration.Value.Minutes}:{track.Duration.Value.Seconds:D2}"));
         if (track.BitRate.HasValue)
-            _output.WriteLine($"  BitRate:  {track.BitRate}kbps");
-        _output.WriteLine($"  Plays:  {track.PlayCount}");
+            fields.Add(("BitRate:", $"{track.BitRate}kbps"));
+        fields.Add(("Plays:", track.PlayCount.ToString()));
         if (track.Rating.HasValue)
-            _output.WriteLine($"  Rating: {track.Rating}/5");
+            fields.Add(("Rating:", $"{track.Rating}/5"));
+
+        Print.WriteDetailCard(_output, "Now Playing", fields);
 
         await _audioService.PlayTrackAsync(track);
     }
