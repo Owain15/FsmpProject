@@ -23,9 +23,10 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `PlaybackHistoryTests.cs`, `LibraryPathTests.cs`, `ConfigurationTests.cs`
 - `PlaylistTests.cs`, `PlaylistTrackTests.cs`
 
-**Services/** (6 files, ~114 tests):
+**Services/** (7 files, ~151 tests):
 - `AudioServiceTests.cs`, `ConfigurationServiceTests.cs`, `MetadataServiceTests.cs`
 - `LibraryScanServiceTests.cs`, `PlaybackTrackingServiceTests.cs`, `StatisticsServiceTests.cs`
+- `PlaylistServiceTests.cs` (37 tests)
 
 **Repositories/** (7 files, ~70 tests):
 - `RepositoryTests.cs`, `TrackRepositoryTests.cs`, `AlbumRepositoryTests.cs`
@@ -51,7 +52,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature | **Tests**: 588 passing | **Overall Coverage**: 92.49%
+**Status**: Complete (v1) + Playlist feature | **Tests**: 625 passing | **Overall Coverage**: 92.49%
 
 | Project | Coverage |
 |---------|----------|
@@ -85,5 +86,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature tests (entity config, repository)
-**Next Action**: PlaylistService (Batch 11), then PlaylistService tests (Batch 12)
+**Status**: Complete (v1) + Playlist feature tests (entity config, repository, service)
+**Next Action**: PlayerUI + Print.NewDisplay() update (Batch 13)

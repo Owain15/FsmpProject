@@ -56,5 +56,5 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist repository + PlaylistService
-**Next Action**: PlaylistService tests (Batch 12), then UI updates
+**Status**: Complete (v1) + Playlist repository + PlaylistService (fully tested)
+**Next Action**: UI updates (Batch 13-14)
