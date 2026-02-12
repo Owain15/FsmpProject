@@ -278,4 +278,201 @@ public class EntityConfigurationTests : IDisposable
 
         act.Should().Throw<DbUpdateException>();
     }
+
+    [Fact]
+    public void Playlist_CanBeCreated()
+    {
+        var playlist = new Playlist
+        {
+            Name = "My Playlist",
+            Description = "A test playlist",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _context.Playlists.Add(playlist);
+        _context.SaveChanges();
+
+        var retrieved = _context.Playlists.First(p => p.Name == "My Playlist");
+        retrieved.Name.Should().Be("My Playlist");
+        retrieved.Description.Should().Be("A test playlist");
+        retrieved.PlaylistId.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public void Playlist_Description_ShouldBeOptional()
+    {
+        var playlist = new Playlist
+        {
+            Name = "No Description Playlist",
+            Description = null,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _context.Playlists.Add(playlist);
+        _context.SaveChanges();
+
+        var retrieved = _context.Playlists.First(p => p.Name == "No Description Playlist");
+        retrieved.Description.Should().BeNull();
+    }
+
+    [Fact]
+    public void Playlist_PlaylistTracks_Navigation_ShouldWork()
+    {
+        var track = new Track { Title = "Nav Track", FilePath = @"C:\nav.mp3", FileHash = "navhash" };
+        _context.Tracks.Add(track);
+        _context.SaveChanges();
+
+        var playlist = new Playlist
+        {
+            Name = "Nav Playlist",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        playlist.PlaylistTracks.Add(new PlaylistTrack
+        {
+            TrackId = track.TrackId,
+            Position = 0,
+            AddedAt = DateTime.UtcNow
+        });
+
+        _context.Playlists.Add(playlist);
+        _context.SaveChanges();
+
+        var retrieved = _context.Playlists
+            .Include(p => p.PlaylistTracks)
+            .First(p => p.Name == "Nav Playlist");
+
+        retrieved.PlaylistTracks.Should().HaveCount(1);
+        retrieved.PlaylistTracks.First().TrackId.Should().Be(track.TrackId);
+    }
+
+    [Fact]
+    public void PlaylistTrack_Playlist_Relationship_ShouldWork()
+    {
+        var track = new Track { Title = "PT Track", FilePath = @"C:\pt.mp3", FileHash = "pthash" };
+        _context.Tracks.Add(track);
+        var playlist = new Playlist
+        {
+            Name = "PT Playlist",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        _context.Playlists.Add(playlist);
+        _context.SaveChanges();
+
+        var playlistTrack = new PlaylistTrack
+        {
+            PlaylistId = playlist.PlaylistId,
+            TrackId = track.TrackId,
+            Position = 0,
+            AddedAt = DateTime.UtcNow
+        };
+        _context.PlaylistTracks.Add(playlistTrack);
+        _context.SaveChanges();
+
+        var retrieved = _context.PlaylistTracks
+            .Include(pt => pt.Playlist)
+            .First(pt => pt.PlaylistTrackId == playlistTrack.PlaylistTrackId);
+
+        retrieved.Playlist.Should().NotBeNull();
+        retrieved.Playlist!.Name.Should().Be("PT Playlist");
+    }
+
+    [Fact]
+    public void PlaylistTrack_Track_Relationship_ShouldWork()
+    {
+        var track = new Track { Title = "Rel Track", FilePath = @"C:\rel.mp3", FileHash = "relhash" };
+        _context.Tracks.Add(track);
+        var playlist = new Playlist
+        {
+            Name = "Rel Playlist",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        _context.Playlists.Add(playlist);
+        _context.SaveChanges();
+
+        var playlistTrack = new PlaylistTrack
+        {
+            PlaylistId = playlist.PlaylistId,
+            TrackId = track.TrackId,
+            Position = 0,
+            AddedAt = DateTime.UtcNow
+        };
+        _context.PlaylistTracks.Add(playlistTrack);
+        _context.SaveChanges();
+
+        var retrieved = _context.PlaylistTracks
+            .Include(pt => pt.Track)
+            .First(pt => pt.PlaylistTrackId == playlistTrack.PlaylistTrackId);
+
+        retrieved.Track.Should().NotBeNull();
+        retrieved.Track!.Title.Should().Be("Rel Track");
+    }
+
+    [Fact]
+    public void PlaylistTrack_Playlist_CascadeDelete()
+    {
+        var track = new Track { Title = "Cascade Track", FilePath = @"C:\cascade.mp3", FileHash = "cascadehash" };
+        _context.Tracks.Add(track);
+        var playlist = new Playlist
+        {
+            Name = "Cascade Playlist",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        _context.Playlists.Add(playlist);
+        _context.SaveChanges();
+
+        var playlistTrack = new PlaylistTrack
+        {
+            PlaylistId = playlist.PlaylistId,
+            TrackId = track.TrackId,
+            Position = 0,
+            AddedAt = DateTime.UtcNow
+        };
+        _context.PlaylistTracks.Add(playlistTrack);
+        _context.SaveChanges();
+
+        _context.PlaylistTracks.Should().HaveCount(1);
+
+        _context.Playlists.Remove(playlist);
+        _context.SaveChanges();
+
+        _context.PlaylistTracks.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void PlaylistTrack_Track_CascadeDelete()
+    {
+        var track = new Track { Title = "TCascade Track", FilePath = @"C:\tcascade.mp3", FileHash = "tcascadehash" };
+        _context.Tracks.Add(track);
+        var playlist = new Playlist
+        {
+            Name = "TCascade Playlist",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        _context.Playlists.Add(playlist);
+        _context.SaveChanges();
+
+        var playlistTrack = new PlaylistTrack
+        {
+            PlaylistId = playlist.PlaylistId,
+            TrackId = track.TrackId,
+            Position = 0,
+            AddedAt = DateTime.UtcNow
+        };
+        _context.PlaylistTracks.Add(playlistTrack);
+        _context.SaveChanges();
+
+        _context.PlaylistTracks.Should().HaveCount(1);
+
+        _context.Tracks.Remove(track);
+        _context.SaveChanges();
+
+        _context.PlaylistTracks.Should().BeEmpty();
+    }
 }

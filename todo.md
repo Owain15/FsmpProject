@@ -11,7 +11,7 @@
 | FSMO | File System Music Organizer | Not started | -- | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 
-**Overall coverage**: 92.49% | **Tests**: 567 passing | **Build**: Passing
+**Overall coverage**: 92.49% | **Tests**: 574 passing | **Build**: Passing
 
 ---
 
@@ -36,7 +36,7 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 
 ### Playlist + Music Player Feature
 
-**Status**: In progress | **Batches**: 7/17 complete
+**Status**: In progress | **Batches**: 8/17 complete
 **Plan**: [.claude/plans/smooth-wishing-cerf.md](.claude/plans/smooth-wishing-cerf.md)
 
 | # | Component | Status | Project |
@@ -48,7 +48,7 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 | 5 | Playlist model tests | **Complete** | FSMP.Tests |
 | 6 | FsmpDbContext (DbSets + config) | **Complete** | FsmpDataAcsses |
 | 7 | EF Core migration (AddPlaylists) | **Complete** | FsmpDataAcsses |
-| 8 | Entity configuration tests | Not started | FSMP.Tests |
+| 8 | Entity configuration tests | **Complete** | FSMP.Tests |
 | 9 | PlaylistRepository + UnitOfWork | Not started | FsmpDataAcsses |
 | 10 | PlaylistRepository tests | Not started | FSMP.Tests |
 | 11 | PlaylistService | Not started | FsmpDataAcsses |

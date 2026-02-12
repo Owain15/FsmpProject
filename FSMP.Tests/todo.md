@@ -31,8 +31,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `RepositoryTests.cs`, `TrackRepositoryTests.cs`, `AlbumRepositoryTests.cs`
 - `ArtistRepositoryTests.cs`, `PlaybackHistoryRepositoryTests.cs`, `UnitOfWorkTests.cs`
 
-**Database/** (3 files, ~41 tests):
-- `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs`, `MigrationTests.cs`
+**Database/** (3 files, ~48 tests):
+- `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs` (20 tests incl. Playlist/PlaylistTrack config), `MigrationTests.cs`
 
 **UI/** (8 files, ~175 tests):
 - `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlaybackUITests.cs`
@@ -50,7 +50,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature | **Tests**: 567 passing | **Overall Coverage**: 92.49%
+**Status**: Complete (v1) + Playlist feature | **Tests**: 574 passing | **Overall Coverage**: 92.49%
 
 | Project | Coverage |
 |---------|----------|
@@ -84,5 +84,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + ActivePlaylistService tests
-**Next Action**: Entity configuration tests (Batch 8), then PlaylistRepository tests (Batch 10)
+**Status**: Complete (v1) + ActivePlaylistService tests + Playlist entity config tests
+**Next Action**: PlaylistRepository + UnitOfWork (Batch 9), then PlaylistRepository tests (Batch 10)
