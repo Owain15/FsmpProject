@@ -5,7 +5,7 @@
 | Project | Description | Status | Coverage | Todo |
 |---------|-------------|--------|----------|------|
 | FsmpLibrary | Core business logic & models | Complete (v1) | 65.74% | [todo](FSMP.lib/FsmpLibrary/todo.md) |
-| FSMP.Core | Platform-agnostic player logic | Not started | -- | [todo](FSMP.lib/FSMP.Core/todo.md) |
+| FSMP.Core | Platform-agnostic player logic | In progress | -- | [todo](FSMP.lib/FSMP.Core/todo.md) |
 | FsmpDataAcsses | EF Core data access layer | Complete (v1) | 98.18% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
 | FsmpConsole | Console UI application | Complete (v1) | 94.20% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
 | FSMO | File System Music Organizer | Not started | -- | [todo](FSMP.lib/FSMO/todo.md) |
@@ -36,12 +36,12 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 
 ### Playlist + Music Player Feature
 
-**Status**: In progress | **Batches**: 4/17 complete
+**Status**: In progress | **Batches**: 5/17 complete
 **Plan**: [.claude/plans/smooth-wishing-cerf.md](.claude/plans/smooth-wishing-cerf.md)
 
 | # | Component | Status | Project |
 |---|-----------|--------|---------|
-| 1 | FSMP.Core project setup (csproj, slnx, refs) | Not started | FSMP.Core |
+| 1 | FSMP.Core project setup (csproj, slnx, refs) | **Complete** | FSMP.Core |
 | 2 | RepeatMode enum + ActivePlaylistService | Not started | FSMP.Core |
 | 3 | ActivePlaylistService tests | Not started | FSMP.Tests |
 | 4 | Playlist + PlaylistTrack models | **Complete** | FsmpLibrary |

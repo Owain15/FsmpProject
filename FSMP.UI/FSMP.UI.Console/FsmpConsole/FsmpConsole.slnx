@@ -8,6 +8,9 @@
   <Project Path="../../../FSMP.lib/FsmpLibrary/FsmpLibrary/FsmpLibrary.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />
   </Project>
+  <Project Path="../../../FSMP.lib/FSMP.Core/FSMP.Core.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+  </Project>
   <Project Path="../../../FSMP.Tests/FSMP.Tests.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />
   </Project>
