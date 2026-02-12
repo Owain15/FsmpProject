@@ -39,6 +39,9 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `MetadataEditorTests.cs`, `LibraryManagerTests.cs`, `StatisticsViewerTests.cs`
 - `PrintTests.cs`, `AppStartupTests.cs`
 
+**Core/** (1 file, 37 tests):
+- `ActivePlaylistServiceTests.cs` -- RepeatMode, shuffle, queue navigation
+
 **Integration/** (1 file, 12 tests):
 - `EndToEndTests.cs` -- Full-stack E2E workflows with real SQLite
 
@@ -47,13 +50,14 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist models | **Tests**: 530 passing | **Overall Coverage**: 92.49%
+**Status**: Complete (v1) + Playlist feature | **Tests**: 567 passing | **Overall Coverage**: 92.49%
 
 | Project | Coverage |
 |---------|----------|
 | FsmpConsole | 94.20% |
 | FsmpDataAcsses | 98.18% |
 | FsmpLibrary | 65.74% |
+| FSMP.Core | -- |
 
 ---
 
@@ -71,7 +75,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ### Cross-Platform Migration Tests (when migration begins)
 
-- [ ] Create `FSMP.Tests/Core/` directory for FSMP.Core tests
+- [x] Create `FSMP.Tests/Core/` directory for FSMP.Core tests
 - [ ] Create `FSMP.Tests/Platform.Windows/` for Windows-specific tests
 - [ ] Create `FSMP.Tests/Platform.Android/` for Android-specific tests
 - [ ] Expand EndToEndTests.cs for cross-platform scenarios
@@ -80,5 +84,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1)
-**Next Action**: FSMO test directory setup (when FSMO Slice 1 begins)
+**Status**: Complete (v1) + ActivePlaylistService tests
+**Next Action**: Entity configuration tests (Batch 8), then PlaylistRepository tests (Batch 10)

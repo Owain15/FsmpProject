@@ -11,7 +11,7 @@
 | FSMO | File System Music Organizer | Not started | -- | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 
-**Overall coverage**: 92.49% | **Tests**: 530 passing | **Build**: Passing
+**Overall coverage**: 92.49% | **Tests**: 567 passing | **Build**: Passing
 
 ---
 
@@ -36,14 +36,14 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 
 ### Playlist + Music Player Feature
 
-**Status**: In progress | **Batches**: 5/17 complete
+**Status**: In progress | **Batches**: 7/17 complete
 **Plan**: [.claude/plans/smooth-wishing-cerf.md](.claude/plans/smooth-wishing-cerf.md)
 
 | # | Component | Status | Project |
 |---|-----------|--------|---------|
 | 1 | FSMP.Core project setup (csproj, slnx, refs) | **Complete** | FSMP.Core |
-| 2 | RepeatMode enum + ActivePlaylistService | Not started | FSMP.Core |
-| 3 | ActivePlaylistService tests | Not started | FSMP.Tests |
+| 2 | RepeatMode enum + ActivePlaylistService | **Complete** | FSMP.Core |
+| 3 | ActivePlaylistService tests | **Complete** | FSMP.Tests |
 | 4 | Playlist + PlaylistTrack models | **Complete** | FsmpLibrary |
 | 5 | Playlist model tests | **Complete** | FSMP.Tests |
 | 6 | FsmpDbContext (DbSets + config) | **Complete** | FsmpDataAcsses |

@@ -10,21 +10,19 @@ Cross-platform business logic for playlist management, active playback queue, an
 - [x] Add to solution file (FsmpConsole.slnx)
 - [x] Add project reference from FSMP.Tests
 
-## Current Work
-
 ### Playlist + Music Player Feature
 
-- [ ] Create `RepeatMode.cs` enum (None, One, All)
-- [ ] Create `ActivePlaylistService.cs` (in-memory playlist queue with shuffle, repeat, next/prev)
-- [ ] ActivePlaylistService tests
+- [x] Create `RepeatMode.cs` enum (None, One, All)
+- [x] Create `ActivePlaylistService.cs` (in-memory playlist queue with shuffle, repeat, next/prev)
+- [x] ActivePlaylistService tests (37 tests in FSMP.Tests/Core/)
 
 ## Current Status
 
-**Status**: In progress | **Coverage**: -- | **Tests**: see FSMP.Tests
+**Status**: Complete (for current feature) | **Coverage**: -- | **Tests**: 37 passing
 
 ---
 
 ## Progress Summary
 
-**Status**: Project setup complete, implementing playlist logic
-**Next Action**: RepeatMode enum + ActivePlaylistService
+**Status**: All playlist-related FSMP.Core work complete
+**Next Action**: PlaylistRepository (Batch 9, FsmpDataAcsses)
