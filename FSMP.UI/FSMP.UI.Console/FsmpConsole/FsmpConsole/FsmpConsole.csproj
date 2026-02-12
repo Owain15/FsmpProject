@@ -23,4 +23,28 @@
     <ProjectReference Include="..\..\..\..\FSMP.lib\FsmpLibrary\FsmpLibrary\FsmpLibrary.csproj" />
   </ItemGroup>
 
+  <!-- Copy ARM64 LibVLC native libraries to output (NuGet package only ships x64/x86) -->
+  <ItemGroup Condition="'$(Platform)' == 'ARM64'">
+    <Content Include="..\..\..\..\dependencies\libvlc\libvlc.dll">
+      <Link>libvlc\win-arm64\libvlc.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\dependencies\libvlc\libvlccore.dll">
+      <Link>libvlc\win-arm64\libvlccore.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\dependencies\libvlc\plugins\**">
+      <Link>libvlc\win-arm64\plugins\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\dependencies\libvlc\hrtfs\**">
+      <Link>libvlc\win-arm64\hrtfs\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\dependencies\libvlc\lua\**">
+      <Link>libvlc\win-arm64\lua\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

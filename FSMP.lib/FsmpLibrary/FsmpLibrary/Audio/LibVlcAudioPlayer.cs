@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using LibVLCSharp.Shared;
 using FsmpLibrary.Interfaces;
 using FsmpLibrary.Interfaces.EventArgs;
@@ -26,8 +27,14 @@ public class LibVlcAudioPlayer : IAudioPlayer
         {
             if (!_coreInitialized)
             {
-                // Specify path to native LibVLC libraries (in libvlc/win-x64 subdirectory)
-                var libvlcPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "libvlc", "win-x64"));
+                // Detect process architecture to select correct native LibVLC libraries
+                var archFolder = RuntimeInformation.ProcessArchitecture switch
+                {
+                    Architecture.Arm64 => "win-arm64",
+                    Architecture.X86 => "win-x86",
+                    _ => "win-x64"
+                };
+                var libvlcPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "libvlc", archFolder));
 
                 // Set VLC_PLUGIN_PATH environment variable for plugins discovery
                 var pluginsPath = Path.Combine(libvlcPath, "plugins");
