@@ -32,6 +32,7 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 - `LibraryScanService.cs` -- Scan directories, import tracks with metadata, SHA256 duplicate detection, artist/album auto-creation
 - `PlaybackTrackingService.cs` -- Record playback history, update play count/skip count/last played timestamps
 - `StatisticsService.cs` -- Most played, recently played, favorites, genre breakdown, total counts/listening time
+- `PlaylistService.cs` -- Create/rename/delete playlists, add/remove tracks, search, reorder
 
 ## Current Status
 
@@ -55,5 +56,5 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist repository
-**Next Action**: PlaylistService (Batch 11), then cross-platform migration Phase 1
+**Status**: Complete (v1) + Playlist repository + PlaylistService
+**Next Action**: PlaylistService tests (Batch 12), then UI updates
