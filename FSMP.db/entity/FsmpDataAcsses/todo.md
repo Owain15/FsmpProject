@@ -24,6 +24,7 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 - `DesignTimeDbContextFactory.cs` -- For EF Core tooling
 - `Migrations/20260206102128_InitialCreate.cs` -- Full schema with all tables, FKs, indexes, junction tables
+- `Migrations/20260212102125_AddPlaylistTables.cs` -- Playlists and PlaylistTracks tables with FK relationships
 
 ### Services (`Services/`)
 

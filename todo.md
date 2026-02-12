@@ -36,7 +36,7 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 
 ### Playlist + Music Player Feature
 
-**Status**: In progress | **Batches**: 2/17 complete
+**Status**: In progress | **Batches**: 4/17 complete
 **Plan**: [.claude/plans/smooth-wishing-cerf.md](.claude/plans/smooth-wishing-cerf.md)
 
 | # | Component | Status | Project |
@@ -46,8 +46,8 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 | 3 | ActivePlaylistService tests | Not started | FSMP.Tests |
 | 4 | Playlist + PlaylistTrack models | **Complete** | FsmpLibrary |
 | 5 | Playlist model tests | **Complete** | FSMP.Tests |
-| 6 | FsmpDbContext (DbSets + config) | Not started | FsmpDataAcsses |
-| 7 | EF Core migration (AddPlaylists) | Not started | FsmpDataAcsses |
+| 6 | FsmpDbContext (DbSets + config) | **Complete** | FsmpDataAcsses |
+| 7 | EF Core migration (AddPlaylists) | **Complete** | FsmpDataAcsses |
 | 8 | Entity configuration tests | Not started | FSMP.Tests |
 | 9 | PlaylistRepository + UnitOfWork | Not started | FsmpDataAcsses |
 | 10 | PlaylistRepository tests | Not started | FSMP.Tests |

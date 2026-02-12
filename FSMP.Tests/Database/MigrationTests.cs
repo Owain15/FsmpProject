@@ -79,7 +79,7 @@ public class MigrationTests : IDisposable
     public void Migration_ShouldApplySuccessfully()
     {
         // If we got here without exception, the migration applied successfully
-        _context.Database.GetAppliedMigrations().Should().HaveCount(1);
+        _context.Database.GetAppliedMigrations().Should().HaveCount(2);
     }
 
     [Fact]

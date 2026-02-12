@@ -6,7 +6,7 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ### Application Startup
 
-- `Program.cs` -- 4-line entry point delegating to AppStartup
+- `Program.cs` -- Entry point with top-level exception handling, delegating to AppStartup
 - `AppStartup.cs` -- Testable startup: loads config, initializes SQLite + EF migrations, wires DI (UnitOfWork, MetadataService, LibraryScanService, StatisticsService, AudioService), auto-scans on startup, launches MenuSystem
 
 ### Menu System

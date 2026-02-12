@@ -20,6 +20,8 @@ public class FsmpDbContext : DbContext
     public DbSet<FileExtension> FileExtensions => Set<FileExtension>();
     public DbSet<PlaybackHistory> PlaybackHistories => Set<PlaybackHistory>();
     public DbSet<LibraryPath> LibraryPaths => Set<LibraryPath>();
+    public DbSet<Playlist> Playlists => Set<Playlist>();
+    public DbSet<PlaylistTrack> PlaylistTracks => Set<PlaylistTrack>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,6 +34,8 @@ public class FsmpDbContext : DbContext
         ConfigureFileExtension(modelBuilder);
         ConfigurePlaybackHistory(modelBuilder);
         ConfigureLibraryPath(modelBuilder);
+        ConfigurePlaylist(modelBuilder);
+        ConfigurePlaylistTrack(modelBuilder);
 
         SeedData(modelBuilder);
     }
@@ -208,6 +212,45 @@ public class FsmpDbContext : DbContext
             entity.Property(lp => lp.Path)
                 .IsRequired()
                 .HasMaxLength(1000);
+        });
+    }
+
+    private static void ConfigurePlaylist(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Playlist>(entity =>
+        {
+            entity.HasKey(p => p.PlaylistId);
+
+            entity.Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            entity.Property(p => p.Description)
+                .HasMaxLength(2000);
+        });
+    }
+
+    private static void ConfigurePlaylistTrack(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PlaylistTrack>(entity =>
+        {
+            entity.HasKey(pt => pt.PlaylistTrackId);
+
+            entity.HasIndex(pt => new { pt.PlaylistId, pt.Position });
+
+            // Relationship to Playlist (many-to-one, required with cascade delete)
+            entity.HasOne(pt => pt.Playlist)
+                .WithMany(p => p.PlaylistTracks)
+                .HasForeignKey(pt => pt.PlaylistId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+            // Relationship to Track (many-to-one, required with cascade delete)
+            entity.HasOne(pt => pt.Track)
+                .WithMany(t => t.PlaylistTracks)
+                .HasForeignKey(pt => pt.TrackId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
         });
     }
 
