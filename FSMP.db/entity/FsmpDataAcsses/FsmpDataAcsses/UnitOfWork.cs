@@ -18,6 +18,7 @@ public class UnitOfWork : IDisposable
     private Repository<LibraryPath>? _libraryPaths;
     private Repository<Genre>? _genres;
     private Repository<FileExtension>? _fileExtensions;
+    private PlaylistRepository? _playlists;
 
     public UnitOfWork(FsmpDbContext context)
     {
@@ -44,6 +45,9 @@ public class UnitOfWork : IDisposable
 
     public Repository<FileExtension> FileExtensions =>
         _fileExtensions ??= new Repository<FileExtension>(_context);
+
+    public PlaylistRepository Playlists =>
+        _playlists ??= new PlaylistRepository(_context);
 
     public async Task<int> SaveAsync()
     {

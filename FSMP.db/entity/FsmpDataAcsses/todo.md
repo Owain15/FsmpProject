@@ -6,7 +6,7 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 ### Database Context
 
-- `FsmpDbContext.cs` -- 7 DbSets (Tracks, Albums, Artists, Genres, PlaybackHistories, LibraryPaths, FileExtensions), seed data for genres (Rock, Jazz, Classic, Metal, Comedy) and file extensions (wav, wma, mp3), full entity configuration with indexes, relationships, and constraints
+- `FsmpDbContext.cs` -- 9 DbSets (Tracks, Albums, Artists, Genres, PlaybackHistories, LibraryPaths, FileExtensions), seed data for genres (Rock, Jazz, Classic, Metal, Comedy) and file extensions (wav, wma, mp3), full entity configuration with indexes, relationships, and constraints
 
 ### Repositories (`Repositories/`)
 
@@ -15,10 +15,11 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 - `AlbumRepository.cs` -- GetByArtist, GetByYear, GetWithTracks
 - `ArtistRepository.cs` -- GetWithAlbums, GetWithTracks, Search
 - `PlaybackHistoryRepository.cs` -- GetRecentPlays, GetByTrack, GetTotalPlayCount, GetTotalListeningTime
+- `PlaylistRepository.cs` -- GetWithTracks, GetByName, Search, GetRecent
 
 ### Unit of Work
 
-- `UnitOfWork.cs` -- Coordinates all 7 repositories with shared DbContext, IDisposable, SaveAsync
+- `UnitOfWork.cs` -- Coordinates all 8 repositories (incl. Playlists) with shared DbContext, IDisposable, SaveAsync
 
 ### Migrations
 
@@ -54,5 +55,5 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 ## Progress Summary
 
-**Status**: Complete (v1)
-**Next Action**: Cross-platform migration Phase 1
+**Status**: Complete (v1) + Playlist repository
+**Next Action**: PlaylistService (Batch 11), then cross-platform migration Phase 1
