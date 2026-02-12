@@ -54,9 +54,9 @@ Coverage is lower due to untested `LibVlcAudioPlayer.cs` and `LibVlcAudioPlayerF
 
 ### Playlist Models (Playlist + Music Player Feature)
 
-- [ ] Create `Models/Playlist.cs` — PlaylistId, Name, Description, CreatedAt, UpdatedAt, PlaylistTracks collection
-- [ ] Create `Models/PlaylistTrack.cs` — PlaylistTrackId, PlaylistId (FK), TrackId (FK), Position, AddedAt
-- [ ] Add `PlaylistTracks` nav collection to `Track.cs` (line 168)
+- [x] Create `Models/Playlist.cs` — PlaylistId, Name, Description, CreatedAt, UpdatedAt, PlaylistTracks collection
+- [x] Create `Models/PlaylistTrack.cs` — PlaylistTrackId, PlaylistId (FK), TrackId (FK), Position, AddedAt
+- [x] Add `PlaylistTracks` nav collection to `Track.cs`
 
 ---
 

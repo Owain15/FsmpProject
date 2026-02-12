@@ -166,6 +166,7 @@ public class Track
     /// </summary>
     public ICollection<PlaybackHistory> PlaybackHistories { get; set; } = new List<PlaybackHistory>();
     public ICollection<Genre> Genres { get; set; } = new List<Genre>();
+    public ICollection<PlaylistTrack> PlaylistTracks { get; set; } = new List<PlaylistTrack>();
 
     /// <summary>
     /// Gets the display title, preferring custom title over file metadata.

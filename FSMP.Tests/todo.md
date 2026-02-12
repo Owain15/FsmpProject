@@ -18,9 +18,10 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ### Test Files by Directory
 
-**Models/** (6 files, ~85 tests):
+**Models/** (8 files, ~102 tests):
 - `TrackTests.cs`, `AlbumTests.cs`, `ArtistTests.cs`
 - `PlaybackHistoryTests.cs`, `LibraryPathTests.cs`, `ConfigurationTests.cs`
+- `PlaylistTests.cs`, `PlaylistTrackTests.cs`
 
 **Services/** (6 files, ~114 tests):
 - `AudioServiceTests.cs`, `ConfigurationServiceTests.cs`, `MetadataServiceTests.cs`
@@ -46,7 +47,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) | **Tests**: 513 passing | **Overall Coverage**: 92.49%
+**Status**: Complete (v1) + Playlist models | **Tests**: 530 passing | **Overall Coverage**: 92.49%
 
 | Project | Coverage |
 |---------|----------|
