@@ -1,3 +1,4 @@
+using FSMP.Core;
 using FluentAssertions;
 using FsmpConsole;
 using FsmpDataAcsses;
@@ -42,7 +43,8 @@ public class BrowseUITests : IDisposable
     {
         var input = new StringReader(inputLines);
         var output = new StringWriter();
-        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, input, output);
+        var activePlaylist = new ActivePlaylistService();
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
         return (browse, output);
     }
 
@@ -97,28 +99,35 @@ public class BrowseUITests : IDisposable
     [Fact]
     public void Constructor_WithNullUnitOfWork_ShouldThrow()
     {
-        var act = () => new BrowseUI(null!, _audioMock.Object, TextReader.Null, TextWriter.Null);
+        var act = () => new BrowseUI(null!, _audioMock.Object, new ActivePlaylistService(), TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("unitOfWork");
     }
 
     [Fact]
     public void Constructor_WithNullAudioService_ShouldThrow()
     {
-        var act = () => new BrowseUI(_unitOfWork, null!, TextReader.Null, TextWriter.Null);
+        var act = () => new BrowseUI(_unitOfWork, null!, new ActivePlaylistService(), TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("audioService");
+    }
+
+    [Fact]
+    public void Constructor_WithNullActivePlaylist_ShouldThrow()
+    {
+        var act = () => new BrowseUI(_unitOfWork, _audioMock.Object, null!, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("activePlaylist");
     }
 
     [Fact]
     public void Constructor_WithNullInput_ShouldThrow()
     {
-        var act = () => new BrowseUI(_unitOfWork, _audioMock.Object, null!, TextWriter.Null);
+        var act = () => new BrowseUI(_unitOfWork, _audioMock.Object, new ActivePlaylistService(), null!, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("input");
     }
 
     [Fact]
     public void Constructor_WithNullOutput_ShouldThrow()
     {
-        var act = () => new BrowseUI(_unitOfWork, _audioMock.Object, TextReader.Null, null!);
+        var act = () => new BrowseUI(_unitOfWork, _audioMock.Object, new ActivePlaylistService(), TextReader.Null, null!);
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
 

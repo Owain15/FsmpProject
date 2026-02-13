@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using FSMP.Core;
 using FsmpLibrary.Models;
 
 namespace FsmpConsole
@@ -11,24 +12,47 @@ namespace FsmpConsole
 
 		static string separator = "-----------------\n";
 
-		public static void NewDisplay()
+		public static void NewDisplay(
+			TextWriter output,
+			Track? currentTrack,
+			bool isPlaying,
+			IList<string> queueItems,
+			RepeatMode repeatMode,
+			bool shuffleEnabled)
 		{
-			Console.Clear();
+			ArgumentNullException.ThrowIfNull(output);
+			ArgumentNullException.ThrowIfNull(queueItems);
 
-			Console.WriteLine(title);
+			output.WriteLine(title);
+			output.WriteLine(separator);
 
-			Console.WriteLine(separator);
+			var trackTitle = currentTrack?.DisplayTitle ?? "(none)";
+			var artist = currentTrack?.DisplayArtist ?? "";
+			var album = currentTrack?.DisplayAlbum ?? "";
+			var status = isPlaying ? "Playing" : "Stopped";
 
-			Console.WriteLine("Current track : ");
-			Console.WriteLine("Artist : ");
-			Console.WriteLine("Album : ");
-			Console.WriteLine("Is Playing : ");
+			output.WriteLine($"Current track : {trackTitle}");
+			output.WriteLine($"Artist        : {artist}");
+			output.WriteLine($"Album         : {album}");
+			output.WriteLine($"Status        : {status} [Repeat: {repeatMode}] [Shuffle: {(shuffleEnabled ? "On" : "Off")}]");
+			output.WriteLine();
 
-			Console.WriteLine("Tracks in cue :");
+			if (queueItems.Count > 0)
+			{
+				output.WriteLine($"Queue ({queueItems.Count} tracks):");
+				foreach (var item in queueItems)
+					output.WriteLine($"  {item}");
+			}
+			else
+			{
+				output.WriteLine("Queue: (empty)");
+			}
 
-			Console.WriteLine("\n"+separator);
-
-			Console.WriteLine("Input : ");
+			output.WriteLine();
+			output.WriteLine(separator);
+			output.WriteLine("[N] Next  [P] Prev  [Space] Pause/Resume  [R] Restart");
+			output.WriteLine("[S] Stop  [M] Repeat  [H] Shuffle  [Q] Back");
+			output.Write("Input: ");
 		}
 
 		/// <summary>

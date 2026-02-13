@@ -52,7 +52,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature | **Tests**: 625 passing | **Overall Coverage**: 92.49%
+**Status**: Complete (v1) + Playlist feature | **Tests**: 628 passing | **Overall Coverage**: 92.49%
 
 | Project | Coverage |
 |---------|----------|
@@ -86,5 +86,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature tests (entity config, repository, service)
-**Next Action**: PlayerUI + Print.NewDisplay() update (Batch 13)
+**Status**: Complete (v1) + Playlist feature tests (entity config, repository, service, UI menu updates)
+**Next Action**: PlayerUI tests (Batch 15), MenuSystem/BrowseUI test updates (Batch 16)

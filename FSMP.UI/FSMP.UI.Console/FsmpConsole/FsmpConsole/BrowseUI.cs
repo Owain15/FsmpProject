@@ -1,3 +1,4 @@
+using FSMP.Core;
 using FsmpDataAcsses;
 using FsmpLibrary.Models;
 using FsmpLibrary.Services;
@@ -12,13 +13,15 @@ public class BrowseUI
 {
     private readonly UnitOfWork _unitOfWork;
     private readonly IAudioService _audioService;
+    private readonly ActivePlaylistService _activePlaylist;
     private readonly TextReader _input;
     private readonly TextWriter _output;
 
-    public BrowseUI(UnitOfWork unitOfWork, IAudioService audioService, TextReader input, TextWriter output)
+    public BrowseUI(UnitOfWork unitOfWork, IAudioService audioService, ActivePlaylistService activePlaylist, TextReader input, TextWriter output)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
+        _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
     }
@@ -184,6 +187,26 @@ public class BrowseUI
 
         Print.WriteDetailCard(_output, "Now Playing", fields);
 
+        // Add to active playlist queue and play
+        if (_activePlaylist.Count == 0)
+        {
+            _activePlaylist.SetQueue(new[] { track.TrackId });
+        }
+        else
+        {
+            // Append to end of queue — set queue to current + new track
+            var currentQueue = _activePlaylist.PlayOrder.ToList();
+            if (!currentQueue.Contains(track.TrackId))
+            {
+                currentQueue.Add(track.TrackId);
+                var currentIdx = _activePlaylist.CurrentIndex;
+                _activePlaylist.SetQueue(currentQueue);
+                if (currentIdx >= 0)
+                    _activePlaylist.JumpTo(currentIdx);
+            }
+        }
+
         await _audioService.PlayTrackAsync(track);
+        _output.WriteLine("  Added to player queue.");
     }
 }

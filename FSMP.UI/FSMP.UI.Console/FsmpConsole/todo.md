@@ -11,7 +11,7 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ### Menu System
 
-- `MenuSystem.cs` -- Main event loop with 6 options: Browse & Play, Scan Libraries, View Statistics, Manage Libraries, Settings, Exit
+- `MenuSystem.cs` -- Main event loop with 8 options: Browse & Play, Player, Playlists, Scan Libraries, View Statistics, Manage Libraries, Settings, Exit
 
 ### UI Components
 
@@ -20,7 +20,8 @@ Interactive console application for FSMP, providing menu-driven access to librar
 - `MetadataEditor.cs` -- Search tracks, display file metadata + custom overrides, edit CustomTitle/CustomArtist/CustomAlbum/Rating/IsFavorite/Comment with clear ("-") support
 - `LibraryManager.cs` -- List/add/remove library paths, trigger single or all-library scans
 - `StatisticsViewer.cs` -- Overview, most played, recently played, favorites, genre breakdown
-- `Print.cs` -- Utilities: FormatTable (aligned columns), FormatProgressBar, FormatMetadataCard
+- `PlayerUI.cs` -- Music player view with queue display, playback controls (next/prev/pause/resume/stop/restart), repeat mode cycling, shuffle toggle
+- `Print.cs` -- Utilities: NewDisplay (player view), FormatTable, FormatProgressBar, FormatMetadataCard
 
 ## Current Status
 
@@ -58,5 +59,5 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ## Progress Summary
 
-**Status**: Complete (v1), pending manual verification
-**Next Action**: Complete manual verification checklist
+**Status**: Complete (v1) + Playlist/Player UI integration (Batches 13-14 complete)
+**Next Action**: PlayerUI tests (Batch 15), MenuSystem/BrowseUI test updates (Batch 16)

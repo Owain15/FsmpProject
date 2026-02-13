@@ -1,3 +1,4 @@
+using FSMP.Core;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
 using FsmpLibrary.Audio;
@@ -105,9 +106,12 @@ public class AppStartup
             _output.WriteLine($"Scan complete: {result.TracksAdded} added, {result.TracksUpdated} updated, {result.TracksRemoved} removed");
         }
 
-        // 5. Launch menu
-        //_output.WriteLine();
-        var menu = new MenuSystem(audioService, configService, statsService, scanService, unitOfWork, _input, _output);
+        // 5. Create playlist + player services
+        var playlistService = new PlaylistService(unitOfWork);
+        var activePlaylist = new ActivePlaylistService();
+
+        // 6. Launch menu
+        var menu = new MenuSystem(audioService, configService, statsService, scanService, unitOfWork, playlistService, activePlaylist, _input, _output);
         await menu.RunAsync();
     }
 }

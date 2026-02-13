@@ -1,3 +1,4 @@
+using FSMP.Core;
 using FluentAssertions;
 using FsmpConsole;
 using FsmpDataAcsses;
@@ -50,6 +51,8 @@ public class MenuSystemTests : IDisposable
         var output = new StringWriter();
         var statsService = new StatisticsService(_unitOfWork);
         var scanService = new LibraryScanService(_unitOfWork, _metadataMock.Object);
+        var playlistService = new PlaylistService(_unitOfWork);
+        var activePlaylist = new ActivePlaylistService();
 
         return new MenuSystem(
             _audioMock.Object,
@@ -57,6 +60,8 @@ public class MenuSystemTests : IDisposable
             statsService,
             scanService,
             _unitOfWork,
+            playlistService,
+            activePlaylist,
             input,
             output);
     }
@@ -67,6 +72,8 @@ public class MenuSystemTests : IDisposable
         var output = new StringWriter();
         var statsService = new StatisticsService(_unitOfWork);
         var scanService = new LibraryScanService(_unitOfWork, _metadataMock.Object);
+        var playlistService = new PlaylistService(_unitOfWork);
+        var activePlaylist = new ActivePlaylistService();
 
         var menu = new MenuSystem(
             _audioMock.Object,
@@ -74,6 +81,8 @@ public class MenuSystemTests : IDisposable
             statsService,
             scanService,
             _unitOfWork,
+            playlistService,
+            activePlaylist,
             input,
             output);
 
@@ -149,7 +158,8 @@ public class MenuSystemTests : IDisposable
         var act = () => new MenuSystem(null!, _configService,
             new StatisticsService(_unitOfWork),
             new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, TextReader.Null, TextWriter.Null);
+            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
+            TextReader.Null, TextWriter.Null);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("audioService");
     }
@@ -160,7 +170,8 @@ public class MenuSystemTests : IDisposable
         var act = () => new MenuSystem(_audioMock.Object, null!,
             new StatisticsService(_unitOfWork),
             new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, TextReader.Null, TextWriter.Null);
+            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
+            TextReader.Null, TextWriter.Null);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("configService");
     }
@@ -171,7 +182,8 @@ public class MenuSystemTests : IDisposable
         var act = () => new MenuSystem(_audioMock.Object, _configService,
             null!,
             new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, TextReader.Null, TextWriter.Null);
+            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
+            TextReader.Null, TextWriter.Null);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("statsService");
     }
@@ -182,7 +194,8 @@ public class MenuSystemTests : IDisposable
         var act = () => new MenuSystem(_audioMock.Object, _configService,
             new StatisticsService(_unitOfWork),
             null!,
-            _unitOfWork, TextReader.Null, TextWriter.Null);
+            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
+            TextReader.Null, TextWriter.Null);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("scanService");
     }
@@ -193,9 +206,34 @@ public class MenuSystemTests : IDisposable
         var act = () => new MenuSystem(_audioMock.Object, _configService,
             new StatisticsService(_unitOfWork),
             new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            null!, TextReader.Null, TextWriter.Null);
+            null!, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
+            TextReader.Null, TextWriter.Null);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("unitOfWork");
+    }
+
+    [Fact]
+    public void Constructor_WithNullPlaylistService_ShouldThrow()
+    {
+        var act = () => new MenuSystem(_audioMock.Object, _configService,
+            new StatisticsService(_unitOfWork),
+            new LibraryScanService(_unitOfWork, _metadataMock.Object),
+            _unitOfWork, null!, new ActivePlaylistService(),
+            TextReader.Null, TextWriter.Null);
+
+        act.Should().Throw<ArgumentNullException>().WithParameterName("playlistService");
+    }
+
+    [Fact]
+    public void Constructor_WithNullActivePlaylist_ShouldThrow()
+    {
+        var act = () => new MenuSystem(_audioMock.Object, _configService,
+            new StatisticsService(_unitOfWork),
+            new LibraryScanService(_unitOfWork, _metadataMock.Object),
+            _unitOfWork, new PlaylistService(_unitOfWork), null!,
+            TextReader.Null, TextWriter.Null);
+
+        act.Should().Throw<ArgumentNullException>().WithParameterName("activePlaylist");
     }
 
     [Fact]
@@ -204,7 +242,8 @@ public class MenuSystemTests : IDisposable
         var act = () => new MenuSystem(_audioMock.Object, _configService,
             new StatisticsService(_unitOfWork),
             new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, null!, TextWriter.Null);
+            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
+            null!, TextWriter.Null);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("input");
     }
@@ -215,7 +254,8 @@ public class MenuSystemTests : IDisposable
         var act = () => new MenuSystem(_audioMock.Object, _configService,
             new StatisticsService(_unitOfWork),
             new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, TextReader.Null, null!);
+            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
+            TextReader.Null, null!);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
@@ -225,13 +265,15 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public void DisplayMainMenu_ShouldShowAllOptions()
     {
-        var (menu, output) = CreateMenuWithOutput("6\n");
+        var (menu, output) = CreateMenuWithOutput("8\n");
 
         menu.DisplayMainMenu();
 
         var text = output.ToString();
         text.Should().Contain("FSMP");
         text.Should().Contain("Browse & Play");
+        text.Should().Contain("Player");
+        text.Should().Contain("Playlists");
         text.Should().Contain("Scan Libraries");
         text.Should().Contain("View Statistics");
         text.Should().Contain("Manage Libraries");
@@ -242,9 +284,9 @@ public class MenuSystemTests : IDisposable
     // ========== RunAsync Tests ==========
 
     [Fact]
-    public async Task RunAsync_Option6_ShouldExitAndDisplayGoodbye()
+    public async Task RunAsync_Option8_ShouldExitAndDisplayGoodbye()
     {
-        var (menu, output) = CreateMenuWithOutput("6\n");
+        var (menu, output) = CreateMenuWithOutput("8\n");
 
         await menu.RunAsync();
 
@@ -254,7 +296,7 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public async Task RunAsync_InvalidOption_ShouldShowErrorAndContinue()
     {
-        var (menu, output) = CreateMenuWithOutput("99\n6\n");
+        var (menu, output) = CreateMenuWithOutput("99\n8\n");
 
         await menu.RunAsync();
 
@@ -266,7 +308,7 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public async Task RunAsync_EmptyInput_ShouldContinueLoop()
     {
-        var (menu, output) = CreateMenuWithOutput("\n6\n");
+        var (menu, output) = CreateMenuWithOutput("\n8\n");
 
         await menu.RunAsync();
 
@@ -278,7 +320,7 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public async Task RunAsync_BrowseAndPlay_NoTracks_ShouldShowMessage()
     {
-        var (menu, output) = CreateMenuWithOutput("1\n6\n");
+        var (menu, output) = CreateMenuWithOutput("1\n8\n");
 
         await menu.RunAsync();
 
@@ -291,7 +333,7 @@ public class MenuSystemTests : IDisposable
         await CreateTrackAsync("Kerala");
 
         // Browse → see artists → back → exit
-        var (menu, output) = CreateMenuWithOutput("1\n0\n6\n");
+        var (menu, output) = CreateMenuWithOutput("1\n0\n8\n");
 
         await menu.RunAsync();
 
@@ -304,7 +346,7 @@ public class MenuSystemTests : IDisposable
         var track = await CreateTrackWithAlbumAsync("Kerala", "Test Artist", "Migration");
 
         // Browse → select artist → select album → select track → exit
-        var (menu, output) = CreateMenuWithOutput("1\n1\n1\n1\n6\n");
+        var (menu, output) = CreateMenuWithOutput("1\n1\n1\n1\n8\n");
 
         await menu.RunAsync();
 
@@ -319,7 +361,7 @@ public class MenuSystemTests : IDisposable
     {
         await CreateTrackAsync("Kerala");
 
-        var (menu, output) = CreateMenuWithOutput("1\n999\n6\n");
+        var (menu, output) = CreateMenuWithOutput("1\n999\n8\n");
 
         await menu.RunAsync();
 
@@ -333,7 +375,7 @@ public class MenuSystemTests : IDisposable
     {
         await CreateTrackAsync("Track 1");
 
-        var (menu, output) = CreateMenuWithOutput("3\n6\n");
+        var (menu, output) = CreateMenuWithOutput("5\n8\n");
 
         await menu.RunAsync();
 
@@ -347,7 +389,7 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public async Task RunAsync_ManageLibraries_ShouldShowNoPathsMessage()
     {
-        var (menu, output) = CreateMenuWithOutput("4\n0\n6\n");
+        var (menu, output) = CreateMenuWithOutput("6\n0\n8\n");
 
         await menu.RunAsync();
 
@@ -357,7 +399,7 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public async Task RunAsync_ManageLibraries_AddPath_ShouldAddPath()
     {
-        var (menu, output) = CreateMenuWithOutput("4\na\nC:\\Music\n6\n");
+        var (menu, output) = CreateMenuWithOutput("6\na\nC:\\Music\n8\n");
 
         await menu.RunAsync();
 
@@ -371,7 +413,7 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public async Task RunAsync_Settings_ShouldShowCurrentSettings()
     {
-        var (menu, output) = CreateMenuWithOutput("5\n\n6\n");
+        var (menu, output) = CreateMenuWithOutput("7\n\n8\n");
 
         await menu.RunAsync();
 
@@ -386,7 +428,7 @@ public class MenuSystemTests : IDisposable
     [Fact]
     public async Task RunAsync_ScanLibraries_NoPathsConfigured_ShouldShowMessage()
     {
-        var (menu, output) = CreateMenuWithOutput("2\n6\n");
+        var (menu, output) = CreateMenuWithOutput("4\n8\n");
 
         await menu.RunAsync();
 

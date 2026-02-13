@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
     <ProjectReference Include="..\..\..\..\FSMP.lib\FsmpLibrary\FsmpLibrary\FsmpLibrary.csproj" />
+    <ProjectReference Include="..\..\..\..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
   </ItemGroup>
 
   <!-- Copy ARM64 LibVLC native libraries to output (NuGet package only ships x64/x86) -->

@@ -108,7 +108,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldCreateConfigFile()
     {
-        var (app, output) = CreateApp("6\n");
+        var (app, output) = CreateApp("8\n");
 
         await app.RunAsync();
 
@@ -118,7 +118,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldCreateDatabaseFile()
     {
-        var (app, output) = CreateApp("6\n");
+        var (app, output) = CreateApp("8\n");
 
         await app.RunAsync();
 
@@ -128,7 +128,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldApplyMigrations()
     {
-        var (app, output) = CreateApp("6\n");
+        var (app, output) = CreateApp("8\n");
 
         await app.RunAsync();
 
@@ -139,7 +139,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldShowWelcomeMessage()
     {
-        var (app, output) = CreateApp("6\n");
+        var (app, output) = CreateApp("8\n");
 
         await app.RunAsync();
 
@@ -151,7 +151,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldDisplayMenuAndAcceptExit()
     {
-        var (app, output) = CreateApp("6\n");
+        var (app, output) = CreateApp("8\n");
 
         await app.RunAsync();
 
@@ -163,7 +163,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_WithAutoScanAndNoPaths_ShouldSkipScan()
     {
-        var (app, output) = CreateApp("6\n");
+        var (app, output) = CreateApp("8\n");
 
         await app.RunAsync();
 
@@ -175,11 +175,11 @@ public class AppStartupTests : IDisposable
     public async Task RunAsync_ShouldBeIdempotent_RunTwice()
     {
         // First run
-        var (app1, output1) = CreateApp("6\n");
+        var (app1, output1) = CreateApp("8\n");
         await app1.RunAsync();
 
         // Second run - should work with existing config and DB
-        var (app2, output2) = CreateApp("6\n");
+        var (app2, output2) = CreateApp("8\n");
         await app2.RunAsync();
 
         var text = output2.ToString();
@@ -191,8 +191,8 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ViewStatistics_ShouldShowEmptyStats()
     {
-        // Option 3 = View Statistics, then 6 = Exit
-        var (app, output) = CreateApp("3\n6\n");
+        // Option 5 = View Statistics, then 8 = Exit
+        var (app, output) = CreateApp("5\n8\n");
 
         await app.RunAsync();
 
@@ -204,8 +204,8 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ScanLibraries_NoPaths_ShouldShowMessage()
     {
-        // Option 2 = Scan Libraries (no paths configured), then 6 = Exit
-        var (app, output) = CreateApp("2\n6\n");
+        // Option 4 = Scan Libraries (no paths configured), then 8 = Exit
+        var (app, output) = CreateApp("4\n8\n");
 
         await app.RunAsync();
 
@@ -216,8 +216,8 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_BrowseAndPlay_EmptyLibrary_ShouldShowNoArtists()
     {
-        // Option 1 = Browse, then 0 = Back, then 6 = Exit
-        var (app, output) = CreateApp("1\n0\n6\n");
+        // Option 1 = Browse, then 0 = Back, then 8 = Exit
+        var (app, output) = CreateApp("1\n0\n8\n");
 
         await app.RunAsync();
 
