@@ -36,10 +36,10 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 **Database/** (3 files, ~48 tests):
 - `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs` (20 tests incl. Playlist/PlaylistTrack config), `MigrationTests.cs`
 
-**UI/** (8 files, ~175 tests):
-- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlaybackUITests.cs`
+**UI/** (9 files, ~241 tests):
+- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlaybackUITests.cs`, `PlayerUITests.cs` (40 tests)
 - `MetadataEditorTests.cs`, `LibraryManagerTests.cs`, `StatisticsViewerTests.cs`
-- `PrintTests.cs`, `AppStartupTests.cs`
+- `PrintTests.cs` (incl. 13 NewDisplay tests), `AppStartupTests.cs`
 
 **Core/** (1 file, 37 tests):
 - `ActivePlaylistServiceTests.cs` -- RepeatMode, shuffle, queue navigation
@@ -52,7 +52,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature | **Tests**: 628 passing | **Overall Coverage**: 92.49%
+**Status**: Complete (v1) + Playlist feature | **Tests**: 694 passing | **Overall Coverage**: 92.49%
 
 | Project | Coverage |
 |---------|----------|
@@ -87,4 +87,4 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 ## Progress Summary
 
 **Status**: Complete (v1) + Playlist feature tests (entity config, repository, service, UI menu updates)
-**Next Action**: PlayerUI tests (Batch 15), MenuSystem/BrowseUI test updates (Batch 16)
+**Next Action**: All playlist/player feature tests complete

@@ -1,3 +1,4 @@
+using FSMP.Core;
 using FluentAssertions;
 using FsmpConsole;
 using FsmpLibrary.Models;
@@ -231,5 +232,147 @@ public class PrintTests
     {
         var act = () => Print.FormatMetadataCard(null!);
         act.Should().Throw<ArgumentNullException>();
+    }
+
+    // ========== NewDisplay Tests ==========
+
+    [Fact]
+    public void NewDisplay_NullOutput_ShouldThrow()
+    {
+        var act = () => Print.NewDisplay(null!, null, false, new List<string>(), RepeatMode.None, false);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("output");
+    }
+
+    [Fact]
+    public void NewDisplay_NullQueueItems_ShouldThrow()
+    {
+        var act = () => Print.NewDisplay(new StringWriter(), null, false, null!, RepeatMode.None, false);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("queueItems");
+    }
+
+    [Fact]
+    public void NewDisplay_WithTrack_ShouldShowTrackInfo()
+    {
+        var output = new StringWriter();
+        var track = new Track
+        {
+            Title = "Kerala",
+            Artist = new Artist { Name = "Bonobo" },
+            Album = new Album { Title = "Migration" },
+        };
+
+        Print.NewDisplay(output, track, true, new List<string>(), RepeatMode.None, false);
+
+        var text = output.ToString();
+        text.Should().Contain("Kerala");
+        text.Should().Contain("Bonobo");
+        text.Should().Contain("Migration");
+    }
+
+    [Fact]
+    public void NewDisplay_NullTrack_ShouldShowNone()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+
+        output.ToString().Should().Contain("(none)");
+    }
+
+    [Fact]
+    public void NewDisplay_IsPlaying_ShouldShowPlaying()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, true, new List<string>(), RepeatMode.None, false);
+
+        output.ToString().Should().Contain("Playing");
+    }
+
+    [Fact]
+    public void NewDisplay_NotPlaying_ShouldShowStopped()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+
+        output.ToString().Should().Contain("Stopped");
+    }
+
+    [Fact]
+    public void NewDisplay_RepeatModeOne_ShouldDisplay()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.One, false);
+
+        output.ToString().Should().Contain("Repeat: One");
+    }
+
+    [Fact]
+    public void NewDisplay_RepeatModeAll_ShouldDisplay()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.All, false);
+
+        output.ToString().Should().Contain("Repeat: All");
+    }
+
+    [Fact]
+    public void NewDisplay_ShuffleOn_ShouldShowOn()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, true);
+
+        output.ToString().Should().Contain("Shuffle: On");
+    }
+
+    [Fact]
+    public void NewDisplay_ShuffleOff_ShouldShowOff()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+
+        output.ToString().Should().Contain("Shuffle: Off");
+    }
+
+    [Fact]
+    public void NewDisplay_EmptyQueue_ShouldShowEmpty()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+
+        output.ToString().Should().Contain("Queue: (empty)");
+    }
+
+    [Fact]
+    public void NewDisplay_WithQueueItems_ShouldListThem()
+    {
+        var output = new StringWriter();
+        var queue = new List<string> { "> 1) Kerala - Bonobo [3:20]", "  2) Cirrus - Bonobo [4:15]" };
+
+        Print.NewDisplay(output, null, false, queue, RepeatMode.None, false);
+
+        var text = output.ToString();
+        text.Should().Contain("Queue (2 tracks):");
+        text.Should().Contain("Kerala - Bonobo");
+        text.Should().Contain("Cirrus - Bonobo");
+    }
+
+    [Fact]
+    public void NewDisplay_ShouldShowControls()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+
+        var text = output.ToString();
+        text.Should().Contain("[N] Next");
+        text.Should().Contain("[S] Stop");
+        text.Should().Contain("[Q] Back");
     }
 }

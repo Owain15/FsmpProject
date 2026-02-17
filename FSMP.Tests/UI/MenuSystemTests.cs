@@ -434,4 +434,136 @@ public class MenuSystemTests : IDisposable
 
         output.ToString().Should().Contain("No library paths configured");
     }
+
+    // ========== Player Tests ==========
+
+    [Fact]
+    public async Task RunAsync_OpenPlayer_ShouldShowPlayerUI()
+    {
+        // Option 2 = Player, then Q = back from player, then 8 = exit
+        var (menu, output) = CreateMenuWithOutput("2\nQ\n8\n");
+
+        await menu.RunAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Queue: (empty)");
+        text.Should().Contain("Goodbye!");
+    }
+
+    // ========== Playlist Tests ==========
+
+    [Fact]
+    public async Task RunAsync_Playlists_EmptyList_ShouldShowBack()
+    {
+        // Option 3 = Playlists, then 0 = back, then 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\n0\n8\n");
+
+        await menu.RunAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Playlists");
+        text.Should().Contain("Goodbye!");
+    }
+
+    [Fact]
+    public async Task RunAsync_Playlists_CreateNew_ShouldCreatePlaylist()
+    {
+        // Option 3 = Playlists, C = create, name "My Mix", desc "Best tracks", then 0 = back, 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\nc\nMy Mix\nBest tracks\n0\n8\n");
+
+        await menu.RunAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Created playlist: My Mix");
+    }
+
+    [Fact]
+    public async Task RunAsync_Playlists_CreateNew_EmptyName_ShouldNotCreate()
+    {
+        // Option 3 = Playlists, C = create, empty name, then 0 = back, 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\nc\n\n0\n8\n");
+
+        await menu.RunAsync();
+
+        output.ToString().Should().NotContain("Created playlist");
+    }
+
+    [Fact]
+    public async Task RunAsync_Playlists_SelectPlaylist_ShouldShowPlaylist()
+    {
+        // Create a playlist first
+        var playlistService = new PlaylistService(_unitOfWork);
+        var playlist = await playlistService.CreatePlaylistAsync("My Mix", "Test desc");
+
+        // Option 3 = Playlists, 1 = select first, 0 = back from view, 0 = back from list, 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\n1\n0\n0\n8\n");
+
+        await menu.RunAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("My Mix");
+        text.Should().Contain("Test desc");
+        text.Should().Contain("(no tracks)");
+    }
+
+    [Fact]
+    public async Task RunAsync_Playlists_ViewPlaylistWithTracks_ShouldListTracks()
+    {
+        var track = await CreateTrackAsync("Kerala");
+        var playlistService = new PlaylistService(_unitOfWork);
+        var playlist = await playlistService.CreatePlaylistAsync("My Mix");
+        await playlistService.AddTrackAsync(playlist.PlaylistId, track.TrackId);
+
+        // Option 3 = Playlists, 1 = select, 0 = back from view, 0 = back from list, 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\n1\n0\n0\n8\n");
+
+        await menu.RunAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Kerala");
+    }
+
+    [Fact]
+    public async Task RunAsync_Playlists_LoadIntoQueue_ShouldLoadTracks()
+    {
+        var track = await CreateTrackAsync("Kerala");
+        var playlistService = new PlaylistService(_unitOfWork);
+        var playlist = await playlistService.CreatePlaylistAsync("My Mix");
+        await playlistService.AddTrackAsync(playlist.PlaylistId, track.TrackId);
+
+        // Option 3 = Playlists, 1 = select, L = load into queue, 0 = back from list, 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\n1\nl\n0\n8\n");
+
+        await menu.RunAsync();
+
+        output.ToString().Should().Contain("Loaded 1 tracks into player queue");
+    }
+
+    [Fact]
+    public async Task RunAsync_Playlists_LoadEmptyPlaylist_ShouldShowMessage()
+    {
+        var playlistService = new PlaylistService(_unitOfWork);
+        await playlistService.CreatePlaylistAsync("Empty Mix");
+
+        // Option 3 = Playlists, 1 = select, L = load, 0 = back from list, 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\n1\nl\n0\n8\n");
+
+        await menu.RunAsync();
+
+        output.ToString().Should().Contain("No tracks to load");
+    }
+
+    [Fact]
+    public async Task RunAsync_Playlists_DeletePlaylist_ShouldDelete()
+    {
+        var playlistService = new PlaylistService(_unitOfWork);
+        await playlistService.CreatePlaylistAsync("My Mix");
+
+        // Option 3 = Playlists, 1 = select, D = delete, 0 = back from list, 8 = exit
+        var (menu, output) = CreateMenuWithOutput("3\n1\nd\n0\n8\n");
+
+        await menu.RunAsync();
+
+        output.ToString().Should().Contain("Playlist deleted");
+    }
 }

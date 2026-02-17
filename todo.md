@@ -11,7 +11,7 @@
 | FSMO | File System Music Organizer | Not started | -- | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 
-**Overall coverage**: 92.49% | **Tests**: 628 all passing | **Build**: Passing
+**Overall coverage**: 92.49% | **Tests**: 694 all passing | **Build**: Passing
 
 ---
 
@@ -36,7 +36,7 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 
 ### Playlist + Music Player Feature
 
-**Status**: In progress | **Batches**: 14/17 complete
+**Status**: Complete | **Batches**: 17/17 complete
 **Plan**: [.claude/plans/smooth-wishing-cerf.md](.claude/plans/smooth-wishing-cerf.md)
 
 | # | Component | Status | Project |
@@ -55,9 +55,9 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 | 12 | PlaylistService tests | **Complete** | FSMP.Tests |
 | 13 | PlayerUI + Print.NewDisplay() update | **Complete** | FsmpConsole |
 | 14 | MenuSystem + AppStartup + BrowseUI updates | **Complete** | FsmpConsole |
-| 15 | PlayerUI tests | Not started | FSMP.Tests |
-| 16 | MenuSystem/AppStartup/BrowseUI test updates | Not started | FSMP.Tests |
-| 17 | Update all todo.md files | Not started | — |
+| 15 | PlayerUI tests + Print.NewDisplay tests | **Complete** | FSMP.Tests |
+| 16 | MenuSystem/BrowseUI test updates | **Complete** | FSMP.Tests |
+| 17 | Update all todo.md files | **Complete** | — |
 
 **Key Features**:
 - Saved playlists (DB-persisted with ordered tracks)

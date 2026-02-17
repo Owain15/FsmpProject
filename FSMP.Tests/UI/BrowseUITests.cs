@@ -445,6 +445,79 @@ public class BrowseUITests : IDisposable
         text.Should().Contain("Rating:   4/5");
     }
 
+    // ========== Queue Management Tests ==========
+
+    [Fact]
+    public async Task PlayTrackAsync_EmptyQueue_ShouldSetQueue()
+    {
+        var track = await CreateTrackAsync("Kerala");
+
+        var (browse, output) = CreateBrowseWithOutput("");
+
+        await browse.PlayTrackAsync(track.TrackId);
+
+        // ActivePlaylist is created fresh in CreateBrowseWithOutput, verify via output
+        output.ToString().Should().Contain("Added to player queue");
+    }
+
+    [Fact]
+    public async Task PlayTrackAsync_NonEmptyQueue_ShouldAppendTrack()
+    {
+        var track1 = await CreateTrackAsync("Kerala");
+        var track2 = await CreateTrackAsync("Cirrus");
+
+        var input = new StringReader("");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        activePlaylist.SetQueue(new[] { track1.TrackId });
+
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
+
+        await browse.PlayTrackAsync(track2.TrackId);
+
+        activePlaylist.Count.Should().Be(2);
+        activePlaylist.PlayOrder.Should().Contain(track2.TrackId);
+    }
+
+    [Fact]
+    public async Task PlayTrackAsync_DuplicateTrack_ShouldNotAppendAgain()
+    {
+        var track = await CreateTrackAsync("Kerala");
+
+        var input = new StringReader("");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        activePlaylist.SetQueue(new[] { track.TrackId });
+
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
+
+        await browse.PlayTrackAsync(track.TrackId);
+
+        activePlaylist.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task PlayTrackAsync_AppendTrack_ShouldPreserveCurrentIndex()
+    {
+        var track1 = await CreateTrackAsync("Kerala");
+        var track2 = await CreateTrackAsync("Cirrus");
+        var track3 = await CreateTrackAsync("Bambro");
+
+        var input = new StringReader("");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        activePlaylist.MoveNext(); // index 1 (track2)
+
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
+
+        await browse.PlayTrackAsync(track3.TrackId);
+
+        activePlaylist.CurrentIndex.Should().Be(1);
+        activePlaylist.CurrentTrackId.Should().Be(track2.TrackId);
+        activePlaylist.Count.Should().Be(3);
+    }
+
     // ========== RunAsync Integration Test ==========
 
     [Fact]
