@@ -466,7 +466,7 @@ public class EndToEndTests : IDisposable
         await viewer.RunAsync();
 
         var text = statsOutput.ToString();
-        text.Should().Contain("Total tracks:     2");
+        text.Should().Contain("Total tracks:   2");
     }
 
     // ========== Test 10: Config Persistence ==========

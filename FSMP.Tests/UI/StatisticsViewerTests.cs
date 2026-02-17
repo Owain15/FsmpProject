@@ -115,8 +115,8 @@ public class StatisticsViewerTests : IDisposable
 
         var text = output.ToString();
         text.Should().Contain("Library Overview");
-        text.Should().Contain("Total tracks:     0");
-        text.Should().Contain("Total plays:      0");
+        text.Should().Contain("Total tracks:   0");
+        text.Should().Contain("Total plays:    0");
         text.Should().Contain("Listening time:");
     }
 
@@ -132,8 +132,8 @@ public class StatisticsViewerTests : IDisposable
         await viewer.DisplayTotalStatisticsAsync();
 
         var text = output.ToString();
-        text.Should().Contain("Total tracks:     1");
-        text.Should().Contain("Total plays:      2");
+        text.Should().Contain("Total tracks:   1");
+        text.Should().Contain("Total plays:    2");
         text.Should().Contain("7m");
     }
 

@@ -441,8 +441,8 @@ public class BrowseUITests : IDisposable
         var text = output.ToString();
         text.Should().Contain("3:15");
         text.Should().Contain("320kbps");
-        text.Should().Contain("Plays:  5");
-        text.Should().Contain("Rating: 4/5");
+        text.Should().Contain("Plays:    5");
+        text.Should().Contain("Rating:   4/5");
     }
 
     // ========== RunAsync Integration Test ==========

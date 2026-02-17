@@ -11,7 +11,7 @@
 | FSMO | File System Music Organizer | Not started | -- | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 
-**Overall coverage**: 92.49% | **Tests**: 628 passing | **Build**: Passing
+**Overall coverage**: 92.49% | **Tests**: 628 all passing | **Build**: Passing
 
 ---
 
