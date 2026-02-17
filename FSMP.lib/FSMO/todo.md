@@ -100,27 +100,27 @@
 
 **What it delivers**: Given metadata, produce the organized target file path
 
-- [ ] Create `PathBuilder.cs` in FSMO/
-  - [ ] `string BuildTargetPath(string destinationRoot, AudioMetadata metadata, string originalFileName)` — returns `destination/Artist/Album/filename`
-  - [ ] Fallback: "Unknown Artist" when artist is null/empty
-  - [ ] Fallback: "Unknown Album" when album is null/empty
-  - [ ] Sanitize folder names: remove invalid path characters
-  - [ ] Trim whitespace from artist/album names
-- [ ] Create `PathBuilderTests.cs` in `FSMP.Tests/FSMO/`
-  - [ ] Test builds correct path with full metadata (Artist/Album/file.mp3)
-  - [ ] Test falls back to "Unknown Artist" when artist is null
-  - [ ] Test falls back to "Unknown Artist" when artist is empty/whitespace
-  - [ ] Test falls back to "Unknown Album" when album is null
-  - [ ] Test falls back to "Unknown Album" when album is empty/whitespace
-  - [ ] Test sanitizes invalid path characters from artist name
-  - [ ] Test sanitizes invalid path characters from album name
-  - [ ] Test trims whitespace from artist and album
-  - [ ] Test preserves original file name and extension
-  - [ ] Test throws on null destination root
-  - [ ] Test throws on null original file name
-- [ ] **Build**: Pass
-- [ ] **Tests**: Pass
-- [ ] **Coverage**: ≥80% on PathBuilder
+- [x] Create `PathBuilder.cs` in FSMO/
+  - [x] `string BuildTargetPath(string destinationRoot, AudioMetadata metadata, string originalFileName)` — returns `destination/Artist/Album/filename`
+  - [x] Fallback: "Unknown Artist" when artist is null/empty
+  - [x] Fallback: "Unknown Album" when album is null/empty
+  - [x] Sanitize folder names: remove invalid path characters
+  - [x] Trim whitespace from artist/album names
+- [x] Create `PathBuilderTests.cs` in `FSMP.Tests/FSMO/` (13 tests)
+  - [x] Test builds correct path with full metadata (Artist/Album/file.mp3)
+  - [x] Test falls back to "Unknown Artist" when artist is null
+  - [x] Test falls back to "Unknown Artist" when artist is empty/whitespace
+  - [x] Test falls back to "Unknown Album" when album is null
+  - [x] Test falls back to "Unknown Album" when album is empty/whitespace
+  - [x] Test sanitizes invalid path characters from artist name
+  - [x] Test sanitizes invalid path characters from album name
+  - [x] Test trims whitespace from artist and album
+  - [x] Test preserves original file name and extension
+  - [x] Test throws on null destination root
+  - [x] Test throws on null original file name
+- [x] **Build**: Pass
+- [x] **Tests**: Pass
+- [x] **Coverage**: 93.80% on FSMO (≥80% target met)
 
 ---
 
@@ -242,6 +242,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 4 / 10
-**Status**: Metadata reading implemented and tested, ready for Slice 5
-**Next Action**: Slice 5 — Path Builder
+**Completed Slices**: 5 / 10
+**Status**: Path building implemented and tested, ready for Slice 6
+**Next Action**: Slice 6 — File Organizer (Copy Mode)
