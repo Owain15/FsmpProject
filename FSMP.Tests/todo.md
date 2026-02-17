@@ -57,7 +57,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests | **Tests**: 780 passing | **Overall Coverage**: 96.43%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests | **Tests**: 795 passing | **Overall Coverage**: 96.34%
 
 | Project | Coverage |
 |---------|----------|
@@ -65,6 +65,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 | FsmpDataAcsses | 98.52% |
 | FsmpLibrary | 86.26% |
 | FSMP.Core | 100% |
+| FSMO | 92.55% |
 
 ---
 
@@ -76,6 +77,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - [x] `FsmoReferenceTests.cs` — placeholder test verifying FSMO project reference (1 test)
 - [x] `FileSystemTests.cs` — 12 tests covering all FileSystem helper methods (create/delete/move for files and directories)
 - [x] `AudioFileScannerTests.cs` — 21 tests covering ScanDirectory and IsSupportedFormat (mp3/wav/wma, case-insensitive, recursion, validation)
+- [x] `AudioMetadataTests.cs` — 7 tests covering POCO property defaults and setters
+- [x] `MetadataReaderTests.cs` — 8 tests covering TagLibSharp metadata extraction (MP3, WMA, WAV no-tags, corrupt file, validation)
 - [ ] Additional tests tracked in [FSMO todo](../FSMP.lib/FSMO/todo.md) alongside implementation slices
 
 ### Coverage Improvement
@@ -95,5 +98,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature + Audio coverage improvement (52 new tests) + FSMO Slice 3 tests (21 new)
-**Next Action**: FSMO Slice 4 tests (Metadata Reader)
+**Status**: Complete (v1) + Playlist feature + Audio coverage improvement (52 new tests) + FSMO Slices 1-4 tests
+**Next Action**: FSMO Slice 5 tests (Path Builder)
