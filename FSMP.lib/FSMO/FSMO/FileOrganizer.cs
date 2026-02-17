@@ -41,6 +41,22 @@ public static class FileOrganizer
             }
         }
 
+        if (mode == OrganizeMode.Move)
+            CleanupEmptyDirectories(sourcePath);
+
         return result;
+    }
+
+    private static void CleanupEmptyDirectories(string rootPath)
+    {
+        foreach (var dir in Directory.GetDirectories(rootPath, "*", SearchOption.AllDirectories)
+                     .OrderByDescending(d => d.Length))
+        {
+            if (Directory.Exists(dir) &&
+                !Directory.EnumerateFileSystemEntries(dir).Any())
+            {
+                Directory.Delete(dir);
+            }
+        }
     }
 }

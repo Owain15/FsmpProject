@@ -156,19 +156,19 @@
 
 **What it delivers**: Move audio files into organized structure, clean up empty source directories
 
-- [ ] Extend `FileOrganizer.Organize` with move mode support
-  - [ ] Move mode: move each file to target path, create directories as needed
-  - [ ] After moving, remove empty source directories (leaf-first cleanup)
-- [ ] Add tests to `FileOrganizerTests.cs`
-  - [ ] Test Organize move mode moves file to correct location
-  - [ ] Test Organize move mode removes file from source
-  - [ ] Test Organize move mode creates target directories
-  - [ ] Test Organize move mode returns correct FilesMoved count
-  - [ ] Test Organize move mode cleans up empty source directories
-  - [ ] Test Organize move mode does not delete non-empty source directories
-- [ ] **Build**: Pass
-- [ ] **Tests**: Pass
-- [ ] **Coverage**: ≥80% on FileOrganizer
+- [x] Extend `FileOrganizer.Organize` with move mode support
+  - [x] Move mode: move each file to target path, create directories as needed
+  - [x] After moving, remove empty source directories (leaf-first cleanup)
+- [x] Add tests to `FileOrganizerTests.cs` (6 new tests, 16 total)
+  - [x] Test Organize move mode moves file to correct location
+  - [x] Test Organize move mode removes file from source
+  - [x] Test Organize move mode creates target directories
+  - [x] Test Organize move mode returns correct FilesMoved count
+  - [x] Test Organize move mode cleans up empty source directories
+  - [x] Test Organize move mode does not delete non-empty source directories
+- [x] **Build**: Pass
+- [x] **Tests**: Pass
+- [x] **Coverage**: 92.59% on FSMO (≥80% target met)
 
 ---
 
@@ -242,6 +242,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 6 / 10
-**Status**: File organizer (copy mode) implemented and tested, ready for Slice 7
-**Next Action**: Slice 7 — File Organizer (Move Mode)
+**Completed Slices**: 7 / 10
+**Status**: File organizer (copy + move modes) implemented and tested, ready for Slice 8
+**Next Action**: Slice 8 — Duplicate Handling

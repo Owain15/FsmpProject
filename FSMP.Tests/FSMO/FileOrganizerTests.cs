@@ -163,6 +163,78 @@ public class FileOrganizerTests : IDisposable
 
     #endregion
 
+    #region Organize Move Mode
+
+    [Fact]
+    public void Organize_MoveMode_MovesFileToCorrectLocation()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        var result = FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Move);
+
+        var targetDir = Path.Combine(_destDir, "Bonobo", "Migration");
+        Directory.Exists(targetDir).Should().BeTrue();
+        Directory.GetFiles(targetDir).Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void Organize_MoveMode_RemovesFileFromSource()
+    {
+        var sourcePath = CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Move);
+
+        File.Exists(sourcePath).Should().BeFalse();
+    }
+
+    [Fact]
+    public void Organize_MoveMode_CreatesTargetDirectories()
+    {
+        CreateWavWithMetadata(artist: "Kiasmos", album: "Blurred");
+
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Move);
+
+        Directory.Exists(Path.Combine(_destDir, "Kiasmos")).Should().BeTrue();
+        Directory.Exists(Path.Combine(_destDir, "Kiasmos", "Blurred")).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Organize_MoveMode_ReturnsCorrectFilesMovedCount()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        var result = FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Move);
+
+        result.FilesMoved.Should().Be(2);
+        result.FilesCopied.Should().Be(0);
+        result.Errors.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Organize_MoveMode_CleansUpEmptySourceDirectories()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration", subDir: "subA");
+
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Move);
+
+        Directory.Exists(Path.Combine(_sourceDir, "subA")).Should().BeFalse();
+    }
+
+    [Fact]
+    public void Organize_MoveMode_DoesNotDeleteNonEmptySourceDirectories()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration", subDir: "subB");
+        // Create a non-audio file that won't be moved
+        File.WriteAllText(Path.Combine(_sourceDir, "subB", "readme.txt"), "keep me");
+
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Move);
+
+        Directory.Exists(Path.Combine(_sourceDir, "subB")).Should().BeTrue();
+    }
+
+    #endregion
+
     #region Organize — Input Validation
 
     [Fact]
