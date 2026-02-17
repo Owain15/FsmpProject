@@ -235,6 +235,93 @@ public class FileOrganizerTests : IDisposable
 
     #endregion
 
+    #region Organize — Duplicate Handling
+
+    [Fact]
+    public void Organize_SkipStrategy_SkipsExistingFileAndIncrementsFilesSkipped()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        // First organize to create the destination file
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy);
+
+        // Second organize with same source — should skip
+        var result = FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy, DuplicateStrategy.Skip);
+
+        result.FilesSkipped.Should().Be(1);
+        result.FilesCopied.Should().Be(0);
+    }
+
+    [Fact]
+    public void Organize_OverwriteStrategy_ReplacesExistingFile()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        // First organize
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy);
+        var targetDir = Path.Combine(_destDir, "Bonobo", "Migration");
+        var targetFile = Directory.GetFiles(targetDir).Single();
+        var originalSize = new FileInfo(targetFile).Length;
+
+        // Second organize with overwrite
+        var result = FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy, DuplicateStrategy.Overwrite);
+
+        result.FilesCopied.Should().Be(1);
+        result.FilesSkipped.Should().Be(0);
+        File.Exists(targetFile).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Organize_RenameStrategy_CreatesFileWithSuffix()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        // First organize
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy);
+
+        // Second organize with rename
+        var result = FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy, DuplicateStrategy.Rename);
+
+        result.FilesCopied.Should().Be(1);
+        var targetDir = Path.Combine(_destDir, "Bonobo", "Migration");
+        Directory.GetFiles(targetDir).Should().HaveCount(2);
+        Directory.GetFiles(targetDir).Should().Contain(f => f.Contains("_1"));
+    }
+
+    [Fact]
+    public void Organize_RenameStrategy_IncrementsSuffixForMultipleDuplicates()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        // Organize three times with rename
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy);
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy, DuplicateStrategy.Rename);
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy, DuplicateStrategy.Rename);
+
+        var targetDir = Path.Combine(_destDir, "Bonobo", "Migration");
+        var files = Directory.GetFiles(targetDir);
+        files.Should().HaveCount(3);
+        files.Should().Contain(f => f.Contains("_1"));
+        files.Should().Contain(f => f.Contains("_2"));
+    }
+
+    [Fact]
+    public void Organize_DefaultStrategy_IsSkip()
+    {
+        CreateWavWithMetadata(artist: "Bonobo", album: "Migration");
+
+        // First organize
+        FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy);
+
+        // Second organize without specifying strategy — should default to Skip
+        var result = FileOrganizer.Organize(_sourceDir, _destDir, OrganizeMode.Copy);
+
+        result.FilesSkipped.Should().Be(1);
+        result.FilesCopied.Should().Be(0);
+    }
+
+    #endregion
+
     #region Organize — Input Validation
 
     [Fact]

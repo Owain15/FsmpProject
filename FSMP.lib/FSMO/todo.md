@@ -176,20 +176,20 @@
 
 **What it delivers**: Handle files that already exist at the destination
 
-- [ ] Create `DuplicateStrategy.cs` enum in FSMO/ — `Skip`, `Overwrite`, `Rename`
-- [ ] Extend `FileOrganizer.Organize` with `DuplicateStrategy` parameter (default: Skip)
-  - [ ] Skip: do not copy/move, increment FilesSkipped count
-  - [ ] Overwrite: replace existing file at destination
-  - [ ] Rename: append `_1`, `_2`, etc. suffix before extension
-- [ ] Add tests to `FileOrganizerTests.cs`
-  - [ ] Test Skip strategy skips existing file and increments FilesSkipped
-  - [ ] Test Overwrite strategy replaces existing file
-  - [ ] Test Rename strategy creates file with _1 suffix
-  - [ ] Test Rename strategy increments suffix (_1, _2, _3) for multiple duplicates
-  - [ ] Test default strategy is Skip
-- [ ] **Build**: Pass
-- [ ] **Tests**: Pass
-- [ ] **Coverage**: ≥80% on FileOrganizer
+- [x] Create `DuplicateStrategy.cs` enum in FSMO/ — `Skip`, `Overwrite`, `Rename`
+- [x] Extend `FileOrganizer.Organize` with `DuplicateStrategy` parameter (default: Skip)
+  - [x] Skip: do not copy/move, increment FilesSkipped count
+  - [x] Overwrite: replace existing file at destination
+  - [x] Rename: append `_1`, `_2`, etc. suffix before extension
+- [x] Add tests to `FileOrganizerTests.cs` (5 new tests, 21 total)
+  - [x] Test Skip strategy skips existing file and increments FilesSkipped
+  - [x] Test Overwrite strategy replaces existing file
+  - [x] Test Rename strategy creates file with _1 suffix
+  - [x] Test Rename strategy increments suffix (_1, _2, _3) for multiple duplicates
+  - [x] Test default strategy is Skip
+- [x] **Build**: Pass
+- [x] **Tests**: Pass
+- [x] **Coverage**: 93.98% on FSMO (≥80% target met)
 
 ---
 
@@ -242,6 +242,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 7 / 10
-**Status**: File organizer (copy + move modes) implemented and tested, ready for Slice 8
-**Next Action**: Slice 8 — Duplicate Handling
+**Completed Slices**: 8 / 10
+**Status**: Duplicate handling implemented and tested, ready for Slice 9
+**Next Action**: Slice 9 — DirectoryManager Integration

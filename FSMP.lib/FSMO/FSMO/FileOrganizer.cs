@@ -2,7 +2,8 @@ namespace FSMO;
 
 public static class FileOrganizer
 {
-    public static OrganizeResult Organize(string sourcePath, string destinationPath, OrganizeMode mode)
+    public static OrganizeResult Organize(string sourcePath, string destinationPath, OrganizeMode mode,
+        DuplicateStrategy duplicateStrategy = DuplicateStrategy.Skip)
     {
         ArgumentNullException.ThrowIfNull(sourcePath);
         ArgumentNullException.ThrowIfNull(destinationPath);
@@ -24,9 +25,25 @@ public static class FileOrganizer
                 if (!Directory.Exists(targetDir))
                     Directory.CreateDirectory(targetDir);
 
+                if (File.Exists(targetPath))
+                {
+                    switch (duplicateStrategy)
+                    {
+                        case DuplicateStrategy.Skip:
+                            result.FilesSkipped++;
+                            continue;
+                        case DuplicateStrategy.Overwrite:
+                            File.Delete(targetPath);
+                            break;
+                        case DuplicateStrategy.Rename:
+                            targetPath = GetUniqueFilePath(targetPath);
+                            break;
+                    }
+                }
+
                 if (mode == OrganizeMode.Copy)
                 {
-                    File.Copy(file.FullName, targetPath, overwrite: false);
+                    File.Copy(file.FullName, targetPath);
                     result.FilesCopied++;
                 }
                 else
@@ -45,6 +62,23 @@ public static class FileOrganizer
             CleanupEmptyDirectories(sourcePath);
 
         return result;
+    }
+
+    private static string GetUniqueFilePath(string path)
+    {
+        var dir = Path.GetDirectoryName(path)!;
+        var nameWithoutExt = Path.GetFileNameWithoutExtension(path);
+        var ext = Path.GetExtension(path);
+        var counter = 1;
+
+        string candidate;
+        do
+        {
+            candidate = Path.Combine(dir, $"{nameWithoutExt}_{counter}{ext}");
+            counter++;
+        } while (File.Exists(candidate));
+
+        return candidate;
     }
 
     private static void CleanupEmptyDirectories(string rootPath)
