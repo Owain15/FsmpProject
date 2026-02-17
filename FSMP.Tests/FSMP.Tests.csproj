@@ -34,6 +34,7 @@
     <ProjectReference Include="..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
     <ProjectReference Include="..\FSMP.UI\FSMP.UI.Console\FsmpConsole\FsmpConsole\FsmpConsole.csproj" />
     <ProjectReference Include="..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
+    <ProjectReference Include="..\FSMP.lib\FSMO\FSMO\FSMO.csproj" />
   </ItemGroup>
 
 </Project>

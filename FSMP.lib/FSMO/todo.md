@@ -10,12 +10,12 @@
 
 **What it delivers**: FSMO project wired into the test suite with TagLibSharp for metadata reading
 
-- [ ] Add TagLibSharp 2.3.0 NuGet package to FSMO.csproj
-- [ ] Add FSMO project reference to FSMP.Tests.csproj
-- [ ] Create test directory `FSMP.Tests/FSMO/`
-- [ ] Create a placeholder test to verify the reference works
-- [ ] **Build**: Pass
-- [ ] **Tests**: Pass
+- [x] Add TagLibSharp 2.3.0 NuGet package to FSMO.csproj
+- [x] Add FSMO project reference to FSMP.Tests.csproj
+- [x] Create test directory `FSMP.Tests/FSMO/`
+- [x] Create a placeholder test to verify the reference works
+- [x] **Build**: Pass
+- [x] **Tests**: Pass
 
 ---
 
@@ -242,6 +242,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 0 / 10
-**Status**: Ready to begin implementation
-**Next Action**: Slice 1 — Testing Infrastructure
+**Completed Slices**: 1 / 10
+**Status**: Infrastructure wired, ready for Slice 2
+**Next Action**: Slice 2 — FileSystem Tests
