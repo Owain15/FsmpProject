@@ -46,24 +46,24 @@
 
 **What it delivers**: Scan a directory and return all supported audio files
 
-- [ ] Create `AudioFileScanner.cs` in FSMO/
-  - [ ] `List<FileInfo> ScanDirectory(string sourcePath)` — recursively find all audio files
-  - [ ] `bool IsSupportedFormat(string extension)` — check .mp3, .wav, .wma (case-insensitive)
-  - [ ] Input validation: null/empty path, directory not found
-- [ ] Create `AudioFileScannerTests.cs` in `FSMP.Tests/FSMO/`
-  - [ ] Test ScanDirectory finds .mp3 files
-  - [ ] Test ScanDirectory finds .wav files
-  - [ ] Test ScanDirectory finds .wma files
-  - [ ] Test ScanDirectory ignores unsupported formats (.txt, .jpg, .flac)
-  - [ ] Test ScanDirectory searches subdirectories recursively
-  - [ ] Test ScanDirectory returns empty list for empty directory
-  - [ ] Test ScanDirectory throws on null/empty path
-  - [ ] Test ScanDirectory throws on non-existent directory
-  - [ ] Test IsSupportedFormat case-insensitive (.MP3, .Mp3)
-  - [ ] Test IsSupportedFormat rejects unsupported extensions
-- [ ] **Build**: Pass
-- [ ] **Tests**: Pass
-- [ ] **Coverage**: ≥80% on AudioFileScanner
+- [x] Create `AudioFileScanner.cs` in FSMO/
+  - [x] `List<FileInfo> ScanDirectory(string sourcePath)` — recursively find all audio files
+  - [x] `bool IsSupportedFormat(string extension)` — check .mp3, .wav, .wma (case-insensitive)
+  - [x] Input validation: null/empty path, directory not found
+- [x] Create `AudioFileScannerTests.cs` in `FSMP.Tests/FSMO/` (21 tests)
+  - [x] Test ScanDirectory finds .mp3 files
+  - [x] Test ScanDirectory finds .wav files
+  - [x] Test ScanDirectory finds .wma files
+  - [x] Test ScanDirectory ignores unsupported formats (.txt, .jpg, .flac)
+  - [x] Test ScanDirectory searches subdirectories recursively
+  - [x] Test ScanDirectory returns empty list for empty directory
+  - [x] Test ScanDirectory throws on null/empty path
+  - [x] Test ScanDirectory throws on non-existent directory
+  - [x] Test IsSupportedFormat case-insensitive (.MP3, .Mp3)
+  - [x] Test IsSupportedFormat rejects unsupported extensions
+- [x] **Build**: Pass
+- [x] **Tests**: Pass
+- [x] **Coverage**: ≥80% on AudioFileScanner
 
 ---
 
@@ -242,6 +242,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 2 / 10
-**Status**: FileSystem fully tested, ready for Slice 3
-**Next Action**: Slice 3 — Audio File Discovery
+**Completed Slices**: 3 / 10
+**Status**: Audio file scanning implemented and tested, ready for Slice 4
+**Next Action**: Slice 4 — Metadata Reader

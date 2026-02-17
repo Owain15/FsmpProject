@@ -11,7 +11,7 @@
 | FSMO | File System Music Organizer | Not started | -- | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 
-**Overall coverage**: 96.43% | **Tests**: 759 all passing | **Build**: Passing
+**Overall coverage**: 96.43% | **Tests**: 780 all passing | **Build**: Passing
 
 ---
 
@@ -82,7 +82,7 @@ Refactored `LibVlcAudioPlayer` to extract `IMediaPlayerAdapter` interface, enabl
 
 ### FSMO -- File System Music Organizer
 
-**Status**: 2/10 slices complete | **Next**: Slice 3 -- Audio File Discovery
+**Status**: 3/10 slices complete | **Next**: Slice 4 -- Metadata Reader
 
 Scan source directories for audio files and reorganize them into `Artist/Album/Track` structure. Supports copy and move operations with duplicate handling.
 
