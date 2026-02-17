@@ -8,10 +8,10 @@
 | FSMP.Core | Platform-agnostic player logic | In progress | 100% | [todo](FSMP.lib/FSMP.Core/todo.md) |
 | FsmpDataAcsses | EF Core data access layer | Complete (v1) | 98.52% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
 | FsmpConsole | Console UI application | Complete (v1) | 95.60% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
-| FSMO | File System Music Organizer | In progress (8/10) | 93.98% | [todo](FSMP.lib/FSMO/todo.md) |
+| FSMO | File System Music Organizer | In progress (9/10) | 96.35% | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 
-**Overall coverage**: 96.33% | **Tests**: 829 all passing | **Build**: Passing
+**Overall coverage**: 96.42% | **Tests**: 837 all passing | **Build**: Passing
 
 ---
 
@@ -82,7 +82,7 @@ Refactored `LibVlcAudioPlayer` to extract `IMediaPlayerAdapter` interface, enabl
 
 ### FSMO -- File System Music Organizer
 
-**Status**: 8/10 slices complete | **Next**: Slice 9 -- DirectoryManager Integration
+**Status**: 9/10 slices complete | **Next**: Slice 10 -- Edge Cases & Polish
 
 Scan source directories for audio files and reorganize them into `Artist/Album/Track` structure. Supports copy and move operations with duplicate handling.
 

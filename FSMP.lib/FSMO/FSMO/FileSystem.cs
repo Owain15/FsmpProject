@@ -3,23 +3,32 @@
 namespace FSMO
 {
     public static class DirectoryManager
-	{
-        public static void ReoginiseDirectory(System.IO.DirectoryInfo dir)
+    {
+        public static OrganizeResult ReorganiseDirectory(DirectoryInfo sourceDir, string destinationPath,
+            OrganizeMode mode = OrganizeMode.Copy, DuplicateStrategy duplicateStrategy = DuplicateStrategy.Skip)
         {
-            throw new NotImplementedException();
-		}
+            ArgumentNullException.ThrowIfNull(sourceDir);
+            ArgumentNullException.ThrowIfNull(destinationPath);
 
-        public static List<System.IO.FileInfo>GetAllDistinctAudioFileNewDirectory()
-        { 
-            throw new NotImplementedException();
+            return FileOrganizer.Organize(sourceDir.FullName, destinationPath, mode, duplicateStrategy);
         }
 
-		public static void CreateDirectory(string path)
+        public static List<FileInfo> GetAllDistinctAudioFiles(string sourcePath)
+        {
+            ArgumentNullException.ThrowIfNull(sourcePath);
+
+            var files = AudioFileScanner.ScanDirectory(sourcePath);
+            return files
+                .GroupBy(f => f.Name, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
+                .ToList();
+        }
+
+        public static void CreateDirectory(string path)
         {
             FileSystem.CreateDirectory(path);
-		}
-
-	}
+        }
+    }
 
     internal class FileSystem
     {
