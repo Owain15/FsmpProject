@@ -28,10 +28,12 @@ Platform-agnostic audio playback abstraction:
 
 ### Audio Implementation (`Audio/`)
 
-LibVLCSharp-based audio playback (replaced WMPLib COM interop):
+LibVLCSharp-based audio playback (replaced WMPLib COM interop), refactored with adapter pattern:
 
-- `LibVlcAudioPlayer.cs` -- IAudioPlayer implementation using LibVLCSharp
-- `LibVlcAudioPlayerFactory.cs` -- IAudioPlayerFactory implementation
+- `IMediaPlayerAdapter.cs` -- Thin adapter interface wrapping platform-specific media player operations
+- `LibVlcMediaPlayerAdapter.cs` -- IMediaPlayerAdapter implementation using LibVLCSharp (thin pass-through)
+- `LibVlcAudioPlayer.cs` -- IAudioPlayer implementation with business logic (state machine, validation, events), uses IMediaPlayerAdapter
+- `LibVlcAudioPlayerFactory.cs` -- IAudioPlayerFactory implementation with optional adapter factory injection
 
 ### Services (`Services/`)
 
@@ -44,9 +46,9 @@ LibVLCSharp-based audio playback (replaced WMPLib COM interop):
 
 ## Current Status
 
-**Status**: Complete (v1) | **Coverage**: 65.74% | **Tests**: see FSMP.Tests
+**Status**: Complete (v1) | **Coverage**: 86.26% | **Tests**: see FSMP.Tests
 
-Coverage is lower due to untested `LibVlcAudioPlayer.cs` and `LibVlcAudioPlayerFactory.cs` (require real LibVLC runtime).
+Coverage improved from 65.74% to 86.26% via adapter pattern refactor (IMediaPlayerAdapter) enabling unit testing of LibVlcAudioPlayer without LibVLC runtime.
 
 ---
 
@@ -64,9 +66,10 @@ Coverage is lower due to untested `LibVlcAudioPlayer.cs` and `LibVlcAudioPlayerF
 
 ### Coverage Improvement
 
-- [ ] Improve coverage from 65.74% toward 80%+
-- [ ] Add integration tests for LibVlcAudioPlayer (requires LibVLC runtime)
-- [ ] Consider mocking LibVLC for unit-testable coverage
+- [x] Improve coverage from 65.74% toward 80%+ (achieved 86.26%)
+- [x] Extract IMediaPlayerAdapter to decouple LibVLC from business logic
+- [x] Add 52 unit tests for LibVlcAudioPlayer and LibVlcAudioPlayerFactory
+- [ ] Add integration tests for LibVlcMediaPlayerAdapter (requires LibVLC runtime, optional)
 
 ### Cross-Platform Migration (when Phase 3 begins)
 
@@ -79,5 +82,5 @@ Coverage is lower due to untested `LibVlcAudioPlayer.cs` and `LibVlcAudioPlayerF
 
 ## Progress Summary
 
-**Status**: Complete (v1), pending coverage improvement
-**Next Action**: Coverage improvement or cross-platform migration Phase 3
+**Status**: Complete (v1), coverage improvement done (86.26%)
+**Next Action**: Cross-platform migration Phase 3 or FSMO

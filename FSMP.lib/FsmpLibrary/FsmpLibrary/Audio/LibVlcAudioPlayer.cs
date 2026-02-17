@@ -1,86 +1,61 @@
-using System.Runtime.InteropServices;
-using LibVLCSharp.Shared;
 using FsmpLibrary.Interfaces;
 using FsmpLibrary.Interfaces.EventArgs;
 
 namespace FsmpLibrary.Audio;
 
 /// <summary>
-/// LibVLCSharp-based audio player implementation.
-/// Supports WAV, WMA, MP3 and virtually any audio format supported by VLC.
+/// Audio player implementation using an IMediaPlayerAdapter for platform-specific playback.
+/// Contains all business logic: state management, validation, event translation, disposal.
 /// </summary>
 public class LibVlcAudioPlayer : IAudioPlayer
 {
-    private static bool _coreInitialized;
-    private static readonly object _initLock = new();
-
-    private readonly LibVLC _libVLC;
-    private readonly MediaPlayer _mediaPlayer;
-    private Media? _currentMedia;
+    private readonly IMediaPlayerAdapter _adapter;
     private string _currentFilePath = string.Empty;
     private bool _disposed;
 
-    public LibVlcAudioPlayer()
+    /// <summary>
+    /// Creates a player with the default LibVLC-based adapter.
+    /// </summary>
+    public LibVlcAudioPlayer() : this(new LibVlcMediaPlayerAdapter()) { }
+
+    /// <summary>
+    /// Creates a player with the specified adapter (enables unit testing).
+    /// </summary>
+    public LibVlcAudioPlayer(IMediaPlayerAdapter adapter)
     {
-        // Initialize LibVLC core once (thread-safe)
-        lock (_initLock)
-        {
-            if (!_coreInitialized)
-            {
-                // Detect process architecture to select correct native LibVLC libraries
-                var archFolder = RuntimeInformation.ProcessArchitecture switch
-                {
-                    Architecture.Arm64 => "win-arm64",
-                    Architecture.X86 => "win-x86",
-                    _ => "win-x64"
-                };
-                var libvlcPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "libvlc", archFolder));
+        _adapter = adapter ?? throw new ArgumentNullException(nameof(adapter));
 
-                // Set VLC_PLUGIN_PATH environment variable for plugins discovery
-                var pluginsPath = Path.Combine(libvlcPath, "plugins");
-                Environment.SetEnvironmentVariable("VLC_PLUGIN_PATH", pluginsPath);
-
-                Core.Initialize(libvlcPath);
-                _coreInitialized = true;
-            }
-        }
-
-        // Create LibVLC instance with minimal logging
-        _libVLC = new LibVLC("--quiet");
-        _mediaPlayer = new MediaPlayer(_libVLC);
-
-        // Wire up events
-        _mediaPlayer.Playing += OnPlaying;
-        _mediaPlayer.Paused += OnPaused;
-        _mediaPlayer.Stopped += OnStopped;
-        _mediaPlayer.EndReached += OnEndReached;
-        _mediaPlayer.EncounteredError += OnError;
-        _mediaPlayer.TimeChanged += OnTimeChanged;
+        _adapter.Playing += OnPlaying;
+        _adapter.Paused += OnPaused;
+        _adapter.Stopped += OnStopped;
+        _adapter.EndReached += OnEndReached;
+        _adapter.EncounteredError += OnError;
+        _adapter.TimeChanged += OnTimeChanged;
     }
 
     /// <inheritdoc/>
     public PlaybackState State { get; private set; } = PlaybackState.Stopped;
 
     /// <inheritdoc/>
-    public TimeSpan Position => TimeSpan.FromMilliseconds(_mediaPlayer.Time);
+    public TimeSpan Position => TimeSpan.FromMilliseconds(_adapter.TimeMs);
 
     /// <inheritdoc/>
-    public TimeSpan Duration => _currentMedia?.Duration > 0
-        ? TimeSpan.FromMilliseconds(_currentMedia.Duration)
+    public TimeSpan Duration => _adapter.DurationMs > 0
+        ? TimeSpan.FromMilliseconds(_adapter.DurationMs)
         : TimeSpan.Zero;
 
     /// <inheritdoc/>
     public float Volume
     {
-        get => _mediaPlayer.Volume / 100f;
-        set => _mediaPlayer.Volume = (int)(Math.Clamp(value, 0f, 1f) * 100);
+        get => _adapter.Volume / 100f;
+        set => _adapter.Volume = (int)(Math.Clamp(value, 0f, 1f) * 100);
     }
 
     /// <inheritdoc/>
     public bool IsMuted
     {
-        get => _mediaPlayer.Mute;
-        set => _mediaPlayer.Mute = value;
+        get => _adapter.Mute;
+        set => _adapter.Mute = value;
     }
 
     /// <inheritdoc/>
@@ -109,20 +84,17 @@ public class LibVlcAudioPlayer : IAudioPlayer
         // Stop current playback
         if (State == PlaybackState.Playing || State == PlaybackState.Paused)
         {
-            _mediaPlayer.Stop();
+            _adapter.Stop();
         }
 
         // Dispose previous media if exists
-        _currentMedia?.Dispose();
+        _adapter.DisposeCurrentMedia();
 
         _currentFilePath = filePath;
         SetState(PlaybackState.Loading);
 
-        // Create new media from file path
-        _currentMedia = new Media(_libVLC, filePath, FromType.FromPath);
-
-        // Parse media to get duration (async operation)
-        await _currentMedia.Parse(MediaParseOptions.ParseLocal, cancellationToken: cancellationToken);
+        // Load and parse new media
+        await _adapter.LoadMediaAsync(filePath, cancellationToken);
 
         SetState(PlaybackState.Stopped);
     }
@@ -132,11 +104,11 @@ public class LibVlcAudioPlayer : IAudioPlayer
     {
         ThrowIfDisposed();
 
-        if (_currentMedia == null)
+        if (!_adapter.HasMedia)
             throw new InvalidOperationException("No media loaded. Call LoadAsync first.");
 
-        _mediaPlayer.Media = _currentMedia;
-        _mediaPlayer.Play();
+        _adapter.SetMedia();
+        _adapter.Play();
 
         return Task.CompletedTask;
     }
@@ -145,7 +117,7 @@ public class LibVlcAudioPlayer : IAudioPlayer
     public Task PauseAsync()
     {
         ThrowIfDisposed();
-        _mediaPlayer.Pause();
+        _adapter.Pause();
         return Task.CompletedTask;
     }
 
@@ -153,7 +125,7 @@ public class LibVlcAudioPlayer : IAudioPlayer
     public Task StopAsync()
     {
         ThrowIfDisposed();
-        _mediaPlayer.Stop();
+        _adapter.Stop();
         return Task.CompletedTask;
     }
 
@@ -161,18 +133,18 @@ public class LibVlcAudioPlayer : IAudioPlayer
     public Task SeekAsync(TimeSpan position)
     {
         ThrowIfDisposed();
-        _mediaPlayer.Time = (long)position.TotalMilliseconds;
+        _adapter.TimeMs = (long)position.TotalMilliseconds;
         return Task.CompletedTask;
     }
 
     // Event handlers
-    private void OnPlaying(object? sender, System.EventArgs e) => SetState(PlaybackState.Playing);
+    private void OnPlaying(object? sender, EventArgs e) => SetState(PlaybackState.Playing);
 
-    private void OnPaused(object? sender, System.EventArgs e) => SetState(PlaybackState.Paused);
+    private void OnPaused(object? sender, EventArgs e) => SetState(PlaybackState.Paused);
 
-    private void OnStopped(object? sender, System.EventArgs e) => SetState(PlaybackState.Stopped);
+    private void OnStopped(object? sender, EventArgs e) => SetState(PlaybackState.Stopped);
 
-    private void OnEndReached(object? sender, System.EventArgs e)
+    private void OnEndReached(object? sender, EventArgs e)
     {
         SetState(PlaybackState.Stopped);
         PlaybackCompleted?.Invoke(this, new PlaybackCompletedEventArgs
@@ -182,7 +154,7 @@ public class LibVlcAudioPlayer : IAudioPlayer
         });
     }
 
-    private void OnError(object? sender, System.EventArgs e)
+    private void OnError(object? sender, EventArgs e)
     {
         SetState(PlaybackState.Error);
         PlaybackError?.Invoke(this, new PlaybackErrorEventArgs
@@ -192,11 +164,11 @@ public class LibVlcAudioPlayer : IAudioPlayer
         });
     }
 
-    private void OnTimeChanged(object? sender, MediaPlayerTimeChangedEventArgs e)
+    private void OnTimeChanged(object? sender, long timeMs)
     {
         PositionChanged?.Invoke(this, new PositionChangedEventArgs
         {
-            Position = TimeSpan.FromMilliseconds(e.Time),
+            Position = TimeSpan.FromMilliseconds(timeMs),
             Duration = Duration
         });
     }
@@ -227,16 +199,14 @@ public class LibVlcAudioPlayer : IAudioPlayer
         _disposed = true;
 
         // Unsubscribe events
-        _mediaPlayer.Playing -= OnPlaying;
-        _mediaPlayer.Paused -= OnPaused;
-        _mediaPlayer.Stopped -= OnStopped;
-        _mediaPlayer.EndReached -= OnEndReached;
-        _mediaPlayer.EncounteredError -= OnError;
-        _mediaPlayer.TimeChanged -= OnTimeChanged;
+        _adapter.Playing -= OnPlaying;
+        _adapter.Paused -= OnPaused;
+        _adapter.Stopped -= OnStopped;
+        _adapter.EndReached -= OnEndReached;
+        _adapter.EncounteredError -= OnError;
+        _adapter.TimeChanged -= OnTimeChanged;
 
-        // Dispose resources
-        _currentMedia?.Dispose();
-        _mediaPlayer.Dispose();
-        _libVLC.Dispose();
+        // Dispose adapter (which disposes LibVLC resources)
+        _adapter.Dispose();
     }
 }

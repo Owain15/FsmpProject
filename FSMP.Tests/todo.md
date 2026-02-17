@@ -15,6 +15,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 - `MockAudioPlayer.cs` -- IAudioPlayer mock implementation for unit testing
 - `MockAudioPlayerFactory.cs` -- IAudioPlayerFactory mock implementation
+- `MockMediaPlayerAdapter.cs` -- IMediaPlayerAdapter mock for LibVlcAudioPlayer unit testing
 
 ### Test Files by Directory
 
@@ -41,6 +42,10 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `MetadataEditorTests.cs`, `LibraryManagerTests.cs`, `StatisticsViewerTests.cs`
 - `PrintTests.cs` (incl. 13 NewDisplay tests), `AppStartupTests.cs`
 
+**Audio/** (2 files, 52 tests):
+- `LibVlcAudioPlayerTests.cs` (50 tests) -- Constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, dispose
+- `LibVlcAudioPlayerFactoryTests.cs` (2 tests) -- Factory with adapter injection
+
 **Core/** (1 file, 37 tests):
 - `ActivePlaylistServiceTests.cs` -- RepeatMode, shuffle, queue navigation
 
@@ -52,14 +57,14 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature | **Tests**: 694 passing | **Overall Coverage**: 92.49%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement | **Tests**: 746 passing | **Overall Coverage**: 96.43%
 
 | Project | Coverage |
 |---------|----------|
-| FsmpConsole | 94.20% |
-| FsmpDataAcsses | 98.18% |
-| FsmpLibrary | 65.74% |
-| FSMP.Core | -- |
+| FsmpConsole | 95.60% |
+| FsmpDataAcsses | 98.52% |
+| FsmpLibrary | 86.26% |
+| FSMP.Core | 100% |
 
 ---
 
@@ -72,8 +77,9 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ### Coverage Improvement
 
-- [ ] Improve FsmpLibrary coverage from 65.74% toward 80%+
-- [ ] Add LibVlcAudioPlayer integration tests (requires LibVLC runtime)
+- [x] Improve FsmpLibrary coverage from 65.74% toward 80%+ (achieved 86.26%)
+- [x] Add LibVlcAudioPlayer unit tests via IMediaPlayerAdapter mock (52 tests)
+- [ ] Add LibVlcMediaPlayerAdapter integration tests (requires LibVLC runtime, optional)
 
 ### Cross-Platform Migration Tests (when migration begins)
 
@@ -86,5 +92,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature tests (entity config, repository, service, UI menu updates)
-**Next Action**: All playlist/player feature tests complete
+**Status**: Complete (v1) + Playlist feature + Audio coverage improvement (52 new tests)
+**Next Action**: FSMO tests (when FSMO implementation begins)

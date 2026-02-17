@@ -4,14 +4,14 @@
 
 | Project | Description | Status | Coverage | Todo |
 |---------|-------------|--------|----------|------|
-| FsmpLibrary | Core business logic & models | Complete (v1) | 65.74% | [todo](FSMP.lib/FsmpLibrary/todo.md) |
-| FSMP.Core | Platform-agnostic player logic | In progress | -- | [todo](FSMP.lib/FSMP.Core/todo.md) |
-| FsmpDataAcsses | EF Core data access layer | Complete (v1) | 98.18% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
-| FsmpConsole | Console UI application | Complete (v1) | 94.20% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
+| FsmpLibrary | Core business logic & models | Complete (v1) | 86.26% | [todo](FSMP.lib/FsmpLibrary/todo.md) |
+| FSMP.Core | Platform-agnostic player logic | In progress | 100% | [todo](FSMP.lib/FSMP.Core/todo.md) |
+| FsmpDataAcsses | EF Core data access layer | Complete (v1) | 98.52% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
+| FsmpConsole | Console UI application | Complete (v1) | 95.60% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
 | FSMO | File System Music Organizer | Not started | -- | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 
-**Overall coverage**: 92.49% | **Tests**: 694 all passing | **Build**: Passing
+**Overall coverage**: 96.43% | **Tests**: 746 all passing | **Build**: Passing
 
 ---
 
@@ -66,6 +66,17 @@ Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 - Playback controls: play/pause, next, prev, restart, stop
 - Repeat modes: None, One, All
 - Shuffle on/off
+
+---
+
+### FsmpLibrary Coverage Improvement
+
+**Status**: Complete | **Batches**: 11/11 complete
+**Plan**: [.claude/plans/nifty-launching-sunset.md](.claude/plans/nifty-launching-sunset.md)
+
+Refactored `LibVlcAudioPlayer` to extract `IMediaPlayerAdapter` interface, enabling unit testing of the audio player business logic without requiring LibVLC runtime. Added 52 new tests covering constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, and disposal.
+
+**Result**: FsmpLibrary coverage **65.74% -> 86.26%** (target was 80%+)
 
 ---
 
