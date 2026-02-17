@@ -57,7 +57,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement | **Tests**: 747 passing | **Overall Coverage**: 96.43%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests | **Tests**: 759 passing | **Overall Coverage**: 96.43%
 
 | Project | Coverage |
 |---------|----------|
@@ -74,6 +74,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 - [x] Create `FSMP.Tests/FSMO/` directory
 - [x] `FsmoReferenceTests.cs` — placeholder test verifying FSMO project reference (1 test)
+- [x] `FileSystemTests.cs` — 12 tests covering all FileSystem helper methods (create/delete/move for files and directories)
 - [ ] Additional tests tracked in [FSMO todo](../FSMP.lib/FSMO/todo.md) alongside implementation slices
 
 ### Coverage Improvement

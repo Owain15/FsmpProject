@@ -23,22 +23,22 @@
 
 **What it delivers**: Full test coverage for the existing `FileSystem` helper class
 
-- [ ] Create `FileSystemTests.cs` in `FSMP.Tests/FSMO/`
-  - [ ] Test CreateDirectory creates new directory
-  - [ ] Test CreateDirectory does nothing when directory exists
-  - [ ] Test CreateFile creates new file
-  - [ ] Test CreateFile does nothing when file exists
-  - [ ] Test DeleteFile removes existing file
-  - [ ] Test DeleteFile does nothing when file missing
-  - [ ] Test DeleteDirectory removes existing directory recursively
-  - [ ] Test DeleteDirectory does nothing when directory missing
-  - [ ] Test MoveFile moves file to new location
-  - [ ] Test MoveFile does nothing when source missing
-  - [ ] Test MoveDirectory moves directory to new location
-  - [ ] Test MoveDirectory does nothing when source missing
-- [ ] **Build**: Pass
-- [ ] **Tests**: Pass
-- [ ] **Coverage**: ≥80% on FileSystem class
+- [x] Create `FileSystemTests.cs` in `FSMP.Tests/FSMO/`
+  - [x] Test CreateDirectory creates new directory
+  - [x] Test CreateDirectory does nothing when directory exists
+  - [x] Test CreateFile creates new file
+  - [x] Test CreateFile does nothing when file exists
+  - [x] Test DeleteFile removes existing file
+  - [x] Test DeleteFile does nothing when file missing
+  - [x] Test DeleteDirectory removes existing directory recursively
+  - [x] Test DeleteDirectory does nothing when directory missing
+  - [x] Test MoveFile moves file to new location
+  - [x] Test MoveFile does nothing when source missing
+  - [x] Test MoveDirectory moves directory to new location
+  - [x] Test MoveDirectory does nothing when source missing
+- [x] **Build**: Pass
+- [x] **Tests**: Pass
+- [x] **Coverage**: ≥80% on FileSystem class
 
 ---
 
@@ -242,6 +242,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 1 / 10
-**Status**: Infrastructure wired, ready for Slice 2
-**Next Action**: Slice 2 — FileSystem Tests
+**Completed Slices**: 2 / 10
+**Status**: FileSystem fully tested, ready for Slice 3
+**Next Action**: Slice 3 — Audio File Discovery
