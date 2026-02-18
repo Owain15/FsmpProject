@@ -7,8 +7,4 @@
     <Platforms>ARM64</Platforms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FsmpLibrary\FsmpLibrary\FsmpLibrary.csproj" />
-  </ItemGroup>
-
 </Project>

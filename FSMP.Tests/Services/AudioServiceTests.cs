@@ -1,5 +1,5 @@
 using FluentAssertions;
-using FsmpLibrary.Interfaces;
+using FSMP.Core.Interfaces;
 using FsmpLibrary.Models;
 using FsmpLibrary.Services;
 using FSMP.Tests.TestHelpers;

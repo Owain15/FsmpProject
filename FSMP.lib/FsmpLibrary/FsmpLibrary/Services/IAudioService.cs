@@ -1,4 +1,4 @@
-using FsmpLibrary.Interfaces;
+using FSMP.Core.Interfaces;
 using FsmpLibrary.Models;
 
 namespace FsmpLibrary.Services;

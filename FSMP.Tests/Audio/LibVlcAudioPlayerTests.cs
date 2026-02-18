@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FsmpLibrary.Audio;
-using FsmpLibrary.Interfaces;
-using FsmpLibrary.Interfaces.EventArgs;
+using FSMP.Core.Interfaces;
+using FSMP.Core.Interfaces.EventArgs;
 using FSMP.Tests.TestHelpers;
 
 namespace FSMP.Tests.Audio;

@@ -1,5 +1,5 @@
-using FsmpLibrary.Interfaces;
-using FsmpLibrary.Interfaces.EventArgs;
+using FSMP.Core.Interfaces;
+using FSMP.Core.Interfaces.EventArgs;
 
 namespace FSMP.Tests.TestHelpers;
 

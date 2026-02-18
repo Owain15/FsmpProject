@@ -20,4 +20,7 @@
   <Project Path="../../../FSMP.lib/FSMO/FSMO/FSMO.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />
   </Project>
+  <Project Path="../../../FSMP.lib/FSMP.Platform.Windows/FSMP.Platform.Windows.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+  </Project>
 </Solution>
