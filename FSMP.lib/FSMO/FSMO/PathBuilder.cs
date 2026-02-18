@@ -4,6 +4,7 @@ public static class PathBuilder
 {
     private const string UnknownArtist = "Unknown Artist";
     private const string UnknownAlbum = "Unknown Album";
+    private const int MaxFolderNameLength = 200;
 
     public static string BuildTargetPath(string destinationRoot, AudioMetadata metadata, string originalFileName)
     {
@@ -29,6 +30,9 @@ public static class PathBuilder
         {
             trimmed = trimmed.Replace(c.ToString(), "");
         }
+
+        if (trimmed.Length > MaxFolderNameLength)
+            trimmed = trimmed[..MaxFolderNameLength].TrimEnd();
 
         return string.IsNullOrWhiteSpace(trimmed) ? fallback : trimmed;
     }

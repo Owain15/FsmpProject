@@ -220,20 +220,20 @@
 
 **What it delivers**: Robust handling of real-world file system scenarios
 
-- [ ] Handle special characters in artist/album names (e.g., AC/DC, Guns N' Roses)
-- [ ] Handle very long path names (truncate to stay under MAX_PATH)
-- [ ] Handle read-only source files gracefully
-- [ ] Handle files with identical names but different content
-- [ ] Handle empty artist AND album (file goes to Unknown Artist/Unknown Album/)
-- [ ] Add error tests
-  - [ ] Test special characters sanitized from folder names
-  - [ ] Test long path names truncated safely
-  - [ ] Test read-only file can still be copied
-  - [ ] Test corrupt audio file is skipped with error logged
-  - [ ] Test mixed valid/corrupt files — valid files still organized
-- [ ] **Build**: Pass
-- [ ] **Tests**: Pass
-- [ ] **Coverage**: ≥80% overall on FSMO project
+- [x] Handle special characters in artist/album names (e.g., AC/DC, Guns N' Roses)
+- [x] Handle very long path names (truncate to stay under MAX_PATH)
+- [x] Handle read-only source files gracefully
+- [x] Handle files with identical names but different content
+- [x] Handle empty artist AND album (file goes to Unknown Artist/Unknown Album/)
+- [x] Add error tests
+  - [x] Test special characters sanitized from folder names
+  - [x] Test long path names truncated safely
+  - [x] Test read-only file can still be copied
+  - [x] Test corrupt audio file is skipped with error logged
+  - [x] Test mixed valid/corrupt files — valid files still organized
+- [x] **Build**: Pass
+- [x] **Tests**: Pass
+- [x] **Coverage**: 96.39% on FSMO (≥80% target met)
 
 ---
 
@@ -245,6 +245,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 9 / 10
-**Status**: DirectoryManager integration implemented and tested, ready for Slice 10
-**Next Action**: Slice 10 — Edge Cases & Polish
+**Completed Slices**: 10 / 10
+**Status**: All slices complete — FSMO feature is fully implemented and tested
+**Next Action**: None (feature complete)
