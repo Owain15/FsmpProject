@@ -165,7 +165,7 @@ public class Track
     /// Navigation property to all playback history records for this track.
     /// </summary>
     public ICollection<PlaybackHistory> PlaybackHistories { get; set; } = new List<PlaybackHistory>();
-    public ICollection<Genre> Genres { get; set; } = new List<Genre>();
+    public ICollection<Tags> Tags { get; set; } = new List<Tags>();
     public ICollection<PlaylistTrack> PlaylistTracks { get; set; } = new List<PlaylistTrack>();
 
     /// <summary>

@@ -1,11 +1,11 @@
 namespace FSMP.Core.Models;
 
 /// <summary>
-/// Lookup entity for music genres. Add new genres by inserting a row — no code change required.
+/// Lookup entity for music tags. Add new tags by inserting a row — no code change required.
 /// </summary>
-public class Genre
+public class Tags
 {
-    public int GenreId { get; set; }
+    public int TagId { get; set; }
     public string Name { get; set; } = string.Empty;
 
     // Navigation properties (many-to-many back-references)
