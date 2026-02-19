@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Audio;
+namespace FSMP.Core.Audio;
 
 /// <summary>
 /// Thin adapter wrapping platform-specific media player operations.

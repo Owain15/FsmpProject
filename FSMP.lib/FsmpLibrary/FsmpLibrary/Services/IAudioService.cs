@@ -1,5 +1,5 @@
 using FSMP.Core.Interfaces;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 
 namespace FsmpLibrary.Services;
 

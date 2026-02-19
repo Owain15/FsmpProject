@@ -1,5 +1,5 @@
 using System.Security.Cryptography;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 using FsmpLibrary.Services;
 
 namespace FsmpDataAcsses.Services;

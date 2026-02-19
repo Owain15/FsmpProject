@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Models;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Represents a music album containing multiple tracks.

@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Models;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Join entity representing a track's membership and position within a playlist.

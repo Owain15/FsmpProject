@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Models;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Represents a user-created playlist containing an ordered collection of tracks.

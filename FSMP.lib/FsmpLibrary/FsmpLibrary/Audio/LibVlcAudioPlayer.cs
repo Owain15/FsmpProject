@@ -1,3 +1,4 @@
+using FSMP.Core.Audio;
 using FSMP.Core.Interfaces;
 using FSMP.Core.Interfaces.EventArgs;
 

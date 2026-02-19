@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Models;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Represents the application configuration stored in config.json.

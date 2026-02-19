@@ -91,7 +91,7 @@ public class AppStartupTests : IDisposable
     public void GetDatabasePath_WithConfig_ShouldReturnConfigPath()
     {
         var app = new AppStartup(TextReader.Null, TextWriter.Null);
-        var config = new FsmpLibrary.Models.Configuration { DatabasePath = @"C:\data\mydb.db" };
+        var config = new FSMP.Core.Models.Configuration { DatabasePath = @"C:\data\mydb.db" };
         app.GetDatabasePath(config).Should().Be(@"C:\data\mydb.db");
     }
 

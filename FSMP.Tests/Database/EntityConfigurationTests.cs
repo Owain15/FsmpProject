@@ -1,6 +1,6 @@
 using FluentAssertions;
 using FsmpDataAcsses;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FSMP.Tests.Database;

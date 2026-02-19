@@ -1,5 +1,5 @@
 using FsmpDataAcsses.Services;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 
 namespace FsmpConsole;
 

@@ -47,7 +47,7 @@ namespace FsmpDataAcsses.Migrations
                     b.ToTable("ArtistGenre", (string)null);
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Album", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Album", b =>
                 {
                     b.Property<int>("AlbumId")
                         .ValueGeneratedOnAdd()
@@ -88,7 +88,7 @@ namespace FsmpDataAcsses.Migrations
                     b.ToTable("Albums");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Artist", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Artist", b =>
                 {
                     b.Property<int>("ArtistId")
                         .ValueGeneratedOnAdd()
@@ -120,7 +120,7 @@ namespace FsmpDataAcsses.Migrations
                     b.ToTable("Artists");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.FileExtension", b =>
+            modelBuilder.Entity("FSMP.Core.Models.FileExtension", b =>
                 {
                     b.Property<int>("FileExtensionId")
                         .ValueGeneratedOnAdd()
@@ -156,7 +156,7 @@ namespace FsmpDataAcsses.Migrations
                         });
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Genre", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Genre", b =>
                 {
                     b.Property<int>("GenreId")
                         .ValueGeneratedOnAdd()
@@ -202,7 +202,7 @@ namespace FsmpDataAcsses.Migrations
                         });
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.LibraryPath", b =>
+            modelBuilder.Entity("FSMP.Core.Models.LibraryPath", b =>
                 {
                     b.Property<int>("LibraryPathId")
                         .ValueGeneratedOnAdd()
@@ -233,7 +233,7 @@ namespace FsmpDataAcsses.Migrations
                     b.ToTable("LibraryPaths");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.PlaybackHistory", b =>
+            modelBuilder.Entity("FSMP.Core.Models.PlaybackHistory", b =>
                 {
                     b.Property<int>("PlaybackHistoryId")
                         .ValueGeneratedOnAdd()
@@ -263,7 +263,7 @@ namespace FsmpDataAcsses.Migrations
                     b.ToTable("PlaybackHistories");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Playlist", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Playlist", b =>
                 {
                     b.Property<int>("PlaylistId")
                         .ValueGeneratedOnAdd()
@@ -289,7 +289,7 @@ namespace FsmpDataAcsses.Migrations
                     b.ToTable("Playlists");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.PlaylistTrack", b =>
+            modelBuilder.Entity("FSMP.Core.Models.PlaylistTrack", b =>
                 {
                     b.Property<int>("PlaylistTrackId")
                         .ValueGeneratedOnAdd()
@@ -316,7 +316,7 @@ namespace FsmpDataAcsses.Migrations
                     b.ToTable("PlaylistTracks");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Track", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Track", b =>
                 {
                     b.Property<int>("TrackId")
                         .ValueGeneratedOnAdd()
@@ -440,13 +440,13 @@ namespace FsmpDataAcsses.Migrations
 
             modelBuilder.Entity("AlbumGenre", b =>
                 {
-                    b.HasOne("FsmpLibrary.Models.Album", null)
+                    b.HasOne("FSMP.Core.Models.Album", null)
                         .WithMany()
                         .HasForeignKey("AlbumsAlbumId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FsmpLibrary.Models.Genre", null)
+                    b.HasOne("FSMP.Core.Models.Genre", null)
                         .WithMany()
                         .HasForeignKey("GenresGenreId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -455,22 +455,22 @@ namespace FsmpDataAcsses.Migrations
 
             modelBuilder.Entity("ArtistGenre", b =>
                 {
-                    b.HasOne("FsmpLibrary.Models.Artist", null)
+                    b.HasOne("FSMP.Core.Models.Artist", null)
                         .WithMany()
                         .HasForeignKey("ArtistsArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FsmpLibrary.Models.Genre", null)
+                    b.HasOne("FSMP.Core.Models.Genre", null)
                         .WithMany()
                         .HasForeignKey("GenresGenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Album", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Album", b =>
                 {
-                    b.HasOne("FsmpLibrary.Models.Artist", "Artist")
+                    b.HasOne("FSMP.Core.Models.Artist", "Artist")
                         .WithMany("Albums")
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -478,9 +478,9 @@ namespace FsmpDataAcsses.Migrations
                     b.Navigation("Artist");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.PlaybackHistory", b =>
+            modelBuilder.Entity("FSMP.Core.Models.PlaybackHistory", b =>
                 {
-                    b.HasOne("FsmpLibrary.Models.Track", "Track")
+                    b.HasOne("FSMP.Core.Models.Track", "Track")
                         .WithMany("PlaybackHistories")
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -489,15 +489,15 @@ namespace FsmpDataAcsses.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.PlaylistTrack", b =>
+            modelBuilder.Entity("FSMP.Core.Models.PlaylistTrack", b =>
                 {
-                    b.HasOne("FsmpLibrary.Models.Playlist", "Playlist")
+                    b.HasOne("FSMP.Core.Models.Playlist", "Playlist")
                         .WithMany("PlaylistTracks")
                         .HasForeignKey("PlaylistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FsmpLibrary.Models.Track", "Track")
+                    b.HasOne("FSMP.Core.Models.Track", "Track")
                         .WithMany("PlaylistTracks")
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -508,19 +508,19 @@ namespace FsmpDataAcsses.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Track", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Track", b =>
                 {
-                    b.HasOne("FsmpLibrary.Models.Album", "Album")
+                    b.HasOne("FSMP.Core.Models.Album", "Album")
                         .WithMany("Tracks")
                         .HasForeignKey("AlbumId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("FsmpLibrary.Models.Artist", "Artist")
+                    b.HasOne("FSMP.Core.Models.Artist", "Artist")
                         .WithMany("Tracks")
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("FsmpLibrary.Models.FileExtension", "FileExtension")
+                    b.HasOne("FSMP.Core.Models.FileExtension", "FileExtension")
                         .WithMany("Tracks")
                         .HasForeignKey("FileExtensionId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -534,42 +534,42 @@ namespace FsmpDataAcsses.Migrations
 
             modelBuilder.Entity("GenreTrack", b =>
                 {
-                    b.HasOne("FsmpLibrary.Models.Genre", null)
+                    b.HasOne("FSMP.Core.Models.Genre", null)
                         .WithMany()
                         .HasForeignKey("GenresGenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FsmpLibrary.Models.Track", null)
+                    b.HasOne("FSMP.Core.Models.Track", null)
                         .WithMany()
                         .HasForeignKey("TracksTrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Album", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Album", b =>
                 {
                     b.Navigation("Tracks");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Artist", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Artist", b =>
                 {
                     b.Navigation("Albums");
 
                     b.Navigation("Tracks");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.FileExtension", b =>
+            modelBuilder.Entity("FSMP.Core.Models.FileExtension", b =>
                 {
                     b.Navigation("Tracks");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Playlist", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Playlist", b =>
                 {
                     b.Navigation("PlaylistTracks");
                 });
 
-            modelBuilder.Entity("FsmpLibrary.Models.Track", b =>
+            modelBuilder.Entity("FSMP.Core.Models.Track", b =>
                 {
                     b.Navigation("PlaybackHistories");
 

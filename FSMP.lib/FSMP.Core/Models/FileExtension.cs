@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Models;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Lookup entity for supported audio file extensions. Seed values: wav, wma, mp3.

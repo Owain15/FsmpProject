@@ -1,4 +1,4 @@
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FsmpDataAcsses.Repositories;

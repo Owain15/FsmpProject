@@ -1,3 +1,4 @@
+using FSMP.Core.Audio;
 using System.Runtime.InteropServices;
 using LibVLCSharp.Shared;
 

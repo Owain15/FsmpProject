@@ -1,7 +1,7 @@
 using FSMP.Core;
 using FluentAssertions;
 using FsmpConsole;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 
 namespace FSMP.Tests.UI;
 

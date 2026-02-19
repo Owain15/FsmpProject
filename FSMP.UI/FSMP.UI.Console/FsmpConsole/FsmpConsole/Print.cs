@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using FSMP.Core;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 
 namespace FsmpConsole
 {

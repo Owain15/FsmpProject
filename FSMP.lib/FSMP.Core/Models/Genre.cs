@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Models;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Lookup entity for music genres. Add new genres by inserting a row — no code change required.

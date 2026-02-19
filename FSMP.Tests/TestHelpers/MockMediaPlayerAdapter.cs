@@ -1,4 +1,4 @@
-using FsmpLibrary.Audio;
+using FSMP.Core.Audio;
 
 namespace FSMP.Tests.TestHelpers;
 

@@ -1,6 +1,6 @@
 using System.Text.Json;
 using FluentAssertions;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 using FsmpLibrary.Services;
 
 namespace FSMP.Tests.Services;

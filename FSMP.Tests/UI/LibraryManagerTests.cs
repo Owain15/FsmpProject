@@ -2,7 +2,7 @@ using FluentAssertions;
 using FsmpConsole;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 using FsmpLibrary.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;

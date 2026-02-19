@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 
 namespace FsmpDataAcsses;
 

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using FSMP.Core.Interfaces;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 using FsmpLibrary.Services;
 using FSMP.Tests.TestHelpers;
 using Moq;

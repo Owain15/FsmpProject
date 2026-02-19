@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\FSMP.lib\FsmpLibrary\FsmpLibrary\FsmpLibrary.csproj" />
+    <ProjectReference Include="..\..\..\..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
   </ItemGroup>
 
 </Project>

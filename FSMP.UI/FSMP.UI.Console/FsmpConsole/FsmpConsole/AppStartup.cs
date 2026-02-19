@@ -3,7 +3,7 @@ using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
 using FsmpLibrary.Audio;
 using FSMP.Core.Interfaces;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 using FsmpLibrary.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

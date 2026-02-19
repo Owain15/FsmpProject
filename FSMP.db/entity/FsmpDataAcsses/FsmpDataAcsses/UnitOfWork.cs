@@ -1,5 +1,5 @@
 using FsmpDataAcsses.Repositories;
-using FsmpLibrary.Models;
+using FSMP.Core.Models;
 
 namespace FsmpDataAcsses;
 

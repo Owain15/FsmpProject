@@ -1,3 +1,4 @@
+using FSMP.Core.Audio;
 using FSMP.Core.Interfaces;
 
 namespace FsmpLibrary.Audio;
