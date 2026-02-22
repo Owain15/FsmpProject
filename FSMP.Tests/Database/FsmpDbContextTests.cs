@@ -42,9 +42,9 @@ public class FsmpDbContextTests : IDisposable
     }
 
     [Fact]
-    public void Genres_DbSet_ShouldNotBeNull()
+    public void Tags_DbSet_ShouldNotBeNull()
     {
-        _context.Genres.Should().NotBeNull();
+        _context.Tags.Should().NotBeNull();
     }
 
     [Fact]
@@ -161,16 +161,16 @@ public class FsmpDbContextTests : IDisposable
     }
 
     [Fact]
-    public void GenreSeedData_ShouldBePresent()
+    public void TagSeedData_ShouldBePresent()
     {
-        var genres = _context.Genres.OrderBy(g => g.GenreId).ToList();
+        var tags = _context.Tags.OrderBy(g => g.TagId).ToList();
 
-        genres.Should().HaveCount(5);
-        genres[0].Name.Should().Be("Rock");
-        genres[1].Name.Should().Be("Jazz");
-        genres[2].Name.Should().Be("Classic");
-        genres[3].Name.Should().Be("Metal");
-        genres[4].Name.Should().Be("Comedy");
+        tags.Should().HaveCount(5);
+        tags[0].Name.Should().Be("Rock");
+        tags[1].Name.Should().Be("Jazz");
+        tags[2].Name.Should().Be("Classic");
+        tags[3].Name.Should().Be("Metal");
+        tags[4].Name.Should().Be("Comedy");
     }
 
     [Fact]

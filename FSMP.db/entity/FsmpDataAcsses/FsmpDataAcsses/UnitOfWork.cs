@@ -16,7 +16,7 @@ public class UnitOfWork : IDisposable
     private ArtistRepository? _artists;
     private PlaybackHistoryRepository? _playbackHistories;
     private Repository<LibraryPath>? _libraryPaths;
-    private Repository<Genre>? _genres;
+    private Repository<Tags>? _tags;
     private Repository<FileExtension>? _fileExtensions;
     private PlaylistRepository? _playlists;
 
@@ -40,8 +40,8 @@ public class UnitOfWork : IDisposable
     public Repository<LibraryPath> LibraryPaths =>
         _libraryPaths ??= new Repository<LibraryPath>(_context);
 
-    public Repository<Genre> Genres =>
-        _genres ??= new Repository<Genre>(_context);
+    public Repository<Tags> Tags =>
+        _tags ??= new Repository<Tags>(_context);
 
     public Repository<FileExtension> FileExtensions =>
         _fileExtensions ??= new Repository<FileExtension>(_context);

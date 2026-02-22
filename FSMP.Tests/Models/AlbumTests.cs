@@ -23,7 +23,7 @@ public class AlbumTests
         album.UpdatedAt.Should().Be(default);
         album.Artist.Should().BeNull();
         album.Tracks.Should().NotBeNull().And.BeEmpty();
-        album.Genres.Should().NotBeNull().And.BeEmpty();
+        album.Tags.Should().NotBeNull().And.BeEmpty();
     }
 
     [Fact]
@@ -198,9 +198,9 @@ public class AlbumTests
         var album = new Album();
 
         // Assert
-        album.Genres.Should().NotBeNull();
-        album.Genres.Should().BeEmpty();
-        album.Genres.Should().BeAssignableTo<ICollection<Genre>>();
+        album.Tags.Should().NotBeNull();
+        album.Tags.Should().BeEmpty();
+        album.Tags.Should().BeAssignableTo<ICollection<Tags>>();
     }
 
     [Fact]
@@ -208,17 +208,17 @@ public class AlbumTests
     {
         // Arrange
         var album = new Album { AlbumId = 1, Title = "Multi-Genre Album" };
-        var rock = new Genre { GenreId = 1, Name = "Rock" };
-        var metal = new Genre { GenreId = 2, Name = "Metal" };
+        var rock = new Tags { TagId = 1, Name = "Rock" };
+        var metal = new Tags { TagId = 2, Name = "Metal" };
 
         // Act
-        album.Genres.Add(rock);
-        album.Genres.Add(metal);
+        album.Tags.Add(rock);
+        album.Tags.Add(metal);
 
         // Assert
-        album.Genres.Should().HaveCount(2);
-        album.Genres.Should().Contain(g => g.Name == "Rock");
-        album.Genres.Should().Contain(g => g.Name == "Metal");
+        album.Tags.Should().HaveCount(2);
+        album.Tags.Should().Contain(g => g.Name == "Rock");
+        album.Tags.Should().Contain(g => g.Name == "Metal");
     }
 
     [Fact]

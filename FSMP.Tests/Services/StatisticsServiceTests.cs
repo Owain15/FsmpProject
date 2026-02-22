@@ -186,7 +186,7 @@ public class StatisticsServiceTests : IDisposable
     // ========== GetGenreStatisticsAsync Tests ==========
 
     [Fact]
-    public async Task GetGenreStatisticsAsync_ShouldReturnEmpty_WhenNoTracksHaveGenres()
+    public async Task GetGenreStatisticsAsync_ShouldReturnEmpty_WhenNoTracksHaveTags()
     {
         await CreateTrackAsync("Track 1");
 
@@ -196,29 +196,29 @@ public class StatisticsServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetGenreStatisticsAsync_ShouldAggregateCountsByGenre()
+    public async Task GetGenreStatisticsAsync_ShouldAggregateCountsByTag()
     {
-        // Get seeded genres from DB
-        var genres = (await _unitOfWork.Genres.GetAllAsync()).ToList();
-        if (genres.Count < 2) return; // skip if no seed data
+        // Get seeded tags from DB
+        var tags = (await _unitOfWork.Tags.GetAllAsync()).ToList();
+        if (tags.Count < 2) return; // skip if no seed data
 
-        var genre1 = genres[0];
-        var genre2 = genres[1];
+        var tag1 = tags[0];
+        var tag2 = tags[1];
 
         var track1 = await CreateTrackAsync("Track 1");
         var track2 = await CreateTrackAsync("Track 2");
         var track3 = await CreateTrackAsync("Track 3");
 
-        // Assign genres via navigation properties
-        track1.Genres.Add(genre1);
-        track2.Genres.Add(genre1);
-        track3.Genres.Add(genre2);
+        // Assign tags via navigation properties
+        track1.Tags.Add(tag1);
+        track2.Tags.Add(tag1);
+        track3.Tags.Add(tag2);
         await _unitOfWork.SaveAsync();
 
         var result = await _service.GetGenreStatisticsAsync();
 
-        result.Should().ContainKey(genre1.Name).WhoseValue.Should().Be(2);
-        result.Should().ContainKey(genre2.Name).WhoseValue.Should().Be(1);
+        result.Should().ContainKey(tag1.Name).WhoseValue.Should().Be(2);
+        result.Should().ContainKey(tag2.Name).WhoseValue.Should().Be(1);
     }
 
     // ========== GetTotalPlayCountAsync Tests ==========

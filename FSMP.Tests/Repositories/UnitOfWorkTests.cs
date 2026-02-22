@@ -63,10 +63,10 @@ public class UnitOfWorkTests : IDisposable
     }
 
     [Fact]
-    public void Genres_ShouldBeInitialized()
+    public void Tags_ShouldBeInitialized()
     {
-        _unitOfWork.Genres.Should().NotBeNull();
-        _unitOfWork.Genres.Should().BeOfType<Repository<Genre>>();
+        _unitOfWork.Tags.Should().NotBeNull();
+        _unitOfWork.Tags.Should().BeOfType<Repository<Tags>>();
     }
 
     [Fact]

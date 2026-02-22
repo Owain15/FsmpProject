@@ -16,7 +16,7 @@ public class FsmpDbContext : DbContext
     public DbSet<Track> Tracks => Set<Track>();
     public DbSet<Album> Albums => Set<Album>();
     public DbSet<Artist> Artists => Set<Artist>();
-    public DbSet<Genre> Genres => Set<Genre>();
+    public DbSet<Tags> Tags => Set<Tags>();
     public DbSet<FileExtension> FileExtensions => Set<FileExtension>();
     public DbSet<PlaybackHistory> PlaybackHistories => Set<PlaybackHistory>();
     public DbSet<LibraryPath> LibraryPaths => Set<LibraryPath>();
@@ -30,7 +30,7 @@ public class FsmpDbContext : DbContext
         ConfigureTrack(modelBuilder);
         ConfigureAlbum(modelBuilder);
         ConfigureArtist(modelBuilder);
-        ConfigureGenre(modelBuilder);
+        ConfigureTags(modelBuilder);
         ConfigureFileExtension(modelBuilder);
         ConfigurePlaybackHistory(modelBuilder);
         ConfigureLibraryPath(modelBuilder);
@@ -92,10 +92,10 @@ public class FsmpDbContext : DbContext
                 .HasForeignKey(t => t.FileExtensionId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Many-to-many relationship with Genre (implicit junction table)
-            entity.HasMany(t => t.Genres)
+            // Many-to-many relationship with Tags (implicit junction table)
+            entity.HasMany(t => t.Tags)
                 .WithMany(g => g.Tracks)
-                .UsingEntity(j => j.ToTable("TrackGenre"));
+                .UsingEntity(j => j.ToTable("TrackTag"));
         });
     }
 
@@ -121,10 +121,10 @@ public class FsmpDbContext : DbContext
                 .HasForeignKey(a => a.ArtistId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Many-to-many relationship with Genre (implicit junction table)
-            entity.HasMany(a => a.Genres)
+            // Many-to-many relationship with Tags (implicit junction table)
+            entity.HasMany(a => a.Tags)
                 .WithMany(g => g.Albums)
-                .UsingEntity(j => j.ToTable("AlbumGenre"));
+                .UsingEntity(j => j.ToTable("AlbumTag"));
         });
     }
 
@@ -146,18 +146,18 @@ public class FsmpDbContext : DbContext
             entity.Property(a => a.Biography)
                 .HasMaxLength(10000);
 
-            // Many-to-many relationship with Genre (implicit junction table)
-            entity.HasMany(a => a.Genres)
+            // Many-to-many relationship with Tags (implicit junction table)
+            entity.HasMany(a => a.Tags)
                 .WithMany(g => g.Artists)
-                .UsingEntity(j => j.ToTable("ArtistGenre"));
+                .UsingEntity(j => j.ToTable("ArtistTag"));
         });
     }
 
-    private static void ConfigureGenre(ModelBuilder modelBuilder)
+    private static void ConfigureTags(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Genre>(entity =>
+        modelBuilder.Entity<Tags>(entity =>
         {
-            entity.HasKey(g => g.GenreId);
+            entity.HasKey(g => g.TagId);
 
             entity.HasIndex(g => g.Name)
                 .IsUnique();
@@ -256,13 +256,13 @@ public class FsmpDbContext : DbContext
 
     private static void SeedData(ModelBuilder modelBuilder)
     {
-        // Seed Genre lookup values
-        modelBuilder.Entity<Genre>().HasData(
-            new Genre { GenreId = 1, Name = "Rock" },
-            new Genre { GenreId = 2, Name = "Jazz" },
-            new Genre { GenreId = 3, Name = "Classic" },
-            new Genre { GenreId = 4, Name = "Metal" },
-            new Genre { GenreId = 5, Name = "Comedy" }
+        // Seed Tags lookup values
+        modelBuilder.Entity<Tags>().HasData(
+            new Tags { TagId = 1, Name = "Rock" },
+            new Tags { TagId = 2, Name = "Jazz" },
+            new Tags { TagId = 3, Name = "Classic" },
+            new Tags { TagId = 4, Name = "Metal" },
+            new Tags { TagId = 5, Name = "Comedy" }
         );
 
         // Seed FileExtension lookup values

@@ -20,7 +20,7 @@ public class ArtistTests
         artist.UpdatedAt.Should().Be(default);
         artist.Albums.Should().NotBeNull().And.BeEmpty();
         artist.Tracks.Should().NotBeNull().And.BeEmpty();
-        artist.Genres.Should().NotBeNull().And.BeEmpty();
+        artist.Tags.Should().NotBeNull().And.BeEmpty();
     }
 
     [Fact]
@@ -137,36 +137,36 @@ public class ArtistTests
     }
 
     [Fact]
-    public void Artist_Genres_ShouldBeInitializedAsEmptyCollection()
+    public void Artist_Tags_ShouldBeInitializedAsEmptyCollection()
     {
         // Arrange & Act
         var artist = new Artist();
 
         // Assert
-        artist.Genres.Should().NotBeNull();
-        artist.Genres.Should().BeEmpty();
-        artist.Genres.Should().BeAssignableTo<ICollection<Genre>>();
+        artist.Tags.Should().NotBeNull();
+        artist.Tags.Should().BeEmpty();
+        artist.Tags.Should().BeAssignableTo<ICollection<Tags>>();
     }
 
     [Fact]
-    public void Artist_Genres_ShouldAllowAddingMultipleGenres()
+    public void Artist_Tags_ShouldAllowAddingMultipleTags()
     {
         // Arrange
         var artist = new Artist { ArtistId = 1, Name = "Versatile Artist" };
-        var rock = new Genre { GenreId = 1, Name = "Rock" };
-        var pop = new Genre { GenreId = 2, Name = "Pop" };
-        var jazz = new Genre { GenreId = 3, Name = "Jazz" };
+        var rock = new Tags { TagId = 1, Name = "Rock" };
+        var pop = new Tags { TagId = 2, Name = "Pop" };
+        var jazz = new Tags { TagId = 3, Name = "Jazz" };
 
         // Act
-        artist.Genres.Add(rock);
-        artist.Genres.Add(pop);
-        artist.Genres.Add(jazz);
+        artist.Tags.Add(rock);
+        artist.Tags.Add(pop);
+        artist.Tags.Add(jazz);
 
         // Assert
-        artist.Genres.Should().HaveCount(3);
-        artist.Genres.Should().Contain(g => g.Name == "Rock");
-        artist.Genres.Should().Contain(g => g.Name == "Pop");
-        artist.Genres.Should().Contain(g => g.Name == "Jazz");
+        artist.Tags.Should().HaveCount(3);
+        artist.Tags.Should().Contain(g => g.Name == "Rock");
+        artist.Tags.Should().Contain(g => g.Name == "Pop");
+        artist.Tags.Should().Contain(g => g.Name == "Jazz");
     }
 
     [Fact]

@@ -50,15 +50,15 @@ public class StatisticsService
     /// </summary>
     public async Task<Dictionary<string, int>> GetGenreStatisticsAsync()
     {
-        var genres = await _unitOfWork.Genres.GetAllAsync();
+        var tags = await _unitOfWork.Tags.GetAllAsync();
         var result = new Dictionary<string, int>();
 
-        foreach (var genre in genres)
+        foreach (var tag in tags)
         {
-            var tracks = await _unitOfWork.Tracks.FindAsync(t => t.Genres.Any(g => g.GenreId == genre.GenreId));
+            var tracks = await _unitOfWork.Tracks.FindAsync(t => t.Tags.Any(g => g.TagId == tag.TagId));
             var trackCount = tracks.Count();
             if (trackCount > 0)
-                result[genre.Name] = trackCount;
+                result[tag.Name] = trackCount;
         }
 
         return result;

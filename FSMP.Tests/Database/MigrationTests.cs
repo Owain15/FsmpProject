@@ -79,7 +79,7 @@ public class MigrationTests : IDisposable
     public void Migration_ShouldApplySuccessfully()
     {
         // If we got here without exception, the migration applied successfully
-        _context.Database.GetAppliedMigrations().Should().HaveCount(2);
+        _context.Database.GetAppliedMigrations().Should().HaveCount(3);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class MigrationTests : IDisposable
     {
         var tables = GetTableNames();
 
-        tables.Should().Contain("Genres");
+        tables.Should().Contain("Tags");
         tables.Should().Contain("FileExtensions");
     }
 
@@ -108,9 +108,9 @@ public class MigrationTests : IDisposable
     {
         var tables = GetTableNames();
 
-        tables.Should().Contain("TrackGenre");
-        tables.Should().Contain("AlbumGenre");
-        tables.Should().Contain("ArtistGenre");
+        tables.Should().Contain("TrackTag");
+        tables.Should().Contain("AlbumTag");
+        tables.Should().Contain("ArtistTag");
     }
 
     [Fact]
@@ -154,12 +154,12 @@ public class MigrationTests : IDisposable
     }
 
     [Fact]
-    public void Genre_SeedData_ShouldBePresent()
+    public void Tag_SeedData_ShouldBePresent()
     {
-        var genres = _context.Genres.OrderBy(g => g.GenreId).ToList();
+        var tags = _context.Tags.OrderBy(g => g.TagId).ToList();
 
-        genres.Should().HaveCount(5);
-        genres.Select(g => g.Name).Should().ContainInOrder("Rock", "Jazz", "Classic", "Metal", "Comedy");
+        tags.Should().HaveCount(5);
+        tags.Select(g => g.Name).Should().ContainInOrder("Rock", "Jazz", "Classic", "Metal", "Comedy");
     }
 
     [Fact]

@@ -318,18 +318,18 @@ public class StatisticsViewerTests : IDisposable
     }
 
     [Fact]
-    public async Task DisplayGenreBreakdownAsync_WithGenres_ShouldShowCounts()
+    public async Task DisplayGenreBreakdownAsync_WithTags_ShouldShowCounts()
     {
-        // Get seed genres from DB
-        var rock = _context.Genres.First(g => g.Name == "Rock");
-        var jazz = _context.Genres.First(g => g.Name == "Jazz");
+        // Get seed tags from DB
+        var rock = _context.Tags.First(g => g.Name == "Rock");
+        var jazz = _context.Tags.First(g => g.Name == "Jazz");
 
         var track1 = await CreateTrackAsync("Rock Song 1");
-        track1.Genres.Add(rock);
+        track1.Tags.Add(rock);
         var track2 = await CreateTrackAsync("Rock Song 2");
-        track2.Genres.Add(rock);
+        track2.Tags.Add(rock);
         var track3 = await CreateTrackAsync("Jazz Song");
-        track3.Genres.Add(jazz);
+        track3.Tags.Add(jazz);
         await _unitOfWork.SaveAsync();
 
         var (viewer, output) = CreateViewerWithOutput("");

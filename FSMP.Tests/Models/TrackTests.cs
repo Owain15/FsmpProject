@@ -28,7 +28,7 @@ public class TrackTests
         track.CustomArtist.Should().BeNull();
         track.CustomAlbum.Should().BeNull();
         track.CustomYear.Should().BeNull();
-        track.Genres.Should().NotBeNull().And.BeEmpty();
+        track.Tags.Should().NotBeNull().And.BeEmpty();
         track.Comment.Should().BeNull();
         track.ArtistId.Should().BeNull();
         track.AlbumId.Should().BeNull();
@@ -69,7 +69,7 @@ public class TrackTests
         track.CustomArtist = "Custom Artist";
         track.CustomAlbum = "Custom Album";
         track.CustomYear = 2024;
-        track.Genres = new List<Genre> { new Genre { GenreId = 1, Name = "Rock" } };
+        track.Tags = new List<Tags> { new Tags { TagId = 1, Name = "Rock" } };
         track.Comment = "Great song!";
         track.ArtistId = 10;
         track.AlbumId = 20;
@@ -99,7 +99,7 @@ public class TrackTests
         track.CustomArtist.Should().Be("Custom Artist");
         track.CustomAlbum.Should().Be("Custom Album");
         track.CustomYear.Should().Be(2024);
-        track.Genres.Should().HaveCount(1);
+        track.Tags.Should().HaveCount(1);
         track.Genres.First().Name.Should().Be("Rock");
         track.Comment.Should().Be("Great song!");
         track.ArtistId.Should().Be(10);

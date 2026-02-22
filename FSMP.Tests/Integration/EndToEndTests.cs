@@ -528,8 +528,8 @@ public class EndToEndTests : IDisposable
         using var context = CreateSqliteContext();
         await context.Database.MigrateAsync();
 
-        // Genre seeds
-        var genres = await context.Genres.ToListAsync();
+        // Tag seeds
+        var genres = await context.Tags.ToListAsync();
         genres.Should().HaveCount(5);
         genres.Select(g => g.Name).Should().Contain("Rock");
         genres.Select(g => g.Name).Should().Contain("Jazz");

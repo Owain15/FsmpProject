@@ -165,10 +165,10 @@ public class EntityConfigurationTests : IDisposable
     }
 
     [Fact]
-    public void Track_Genre_ManyToMany_ShouldWork()
+    public void Track_Tag_ManyToMany_ShouldWork()
     {
-        var rock = _context.Genres.First(g => g.Name == "Rock");
-        var metal = _context.Genres.First(g => g.Name == "Metal");
+        var rock = _context.Tags.First(g => g.Name == "Rock");
+        var metal = _context.Tags.First(g => g.Name == "Metal");
 
         var track = new Track
         {
@@ -176,57 +176,57 @@ public class EntityConfigurationTests : IDisposable
             FilePath = @"C:\rockmetal.mp3",
             FileHash = "hash1"
         };
-        track.Genres.Add(rock);
-        track.Genres.Add(metal);
+        track.Tags.Add(rock);
+        track.Tags.Add(metal);
 
         _context.Tracks.Add(track);
         _context.SaveChanges();
 
         var retrieved = _context.Tracks
-            .Include(t => t.Genres)
+            .Include(t => t.Tags)
             .First(t => t.Title == "Rock Metal Song");
 
-        retrieved.Genres.Should().HaveCount(2);
-        retrieved.Genres.Select(g => g.Name).Should().Contain("Rock");
-        retrieved.Genres.Select(g => g.Name).Should().Contain("Metal");
+        retrieved.Tags.Should().HaveCount(2);
+        retrieved.Tags.Select(g => g.Name).Should().Contain("Rock");
+        retrieved.Tags.Select(g => g.Name).Should().Contain("Metal");
     }
 
     [Fact]
-    public void Album_Genre_ManyToMany_ShouldWork()
+    public void Album_Tag_ManyToMany_ShouldWork()
     {
-        var jazz = _context.Genres.First(g => g.Name == "Jazz");
+        var jazz = _context.Tags.First(g => g.Name == "Jazz");
 
         var album = new Album { Title = "Jazz Album" };
-        album.Genres.Add(jazz);
+        album.Tags.Add(jazz);
 
         _context.Albums.Add(album);
         _context.SaveChanges();
 
         var retrieved = _context.Albums
-            .Include(a => a.Genres)
+            .Include(a => a.Tags)
             .First(a => a.Title == "Jazz Album");
 
-        retrieved.Genres.Should().HaveCount(1);
-        retrieved.Genres.First().Name.Should().Be("Jazz");
+        retrieved.Tags.Should().HaveCount(1);
+        retrieved.Tags.First().Name.Should().Be("Jazz");
     }
 
     [Fact]
-    public void Artist_Genre_ManyToMany_ShouldWork()
+    public void Artist_Tag_ManyToMany_ShouldWork()
     {
-        var classic = _context.Genres.First(g => g.Name == "Classic");
+        var classic = _context.Tags.First(g => g.Name == "Classic");
 
         var artist = new Artist { Name = "Classical Artist" };
-        artist.Genres.Add(classic);
+        artist.Tags.Add(classic);
 
         _context.Artists.Add(artist);
         _context.SaveChanges();
 
         var retrieved = _context.Artists
-            .Include(a => a.Genres)
+            .Include(a => a.Tags)
             .First(a => a.Name == "Classical Artist");
 
-        retrieved.Genres.Should().HaveCount(1);
-        retrieved.Genres.First().Name.Should().Be("Classic");
+        retrieved.Tags.Should().HaveCount(1);
+        retrieved.Tags.First().Name.Should().Be("Classic");
     }
 
     [Fact]
@@ -254,13 +254,13 @@ public class EntityConfigurationTests : IDisposable
     }
 
     [Fact]
-    public void Genre_Name_ShouldBeUnique()
+    public void Tag_Name_ShouldBeUnique()
     {
         using var ctx = CreateSqliteContext();
 
-        var duplicate = new Genre { Name = "Rock" };
+        var duplicate = new Tags { Name = "Rock" };
 
-        ctx.Genres.Add(duplicate);
+        ctx.Tags.Add(duplicate);
         var act = () => ctx.SaveChanges();
 
         act.Should().Throw<DbUpdateException>();
