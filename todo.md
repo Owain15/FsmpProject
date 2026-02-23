@@ -10,6 +10,7 @@
 | FsmpConsole | Console UI application | Complete (v1) | 95.60% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
 | FSMO | File System Music Organizer | Complete (10/10) | 96.39% | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
+| FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
 **Overall coverage**: 96.42% | **Tests**: 846 all passing | **Build**: Passing
 
@@ -90,9 +91,9 @@ See [FSMO todo](FSMP.lib/FSMO/todo.md) for detailed task breakdown.
 
 ---
 
-## Planned: Cross-Platform Migration (Windows + Android)
+## Cross-Platform Migration (Windows + Android)
 
-**Status**: Planning complete, not started | **Phases**: 0/8 complete
+**Status**: In progress | **Phases**: 0/8 complete (Batch 1 starting)
 **Plan Document**: [.claude/plans/elegant-honking-locket.md](.claude/plans/elegant-honking-locket.md)
 
 | # | Phase | Status | Projects Affected |
