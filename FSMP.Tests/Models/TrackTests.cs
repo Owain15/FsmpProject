@@ -100,7 +100,7 @@ public class TrackTests
         track.CustomAlbum.Should().Be("Custom Album");
         track.CustomYear.Should().Be(2024);
         track.Tags.Should().HaveCount(1);
-        track.Genres.First().Name.Should().Be("Rock");
+        track.Tags.First().Name.Should().Be("Rock");
         track.Comment.Should().Be("Great song!");
         track.ArtistId.Should().Be(10);
         track.AlbumId.Should().Be(20);
