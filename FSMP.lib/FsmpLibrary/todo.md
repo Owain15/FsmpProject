@@ -17,13 +17,13 @@ All entity models for the data layer, used by both FsmpLibrary and FsmpDataAcsse
 - `LibraryPath.cs` -- Configured library directory with scan tracking
 - `Configuration.cs` -- App configuration POCO (library paths, DB path, volume, auto-scan)
 
-### Audio Interfaces (`Interfaces/`)
+### Audio Interfaces
 
-Platform-agnostic audio playback abstraction:
-
-- `IAudioPlayer.cs` -- Load/Play/Pause/Stop/Seek with state and position events
-- `IAudioPlayerFactory.cs` -- Factory for creating audio player instances
-- `PlaybackState.cs` -- Enum: Stopped, Playing, Paused, Loading, Error
+**Moved to FSMP.Core** - FsmpLibrary now references `FSMP.Core.Interfaces` for:
+- `IAudioPlayer` -- Load/Play/Pause/Stop/Seek with state and position events
+- `IAudioPlayerFactory` -- Factory for creating audio player instances
+- `IMediaPlayerAdapter` -- Platform-specific media player abstraction
+- `PlaybackState` -- Enum: Stopped, Playing, Paused, Loading, Error
 - `EventArgs/` -- PlaybackStateChanged, PlaybackCompleted, PlaybackError, PositionChanged
 
 ### Audio Implementation (`Audio/`)
@@ -71,12 +71,16 @@ Coverage improved from 65.74% to 86.26% via adapter pattern refactor (IMediaPlay
 - [x] Add 52 unit tests for LibVlcAudioPlayer and LibVlcAudioPlayerFactory
 - [ ] Add integration tests for LibVlcMediaPlayerAdapter (requires LibVLC runtime, optional)
 
-### Cross-Platform Migration (when Phase 3 begins)
+### Cross-Platform Migration
 
+**Batch 1 Complete** - Interface cleanup:
+- [x] Remove duplicate interfaces from `Interfaces/` (now in FSMP.Core)
+- [x] FsmpLibrary now references `FSMP.Core.Interfaces`
+
+**Future Batches**:
 - [ ] Move models from `FsmpLibrary/Models/` to `FSMP.Core/Models/`
-- [ ] Move audio interfaces from `Interfaces/` to `FSMP.Core/Interfaces/`
+- [ ] Move LibVlcMediaPlayerAdapter to FSMP.Platform.Windows
 - [ ] Refactor AudioService to use platform-agnostic IAudioPlayer
-- [ ] Remove LibVLC dependency (move to FSMP.Platform.Windows)
 
 ---
 

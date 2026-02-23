@@ -93,19 +93,25 @@ See [FSMO todo](FSMP.lib/FSMO/todo.md) for detailed task breakdown.
 
 ## Cross-Platform Migration (Windows + Android)
 
-**Status**: In progress | **Phases**: 0/8 complete (Batch 1 starting)
-**Plan Document**: [.claude/plans/elegant-honking-locket.md](.claude/plans/elegant-honking-locket.md)
+**Status**: In progress | **Batch 1 Complete**
+**Plan Document**: [.claude/plans/soft-percolating-codd.md](.claude/plans/soft-percolating-codd.md)
+**Decision**: Use LibVLCSharp on both Windows and Android
 
 | # | Phase | Status | Projects Affected |
 |---|-------|--------|-------------------|
-| 1 | Setup Projects | Not started | NEW: FSMP.Core, Platform.Windows, Platform.Android, FSMP.MAUI |
-| 2 | Platform Abstraction | Not started | FSMP.Core, Platform.Windows, Platform.Android |
+| 1 | Setup Projects | **Partial** | FSMP.Core ✓, FSMP.MAUI ✓, Platform.Windows ✓ (exists), Platform.Android pending |
+| 2 | Platform Abstraction | **Partial** | Interfaces in FSMP.Core ✓, duplicate cleanup ✓ |
 | 3 | Migrate Business Logic | Not started | FSMP.Core, FsmpLibrary (refactor) |
-| 4 | Configure ExoPlayer FFmpeg | Not started | Platform.Android |
+| 4 | Configure LibVLCSharp Android | Not started | Platform.Android |
 | 5 | Build MAUI UI | Not started | FSMP.MAUI |
 | 6 | Android-Specific Features | Not started | FSMP.MAUI, Platform.Android |
 | 7 | Testing & Coverage | Not started | FSMP.Tests |
 | 8 | Documentation & Migration | Not started | All |
+
+**Batch 1 Complete** (Interface Cleanup):
+- [x] Deleted duplicate interfaces from FsmpLibrary/Interfaces/
+- [x] FsmpLibrary now uses FSMP.Core.Interfaces
+- [x] Build passes (MAUI requires SDK installation)
 
 **Key Requirements:**
 - Support Windows 10/11 and Android 11+
