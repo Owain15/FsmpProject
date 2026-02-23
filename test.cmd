@@ -1,13 +1,20 @@
 @echo off
 REM Test script for FSMP project
-REM Builds with MSBuild, then runs tests with dotnet test --no-build
+REM Builds with MSBuild, then runs tests pointing at the platform-specific output
+REM Usage: test.cmd [ARM64|x64]  (default: x64)
 
-echo Building solution...
-call build.cmd
+if "%1"=="" (
+    set PLATFORM=x64
+) else (
+    set PLATFORM=%1
+)
+
+echo Building solution [%PLATFORM%]...
+call build.cmd %PLATFORM%
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
-echo Running tests...
-dotnet test FSMP.Tests\FSMP.Tests.csproj --no-build --verbosity normal -- RunConfiguration.TargetPlatform=ARM64
+echo Running tests [%PLATFORM%]...
+dotnet test FSMP.Tests\bin\%PLATFORM%\Debug\net10.0\FSMP.Tests.dll --verbosity normal
 
 if %ERRORLEVEL% NEQ 0 (
     echo Tests failed!

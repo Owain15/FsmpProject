@@ -1,12 +1,19 @@
 @echo off
 REM Test with coverage script for FSMP project
+REM Usage: test-with-coverage.cmd [ARM64|x64]  (default: x64)
 
-echo Building solution...
-call build.cmd
+if "%1"=="" (
+    set PLATFORM=x64
+) else (
+    set PLATFORM=%1
+)
+
+echo Building solution [%PLATFORM%]...
+call build.cmd %PLATFORM%
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
-echo Running tests with coverage...
-dotnet test FSMP.Tests\FSMP.Tests.csproj --no-build --collect:"XPlat Code Coverage" --results-directory:.\coverage -- RunConfiguration.TargetPlatform=ARM64
+echo Running tests with coverage [%PLATFORM%]...
+dotnet test FSMP.Tests\bin\%PLATFORM%\Debug\net10.0\FSMP.Tests.dll --collect:"XPlat Code Coverage" --results-directory:.\coverage
 
 if %ERRORLEVEL% NEQ 0 (
     echo Tests failed!
