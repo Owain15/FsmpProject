@@ -1,0 +1,23 @@
+-------------------------------------
+
+FSMP Console UI
+
+.main menu set as music player
+.other menus / functinalaty to branch off 
+
+main menu funtions
+.play, pause, resume, stop, skip to, next, previos, toggle repeat style, toggle shuffle, playlist menu
+
+
+
+
+------------------------------------
+
+FSMO
+
+should have no dependency on FSMP (may extract for anuthor program)
+
+.reorginise a music directory
+.compair 2 directoys
+.move or copy from one directory to anuthor
+.handel files with missing information (consider online serch)
