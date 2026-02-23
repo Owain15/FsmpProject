@@ -56,37 +56,45 @@ FSMP (File System Music Player) is a Windows-only C# .NET 10.0 console applicati
 
 **IMPORTANT**: This project uses COM interop (WMPLib) which requires Visual Studio's MSBuild. The standard `dotnet build` command will fail with error MSB4803.
 
+### Device Architecture
+
+**Current dev machine**: ARM64 (Qualcomm Snapdragon, Windows 11 on ARM)
+
+Always build and test with `-p:Platform=ARM64` on this device. The `PROCESSOR_ARCHITECTURE` env var may report `AMD64` due to x64 emulation — ignore it; the native architecture is ARM64.
+
 ### Building
 
 ```bash
-# Build the solution (using build helper script)
-build.cmd
+# Build the solution (ARM64 — use this on current dev machine)
+"C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Build -p:Configuration=Debug -p:Platform=ARM64 -v:minimal
 
-# Or use MSBuild directly
-"C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Build -p:Configuration=Debug
+# Build for x64 (CI or x64 machines)
+"C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Build -p:Configuration=Debug -p:Platform=x64 -v:minimal
 
 # Clean build artifacts
-"C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Clean
+"C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Clean -p:Platform=ARM64
 ```
 
 ### Testing
 
+**IMPORTANT**: Run tests from the built DLL matching the build platform. Do NOT use `dotnet test` with `--no-build` and a csproj — it may pick the wrong architecture's output.
+
 ```bash
-# Run tests (using test helper script)
-test.cmd
+# Run tests (ARM64 — use this on current dev machine)
+dotnet test "FSMP.Tests/bin/ARM64/Debug/net10.0/FSMP.Tests.dll"
+
+# Run tests (x64)
+dotnet test "FSMP.Tests/bin/x64/Debug/net10.0/FSMP.Tests.dll"
 
 # Run tests with code coverage
 test-with-coverage.cmd
-
-# Or manually: build first, then test with --no-build
-build.cmd
-dotnet test FSMP.Tests/FSMP.Tests.csproj --no-build
 ```
 
 **Test Requirements**:
 - Minimum 80% code coverage required
 - All tests must pass before committing
 - Build and test after every code change
+- **All happy paths must have end-to-end tests. This is a non-negotiable requirement.**
 
 ### Running
 

@@ -91,6 +91,27 @@ See [FSMO todo](FSMP.lib/FSMO/todo.md) for detailed task breakdown.
 
 ---
 
+## Console UI Restructure: Player as Main Screen
+
+**Status**: Not started | **Plan**: [.claude/plans/lexical-growing-acorn.md](.claude/plans/lexical-growing-acorn.md)
+
+Replace the 8-option main menu with the Player screen as the primary UI. Navigation to Browse, Playlists, and Directories via hotkeys from the player.
+
+| # | Task | Status | Project |
+|---|------|--------|---------|
+| 1 | Expand PlayerUI with B/L/D/X hotkeys and sub-screen launchers | Not started | FsmpConsole |
+| 2 | Update Print.NewDisplay to show navigation hotkeys | Not started | FsmpConsole |
+| 3 | Simplify/remove MenuSystem (PlayerUI is now the entry point) | Not started | FsmpConsole |
+| 4 | Update AppStartup wiring for expanded PlayerUI | Not started | FsmpConsole |
+| 5 | Update PlayerUI tests for new hotkeys and sub-screens | Not started | FSMP.Tests |
+| 6 | Update MenuSystem tests / remove if MenuSystem removed | Not started | FSMP.Tests |
+| 7 | Update Print.NewDisplay tests | Not started | FSMP.Tests |
+| 8 | Verify build, all tests pass, 80%+ coverage maintained | Not started | All |
+
+**Removed from main flow**: Statistics, Settings, Scan Libraries (scan accessible via Directories)
+
+---
+
 ## Cross-Platform Migration (Windows + Android)
 
 **Status**: In progress | **Batch 1 Complete**

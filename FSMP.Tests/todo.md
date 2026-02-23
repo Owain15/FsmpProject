@@ -90,6 +90,13 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - [x] Add LibVlcAudioPlayer unit tests via IMediaPlayerAdapter mock (52 tests)
 - [ ] Add LibVlcMediaPlayerAdapter integration tests (requires LibVLC runtime, optional)
 
+### Console UI Restructure Tests
+
+- [ ] Update `PlayerUITests.cs` — Add tests for B/L/D/X hotkeys, sub-screen launches, exit behavior
+- [ ] Update or remove `MenuSystemTests.cs` — Reflect simplified/removed MenuSystem
+- [ ] Update `PrintTests.cs` — Test updated NewDisplay with navigation hotkeys
+- [ ] Verify all existing tests still pass after refactor
+
 ### Cross-Platform Migration Tests (when migration begins)
 
 - [x] Create `FSMP.Tests/Core/` directory for FSMP.Core tests

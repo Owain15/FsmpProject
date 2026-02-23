@@ -46,6 +46,20 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ---
 
+## Active Work
+
+### Console UI Restructure: Player as Main Screen
+
+**Status**: Not started | **Plan**: [.claude/plans/lexical-growing-acorn.md](../../../../.claude/plans/lexical-growing-acorn.md)
+
+- [ ] Expand `PlayerUI.cs` — Add dependencies (PlaylistService, ConfigurationService, LibraryScanService), add hotkeys: `[B]` Browse, `[L]` Playlists, `[D]` Directories, `[X]` Exit. Remove `[Q]` back-to-menu.
+- [ ] Update `Print.cs` — Update `NewDisplay` to show B/L/D/X navigation hotkeys in controls section
+- [ ] Simplify or remove `MenuSystem.cs` — PlayerUI is now the main entry point
+- [ ] Update `AppStartup.cs` — Wire additional services to PlayerUI
+- [ ] Verify build passes and coverage ≥ 80%
+
+---
+
 ## Future Work
 
 ### Cross-Platform Migration (when Phase 8 begins)

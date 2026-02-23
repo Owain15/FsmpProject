@@ -278,7 +278,7 @@ public class ErrorHandlingTests : IDisposable
         var dbPath = Path.Combine(_tempDir, "app.db");
         await File.WriteAllTextAsync(configPath, "CORRUPT DATA!!!");
 
-        var input = new StringReader("8\n");
+        var input = new StringReader("X\n");
         var output = new StringWriter();
         var app = new AppStartup(input, output, configPath, dbPath);
 
@@ -302,12 +302,12 @@ public class ErrorHandlingTests : IDisposable
         var dbPath = Path.Combine(_tempDir, "double.db");
 
         // First run
-        var app1 = new AppStartup(new StringReader("8\n"), new StringWriter(), configPath, dbPath);
+        var app1 = new AppStartup(new StringReader("X\n"), new StringWriter(), configPath, dbPath);
         await app1.RunAsync();
 
         // Second run — migration already applied, should succeed
         var output2 = new StringWriter();
-        var app2 = new AppStartup(new StringReader("8\n"), output2, configPath, dbPath);
+        var app2 = new AppStartup(new StringReader("X\n"), output2, configPath, dbPath);
         await app2.RunAsync();
 
         output2.ToString().Should().Contain("Database ready at:");

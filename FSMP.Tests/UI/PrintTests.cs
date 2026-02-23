@@ -373,6 +373,7 @@ public class PrintTests
         var text = output.ToString();
         text.Should().Contain("[N] Next");
         text.Should().Contain("[S] Stop");
-        text.Should().Contain("[Q] Back");
+        text.Should().Contain("[B] Browse");
+        text.Should().Contain("[X] Exit");
     }
 }

@@ -1,32 +1,43 @@
 using FSMP.Core;
 using FsmpDataAcsses;
+using FsmpDataAcsses.Services;
 using FSMP.Core.Models;
 using FsmpLibrary.Services;
 
 namespace FsmpConsole;
 
 /// <summary>
-/// Console music player view with queue display and playback controls.
+/// Main application screen — music player with navigation to Browse, Playlists, and Directories.
 /// </summary>
 public class PlayerUI
 {
     private readonly ActivePlaylistService _activePlaylist;
     private readonly IAudioService _audioService;
     private readonly UnitOfWork _unitOfWork;
+    private readonly PlaylistService _playlistService;
+    private readonly ConfigurationService _configService;
+    private readonly LibraryScanService _scanService;
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private bool _isPlaying;
+    private bool _exitRequested;
 
     public PlayerUI(
         ActivePlaylistService activePlaylist,
         IAudioService audioService,
         UnitOfWork unitOfWork,
+        PlaylistService playlistService,
+        ConfigurationService configService,
+        LibraryScanService scanService,
         TextReader input,
         TextWriter output)
     {
         _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        _playlistService = playlistService ?? throw new ArgumentNullException(nameof(playlistService));
+        _configService = configService ?? throw new ArgumentNullException(nameof(configService));
+        _scanService = scanService ?? throw new ArgumentNullException(nameof(scanService));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
     }
@@ -36,16 +47,14 @@ public class PlayerUI
     /// </summary>
     public async Task RunAsync()
     {
-        while (true)
+        _exitRequested = false;
+        while (!_exitRequested)
         {
             await DisplayPlayerStateAsync();
 
             var line = _input.ReadLine()?.Trim().ToUpperInvariant();
             if (string.IsNullOrEmpty(line))
                 continue;
-
-            if (line == "Q")
-                break;
 
             await HandleInputAsync(line);
         }
@@ -95,6 +104,20 @@ public class PlayerUI
                 break;
             case "H":
                 ToggleShuffle();
+                break;
+            case "B":
+                await BrowseAsync();
+                break;
+            case "L":
+                await ManagePlaylistsAsync();
+                break;
+            case "D":
+                await ManageDirectoriesAsync();
+                break;
+            case "X":
+                _exitRequested = true;
+                _output.WriteLine();
+                _output.WriteLine("Goodbye!");
                 break;
         }
     }
@@ -210,5 +233,186 @@ public class PlayerUI
         }
 
         return items;
+    }
+
+    private async Task BrowseAsync()
+    {
+        var browseUI = new BrowseUI(_unitOfWork, _audioService, _activePlaylist, _input, _output);
+        await browseUI.RunAsync();
+    }
+
+    private async Task ManagePlaylistsAsync()
+    {
+        while (true)
+        {
+            var playlists = (await _playlistService.GetAllPlaylistsAsync()).ToList();
+
+            var items = playlists.Select(p =>
+            {
+                var trackCount = p.PlaylistTracks?.Count ?? 0;
+                return $"{p.Name} ({trackCount} tracks)";
+            }).ToList();
+
+            _output.WriteLine();
+            _output.WriteLine("== Playlists ==");
+            _output.WriteLine();
+            for (int i = 0; i < items.Count; i++)
+                _output.WriteLine($"  {i + 1}) {items[i]}");
+            _output.WriteLine();
+            _output.WriteLine("  C) Create new playlist");
+            _output.WriteLine("  0) Back");
+            _output.WriteLine();
+            _output.Write("Select: ");
+
+            var input = _input.ReadLine()?.Trim();
+            if (input == "0" || string.IsNullOrEmpty(input))
+                return;
+
+            if (input?.Equals("c", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                _output.Write("Playlist name: ");
+                var name = _input.ReadLine()?.Trim();
+                if (!string.IsNullOrEmpty(name))
+                {
+                    _output.Write("Description (optional): ");
+                    var desc = _input.ReadLine()?.Trim();
+                    var created = await _playlistService.CreatePlaylistAsync(name, string.IsNullOrEmpty(desc) ? null : desc);
+                    _output.WriteLine($"Created playlist: {created.Name}");
+                }
+                continue;
+            }
+
+            if (int.TryParse(input, out var idx) && idx >= 1 && idx <= playlists.Count)
+            {
+                await ViewPlaylistAsync(playlists[idx - 1].PlaylistId);
+            }
+        }
+    }
+
+    private async Task ViewPlaylistAsync(int playlistId)
+    {
+        var playlist = await _playlistService.GetPlaylistWithTracksAsync(playlistId);
+        if (playlist == null)
+        {
+            _output.WriteLine("Playlist not found.");
+            return;
+        }
+
+        var tracks = playlist.PlaylistTracks.OrderBy(pt => pt.Position).ToList();
+
+        _output.WriteLine();
+        _output.WriteLine($"== {playlist.Name} ==");
+        if (!string.IsNullOrEmpty(playlist.Description))
+            _output.WriteLine($"  {playlist.Description}");
+        _output.WriteLine();
+
+        if (tracks.Count == 0)
+        {
+            _output.WriteLine("  (no tracks)");
+        }
+        else
+        {
+            foreach (var pt in tracks)
+            {
+                var track = await _unitOfWork.Tracks.GetByIdAsync(pt.TrackId);
+                var title = track?.DisplayTitle ?? "Unknown";
+                var artist = track?.DisplayArtist ?? "";
+                var artistSuffix = !string.IsNullOrEmpty(artist) ? $" - {artist}" : "";
+                _output.WriteLine($"  {pt.Position + 1}) {title}{artistSuffix}");
+            }
+        }
+
+        _output.WriteLine();
+        _output.WriteLine("  L) Load into Player queue");
+        _output.WriteLine("  D) Delete playlist");
+        _output.WriteLine("  0) Back");
+        _output.WriteLine();
+        _output.Write("Select: ");
+
+        var input = _input.ReadLine()?.Trim()?.ToLowerInvariant();
+
+        switch (input)
+        {
+            case "l":
+                if (tracks.Count > 0)
+                {
+                    _activePlaylist.SetQueue(tracks.Select(pt => pt.TrackId).ToList());
+                    _output.WriteLine($"Loaded {tracks.Count} tracks into player queue.");
+                }
+                else
+                {
+                    _output.WriteLine("No tracks to load.");
+                }
+                break;
+            case "d":
+                await _playlistService.DeletePlaylistAsync(playlistId);
+                _output.WriteLine("Playlist deleted.");
+                break;
+        }
+    }
+
+    private async Task ManageDirectoriesAsync()
+    {
+        var config = await _configService.LoadConfigurationAsync();
+
+        _output.WriteLine();
+        _output.WriteLine("== Library Paths ==");
+        _output.WriteLine();
+        if (config.LibraryPaths.Count == 0)
+        {
+            _output.WriteLine("  (none configured)");
+        }
+        else
+        {
+            for (int i = 0; i < config.LibraryPaths.Count; i++)
+                _output.WriteLine($"  {i + 1}) {config.LibraryPaths[i]}");
+        }
+        _output.WriteLine();
+        _output.WriteLine("  A) Add path");
+        _output.WriteLine("  R) Remove path");
+        _output.WriteLine("  S) Scan all libraries");
+        _output.WriteLine("  0) Back");
+        _output.WriteLine();
+        _output.Write("Select: ");
+
+        var input = _input.ReadLine()?.Trim()?.ToLowerInvariant();
+
+        switch (input)
+        {
+            case "a":
+                _output.Write("Enter path: ");
+                var newPath = _input.ReadLine()?.Trim();
+                if (!string.IsNullOrEmpty(newPath))
+                {
+                    await _configService.AddLibraryPathAsync(newPath);
+                    _output.WriteLine("Path added.");
+                }
+                break;
+            case "r":
+                _output.Write("Enter path number to remove: ");
+                var removeInput = _input.ReadLine()?.Trim();
+                if (int.TryParse(removeInput, out var removeIndex)
+                    && removeIndex >= 1 && removeIndex <= config.LibraryPaths.Count)
+                {
+                    await _configService.RemoveLibraryPathAsync(config.LibraryPaths[removeIndex - 1]);
+                    _output.WriteLine("Path removed.");
+                }
+                break;
+            case "s":
+                if (config.LibraryPaths.Count == 0)
+                {
+                    _output.WriteLine("No library paths configured.");
+                }
+                else
+                {
+                    _output.WriteLine("Scanning libraries...");
+                    var result = await _scanService.ScanAllLibrariesAsync(config.LibraryPaths);
+                    _output.WriteLine($"Scan complete: {result.TracksAdded} added, {result.TracksUpdated} updated, {result.TracksRemoved} removed");
+                    if (result.Errors.Count > 0)
+                        _output.WriteLine($"  {result.Errors.Count} error(s) occurred.");
+                    _output.WriteLine($"  Duration: {result.Duration.TotalSeconds:F1}s");
+                }
+                break;
+        }
     }
 }

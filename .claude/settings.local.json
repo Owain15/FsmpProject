@@ -8,7 +8,8 @@
       "Bash(dotnet add:*)",
       "Bash(dotnet list:*)",
       "Bash(dotnet test:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(grep:*#)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Admin\\source\\repos\\FsmpProject"

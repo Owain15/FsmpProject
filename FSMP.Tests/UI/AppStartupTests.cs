@@ -108,7 +108,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldCreateConfigFile()
     {
-        var (app, output) = CreateApp("8\n");
+        var (app, output) = CreateApp("X\n");
 
         await app.RunAsync();
 
@@ -118,7 +118,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldCreateDatabaseFile()
     {
-        var (app, output) = CreateApp("8\n");
+        var (app, output) = CreateApp("X\n");
 
         await app.RunAsync();
 
@@ -128,7 +128,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldApplyMigrations()
     {
-        var (app, output) = CreateApp("8\n");
+        var (app, output) = CreateApp("X\n");
 
         await app.RunAsync();
 
@@ -139,7 +139,7 @@ public class AppStartupTests : IDisposable
     [Fact]
     public async Task RunAsync_ShouldShowWelcomeMessage()
     {
-        var (app, output) = CreateApp("8\n");
+        var (app, output) = CreateApp("X\n");
 
         await app.RunAsync();
 
@@ -149,21 +149,21 @@ public class AppStartupTests : IDisposable
     }
 
     [Fact]
-    public async Task RunAsync_ShouldDisplayMenuAndAcceptExit()
+    public async Task RunAsync_ShouldDisplayPlayerAndAcceptExit()
     {
-        var (app, output) = CreateApp("8\n");
+        var (app, output) = CreateApp("X\n");
 
         await app.RunAsync();
 
         var text = output.ToString();
-        text.Should().Contain("Browse & Play");
+        text.Should().Contain("[B] Browse");
         text.Should().Contain("Goodbye!");
     }
 
     [Fact]
     public async Task RunAsync_WithAutoScanAndNoPaths_ShouldSkipScan()
     {
-        var (app, output) = CreateApp("8\n");
+        var (app, output) = CreateApp("X\n");
 
         await app.RunAsync();
 
@@ -175,11 +175,11 @@ public class AppStartupTests : IDisposable
     public async Task RunAsync_ShouldBeIdempotent_RunTwice()
     {
         // First run
-        var (app1, output1) = CreateApp("8\n");
+        var (app1, output1) = CreateApp("X\n");
         await app1.RunAsync();
 
         // Second run - should work with existing config and DB
-        var (app2, output2) = CreateApp("8\n");
+        var (app2, output2) = CreateApp("X\n");
         await app2.RunAsync();
 
         var text = output2.ToString();
@@ -189,39 +189,38 @@ public class AppStartupTests : IDisposable
     }
 
     [Fact]
-    public async Task RunAsync_ViewStatistics_ShouldShowEmptyStats()
+    public async Task RunAsync_BrowseFromPlayer_EmptyLibrary_ShouldShowNoArtists()
     {
-        // Option 5 = View Statistics, then 8 = Exit
-        var (app, output) = CreateApp("5\n8\n");
-
-        await app.RunAsync();
-
-        var text = output.ToString();
-        text.Should().Contain("Library Statistics");
-        text.Should().Contain("Total tracks: 0");
-    }
-
-    [Fact]
-    public async Task RunAsync_ScanLibraries_NoPaths_ShouldShowMessage()
-    {
-        // Option 4 = Scan Libraries (no paths configured), then 8 = Exit
-        var (app, output) = CreateApp("4\n8\n");
-
-        await app.RunAsync();
-
-        var text = output.ToString();
-        text.Should().Contain("No library paths configured");
-    }
-
-    [Fact]
-    public async Task RunAsync_BrowseAndPlay_EmptyLibrary_ShouldShowNoArtists()
-    {
-        // Option 1 = Browse, then 0 = Back, then 8 = Exit
-        var (app, output) = CreateApp("1\n0\n8\n");
+        // B = Browse (from player), then X = Exit
+        var (app, output) = CreateApp("B\nX\n");
 
         await app.RunAsync();
 
         var text = output.ToString();
         text.Should().Contain("No artists");
+    }
+
+    [Fact]
+    public async Task RunAsync_DirectoriesFromPlayer_NoPaths_ShouldShowNoneConfigured()
+    {
+        // D = Directories, then 0 = Back, then X = Exit
+        var (app, output) = CreateApp("D\n0\nX\n");
+
+        await app.RunAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("(none configured)");
+    }
+
+    [Fact]
+    public async Task RunAsync_PlaylistsFromPlayer_ShouldShowPlaylistsScreen()
+    {
+        // L = Playlists, then 0 = Back, then X = Exit
+        var (app, output) = CreateApp("L\n0\nX\n");
+
+        await app.RunAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Playlists");
     }
 }

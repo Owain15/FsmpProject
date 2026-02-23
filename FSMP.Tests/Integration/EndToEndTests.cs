@@ -111,8 +111,8 @@ public class EndToEndTests : IDisposable
     [Fact]
     public async Task FreshInstall_ShouldCreateConfigAndDatabase()
     {
-        // Run app with immediate exit
-        var input = new StringReader("8\n");
+        // Run app with immediate exit (X = exit from player main screen)
+        var input = new StringReader("X\n");
         var output = new StringWriter();
         var app = new AppStartup(input, output, _configPath, _dbPath);
 
@@ -145,16 +145,17 @@ public class EndToEndTests : IDisposable
         // Setup: create music files
         CreateMusicLibrary(_musicDir, "TestArtist", "TestAlbum", "Track01", "Track02");
 
-        // Step 1: Start app, add library path, exit
-        var input1 = new StringReader($"6\na\n{_musicDir}\n\n8\n");
+        // Step 1: Start app, go to Directories, add library path, exit
+        // D = Directories, a = add path, enter path, then X = exit
+        var input1 = new StringReader($"D\na\n{_musicDir}\nX\n");
         var output1 = new StringWriter();
         var app1 = new AppStartup(input1, output1, _configPath, _dbPath);
         await app1.RunAsync();
         output1.ToString().Should().Contain("Path added");
 
-        // Step 2: Start app again, scan libraries, then browse, then view stats, then exit
-        // AutoScanOnStartup is true but we just added the path so it should auto-scan
-        var input2 = new StringReader("1\n0\n5\n8\n");
+        // Step 2: Start app again — auto-scan should find tracks, then browse, then exit
+        // B = Browse (from player), 0 = back, X = exit
+        var input2 = new StringReader("B\n0\nX\n");
         var output2 = new StringWriter();
         var app2 = new AppStartup(input2, output2, _configPath, _dbPath);
         await app2.RunAsync();
@@ -163,8 +164,6 @@ public class EndToEndTests : IDisposable
         // Auto-scan should have found tracks
         text.Should().Contain("Auto-scanning");
         text.Should().Contain("added");
-        // View statistics should show tracks
-        text.Should().Contain("Library Statistics");
     }
 
     // ========== Test 3: Multi-Library Scenario ==========

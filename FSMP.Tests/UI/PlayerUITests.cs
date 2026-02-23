@@ -2,6 +2,7 @@ using FSMP.Core;
 using FluentAssertions;
 using FsmpConsole;
 using FsmpDataAcsses;
+using FsmpDataAcsses.Services;
 using FSMP.Core.Models;
 using FsmpLibrary.Services;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,12 @@ public class PlayerUITests : IDisposable
     private readonly FsmpDbContext _context;
     private readonly UnitOfWork _unitOfWork;
     private readonly Mock<IAudioService> _audioMock;
+    private readonly Mock<IMetadataService> _metadataMock;
     private readonly ActivePlaylistService _activePlaylist;
+    private readonly PlaylistService _playlistService;
+    private readonly ConfigurationService _configService;
+    private readonly LibraryScanService _scanService;
+    private readonly string _configDir;
 
     public PlayerUITests()
     {
@@ -26,12 +32,21 @@ public class PlayerUITests : IDisposable
 
         _unitOfWork = new UnitOfWork(_context);
         _audioMock = new Mock<IAudioService>();
+        _metadataMock = new Mock<IMetadataService>();
         _activePlaylist = new ActivePlaylistService();
+        _playlistService = new PlaylistService(_unitOfWork);
+
+        _configDir = Path.Combine(Path.GetTempPath(), "FSMP_PlayerUITests", Guid.NewGuid().ToString());
+        Directory.CreateDirectory(_configDir);
+        _configService = new ConfigurationService(Path.Combine(_configDir, "config.json"));
+        _scanService = new LibraryScanService(_unitOfWork, _metadataMock.Object);
     }
 
     public void Dispose()
     {
         _unitOfWork.Dispose();
+        if (Directory.Exists(_configDir))
+            Directory.Delete(_configDir, recursive: true);
     }
 
     // --- Helpers ---
@@ -40,7 +55,8 @@ public class PlayerUITests : IDisposable
     {
         var input = new StringReader(inputLines);
         var output = new StringWriter();
-        var player = new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, input, output);
+        var player = new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork,
+            _playlistService, _configService, _scanService, input, output);
         return (player, output);
     }
 
@@ -89,56 +105,78 @@ public class PlayerUITests : IDisposable
     [Fact]
     public void Constructor_WithNullActivePlaylist_ShouldThrow()
     {
-        var act = () => new PlayerUI(null!, _audioMock.Object, _unitOfWork, TextReader.Null, TextWriter.Null);
+        var act = () => new PlayerUI(null!, _audioMock.Object, _unitOfWork, _playlistService, _configService, _scanService, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("activePlaylist");
     }
 
     [Fact]
     public void Constructor_WithNullAudioService_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, null!, _unitOfWork, TextReader.Null, TextWriter.Null);
+        var act = () => new PlayerUI(_activePlaylist, null!, _unitOfWork, _playlistService, _configService, _scanService, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("audioService");
     }
 
     [Fact]
     public void Constructor_WithNullUnitOfWork_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, null!, TextReader.Null, TextWriter.Null);
+        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, null!, _playlistService, _configService, _scanService, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("unitOfWork");
+    }
+
+    [Fact]
+    public void Constructor_WithNullPlaylistService_ShouldThrow()
+    {
+        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, null!, _configService, _scanService, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("playlistService");
+    }
+
+    [Fact]
+    public void Constructor_WithNullConfigService_ShouldThrow()
+    {
+        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, null!, _scanService, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("configService");
+    }
+
+    [Fact]
+    public void Constructor_WithNullScanService_ShouldThrow()
+    {
+        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, _configService, null!, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("scanService");
     }
 
     [Fact]
     public void Constructor_WithNullInput_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, null!, TextWriter.Null);
+        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, _configService, _scanService, null!, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("input");
     }
 
     [Fact]
     public void Constructor_WithNullOutput_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, TextReader.Null, null!);
+        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, _configService, _scanService, TextReader.Null, null!);
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
 
     // ========== RunAsync Tests ==========
 
     [Fact]
-    public async Task RunAsync_QuitImmediately_ShouldExitLoop()
+    public async Task RunAsync_ExitImmediately_ShouldExitLoop()
     {
-        var (player, output) = CreatePlayerWithOutput("Q\n");
+        var (player, output) = CreatePlayerWithOutput("X\n");
 
         await player.RunAsync();
 
         var text = output.ToString();
         text.Should().Contain("Queue: (empty)");
+        text.Should().Contain("Goodbye!");
     }
 
     [Fact]
     public async Task RunAsync_EmptyInput_ShouldContinueLoop()
     {
-        // Empty line then Q
-        var (player, output) = CreatePlayerWithOutput("\nQ\n");
+        // Empty line then X
+        var (player, output) = CreatePlayerWithOutput("\nX\n");
 
         await player.RunAsync();
 
@@ -147,15 +185,16 @@ public class PlayerUITests : IDisposable
     }
 
     [Fact]
-    public async Task RunAsync_LowercaseQ_ShouldExit()
+    public async Task RunAsync_LowercaseX_ShouldExit()
     {
-        // Input is uppercased, so "q" becomes "Q"
-        var (player, output) = CreatePlayerWithOutput("q\n");
+        // Input is uppercased, so "x" becomes "X"
+        var (player, output) = CreatePlayerWithOutput("x\n");
 
         await player.RunAsync();
 
         var text = output.ToString();
         text.Should().Contain("Queue: (empty)");
+        text.Should().Contain("Goodbye!");
     }
 
     // ========== DisplayPlayerStateAsync Tests ==========
@@ -247,7 +286,8 @@ public class PlayerUITests : IDisposable
         var text = output.ToString();
         text.Should().Contain("[N] Next");
         text.Should().Contain("[P] Prev");
-        text.Should().Contain("[Q] Back");
+        text.Should().Contain("[B] Browse");
+        text.Should().Contain("[X] Exit");
     }
 
     // ========== HandleInputAsync — Next (N) ==========
@@ -549,7 +589,7 @@ public class PlayerUITests : IDisposable
     {
         var (player, output) = CreatePlayerWithOutput("");
 
-        var act = async () => await player.HandleInputAsync("X");
+        var act = async () => await player.HandleInputAsync("Z");
 
         await act.Should().NotThrowAsync();
         _audioMock.VerifyNoOtherCalls();
