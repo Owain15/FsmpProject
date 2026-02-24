@@ -1,15 +1,15 @@
 @echo off
 REM Test with coverage script for FSMP project
-REM Usage: test-with-coverage.cmd [ARM64|x64]  (default: x64)
+REM Usage: test-with-coverage.cmd [ARM64|x64]  (default: ARM64)
 
 if "%1"=="" (
-    set PLATFORM=x64
+    set PLATFORM=ARM64
 ) else (
     set PLATFORM=%1
 )
 
 echo Building solution [%PLATFORM%]...
-call build.cmd %PLATFORM%
+call "%~dp0build.cmd" %PLATFORM%
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
 echo Running tests with coverage [%PLATFORM%]...

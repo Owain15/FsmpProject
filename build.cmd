@@ -1,13 +1,13 @@
 @echo off
 REM Build script for FSMP project
 REM Uses Visual Studio MSBuild to support COM references
-REM Usage: build.cmd [ARM64|x64]  (default: x64)
+REM Usage: build.cmd [ARM64|x64]  (default: ARM64)
 
 set MSBUILD="C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe"
 set SOLUTION="FSMP.UI\FSMP.UI.Console\FsmpConsole\FsmpConsole.slnx"
 
 if "%1"=="" (
-    set PLATFORM=x64
+    set PLATFORM=ARM64
 ) else (
     set PLATFORM=%1
 )

@@ -661,7 +661,7 @@ public class BrowseUITests : IDisposable
         var album = await CreateAlbumAsync("Migration", artist.ArtistId);
         await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
 
-        var input = new StringReader("A\n0\n");
+        var input = new StringReader("A\n");
         var output = new StringWriter();
         var activePlaylist = new ActivePlaylistService();
         activePlaylist.SetQueue(new[] { 999 }); // existing track
@@ -670,7 +670,7 @@ public class BrowseUITests : IDisposable
 
         await browse.DisplayTracksByAlbumAsync(album.AlbumId);
 
-        clearCount.Should().Be(2); // initial draw + redraw after A
+        clearCount.Should().Be(1); // initial draw only, then returns to main menu
         output.ToString().Should().Contain("Added 1 tracks from Migration to queue");
     }
 

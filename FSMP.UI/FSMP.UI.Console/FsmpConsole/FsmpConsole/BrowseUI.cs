@@ -18,6 +18,7 @@ public class BrowseUI
     private readonly TextWriter _output;
     private readonly Action? _onClear;
     private string? _statusMessage;
+    private bool _returnToMain;
 
     public BrowseUI(UnitOfWork unitOfWork, IAudioService audioService, ActivePlaylistService activePlaylist, TextReader input, TextWriter output, Action? onClear = null)
     {
@@ -34,6 +35,7 @@ public class BrowseUI
     /// </summary>
     public async Task RunAsync()
     {
+        _returnToMain = false;
         await DisplayArtistsAsync();
     }
 
@@ -90,6 +92,7 @@ public class BrowseUI
                 {
                     _output.WriteLine("  No tracks to queue.");
                 }
+                _returnToMain = true;
                 return;
             }
 
@@ -105,18 +108,20 @@ public class BrowseUI
                 if (allTrackIds.Count > 0)
                 {
                     AppendToQueue(allTrackIds);
-                    _statusMessage = $"  Added {allTrackIds.Count} tracks to queue.";
+                    _output.WriteLine($"  Added {allTrackIds.Count} tracks to queue.");
                 }
                 else
                 {
-                    _statusMessage = "  No tracks to add.";
+                    _output.WriteLine("  No tracks to add.");
                 }
-                continue;
+                _returnToMain = true;
+                return;
             }
 
             if (int.TryParse(input, out var index) && index >= 1 && index <= artists.Count)
             {
                 await DisplayAlbumsByArtistAsync(artists[index - 1].ArtistId);
+                if (_returnToMain) return;
             }
             else
             {
@@ -188,6 +193,7 @@ public class BrowseUI
                 {
                     _output.WriteLine("  No tracks to queue.");
                 }
+                _returnToMain = true;
                 return;
             }
 
@@ -198,18 +204,20 @@ public class BrowseUI
                 if (trackIds.Count > 0)
                 {
                     AppendToQueue(trackIds);
-                    _statusMessage = $"  Added {trackIds.Count} tracks by {artist.Name} to queue.";
+                    _output.WriteLine($"  Added {trackIds.Count} tracks by {artist.Name} to queue.");
                 }
                 else
                 {
-                    _statusMessage = "  No tracks to add.";
+                    _output.WriteLine("  No tracks to add.");
                 }
-                continue;
+                _returnToMain = true;
+                return;
             }
 
             if (int.TryParse(input, out var idx) && idx >= 1 && idx <= albums.Count)
             {
                 await DisplayTracksByAlbumAsync(albums[idx - 1].AlbumId);
+                if (_returnToMain) return;
             }
             else
             {
@@ -275,6 +283,7 @@ public class BrowseUI
                 var trackIds = tracks.Select(t => t.TrackId).ToList();
                 _activePlaylist.SetQueue(trackIds);
                 _output.WriteLine($"  Set queue: {trackIds.Count} tracks from {album.Title}.");
+                _returnToMain = true;
                 return;
             }
 
@@ -282,13 +291,15 @@ public class BrowseUI
             {
                 var trackIds = tracks.Select(t => t.TrackId).ToList();
                 AppendToQueue(trackIds);
-                _statusMessage = $"  Added {trackIds.Count} tracks from {album.Title} to queue.";
-                continue;
+                _output.WriteLine($"  Added {trackIds.Count} tracks from {album.Title} to queue.");
+                _returnToMain = true;
+                return;
             }
 
             if (int.TryParse(input, out var idx) && idx >= 1 && idx <= tracks.Count)
             {
                 await QueueTrackAsync(tracks[idx - 1].TrackId);
+                if (_returnToMain) return;
             }
             else
             {
@@ -338,11 +349,13 @@ public class BrowseUI
         {
             _activePlaylist.SetQueue(new[] { track.TrackId });
             _output.WriteLine($"  Set queue: {track.DisplayTitle}.");
+            _returnToMain = true;
         }
         else if (input?.Equals("a", StringComparison.OrdinalIgnoreCase) == true)
         {
             AppendToQueue(new List<int> { track.TrackId });
             _output.WriteLine($"  Added {track.DisplayTitle} to queue.");
+            _returnToMain = true;
         }
     }
 
