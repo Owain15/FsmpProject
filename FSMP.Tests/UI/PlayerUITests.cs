@@ -404,10 +404,10 @@ public class PlayerUITests : IDisposable
         output.ToString().Should().Contain("Beginning of queue");
     }
 
-    // ========== HandleInputAsync — Pause/Resume (Space) ==========
+    // ========== HandleInputAsync — Pause/Resume (K) ==========
 
     [Fact]
-    public async Task HandleInputAsync_Space_WhenPlaying_ShouldPause()
+    public async Task HandleInputAsync_K_WhenPlaying_ShouldPause()
     {
         var track = await CreateTrackAsync("Track1");
         _activePlaylist.SetQueue(new[] { track.TrackId });
@@ -416,9 +416,6 @@ public class PlayerUITests : IDisposable
 
         // First play a track to set _isPlaying = true
         await player.HandleInputAsync("N");
-        // Track was at index 0, MoveNext goes to null (only 1 track, RepeatMode.None)
-        // Actually, MoveNext on single track with no repeat returns null → stops
-        // Need to set up properly: put 2 tracks, move to second
         _audioMock.Reset();
 
         // Better approach: use a 2-track queue, play next to set isPlaying
@@ -430,31 +427,31 @@ public class PlayerUITests : IDisposable
         _audioMock.Reset();
 
         // Now pause
-        await player.HandleInputAsync(" ");
+        await player.HandleInputAsync("K");
 
         _audioMock.Verify(a => a.PauseAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task HandleInputAsync_Space_WhenNotPlaying_WithCurrentTrack_ShouldResume()
+    public async Task HandleInputAsync_K_WhenNotPlaying_WithCurrentTrack_ShouldResume()
     {
         var track = await CreateTrackAsync("Track1");
         _activePlaylist.SetQueue(new[] { track.TrackId });
 
         var (player, output) = CreatePlayerWithOutput("");
 
-        // Space when not playing but has current track → resume
-        await player.HandleInputAsync(" ");
+        // K when not playing but has current track → resume
+        await player.HandleInputAsync("K");
 
         _audioMock.Verify(a => a.ResumeAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task HandleInputAsync_Space_WhenNotPlaying_NoCurrentTrack_ShouldDoNothing()
+    public async Task HandleInputAsync_K_WhenNotPlaying_NoCurrentTrack_ShouldDoNothing()
     {
         var (player, output) = CreatePlayerWithOutput("");
 
-        await player.HandleInputAsync(" ");
+        await player.HandleInputAsync("K");
 
         _audioMock.Verify(a => a.ResumeAsync(), Times.Never);
         _audioMock.Verify(a => a.PauseAsync(), Times.Never);

@@ -114,6 +114,9 @@ public class PlayerUI
             case "H":
                 ToggleShuffle();
                 break;
+            case "V":
+                await ViewFullQueueAsync();
+                break;
             case "B":
                 await BrowseAsync();
                 await AutoPlayIfQueuedAsync();
@@ -253,13 +256,40 @@ public class PlayerUI
         return await _unitOfWork.Tracks.GetByIdAsync(trackId.Value);
     }
 
-    private async Task<List<string>> BuildQueueDisplayAsync()
+    private async Task<List<string>> BuildQueueDisplayAsync(bool truncate = true)
     {
         var items = new List<string>();
         var playOrder = _activePlaylist.PlayOrder;
         var currentIndex = _activePlaylist.CurrentIndex;
+        const int maxVisible = 9;
 
-        for (int i = 0; i < playOrder.Count; i++)
+        var shouldTruncate = truncate && playOrder.Count > maxVisible + 1;
+
+        // Calculate the window of tracks to display
+        int startIndex = 0;
+        int endIndex = playOrder.Count;
+
+        if (shouldTruncate)
+        {
+            // Place current track in the middle 3 lines (positions 3-5 of 0-8)
+            // Target: currentIndex at display position 4 (middle)
+            startIndex = Math.Max(0, currentIndex - 4);
+            endIndex = startIndex + maxVisible;
+
+            // Clamp to end of list
+            if (endIndex > playOrder.Count)
+            {
+                endIndex = playOrder.Count;
+                startIndex = Math.Max(0, endIndex - maxVisible);
+            }
+        }
+
+        if (shouldTruncate && startIndex > 0)
+        {
+            items.Add($"  ... {startIndex} earlier");
+        }
+
+        for (int i = startIndex; i < endIndex; i++)
         {
             var track = await _unitOfWork.Tracks.GetByIdAsync(playOrder[i]);
             var title = track?.DisplayTitle ?? "Unknown";
@@ -273,7 +303,34 @@ public class PlayerUI
             items.Add($"{prefix}{i + 1}) {title}{artistSuffix}{duration}");
         }
 
+        if (shouldTruncate && endIndex < playOrder.Count)
+        {
+            var remaining = playOrder.Count - endIndex;
+            items.Add($"  ... {remaining} more — press [V] to view all");
+        }
+
         return items;
+    }
+
+    private async Task ViewFullQueueAsync()
+    {
+        var items = await BuildQueueDisplayAsync(truncate: false);
+        if (items.Count == 0)
+        {
+            _statusMessage = "Queue is empty.";
+            return;
+        }
+
+        _output.WriteLine();
+        _output.WriteLine($"== Full Queue ({_activePlaylist.Count} tracks) ==");
+        _output.WriteLine();
+        foreach (var item in items)
+            _output.WriteLine($"  {item}");
+        _output.WriteLine();
+        _output.WriteLine("  0) Back");
+        _output.WriteLine();
+        _output.Write("Select: ");
+        _input.ReadLine();
     }
 
     private async Task BrowseAsync()
