@@ -58,7 +58,7 @@ Interactive console application for FSMP, providing menu-driven access to librar
 - [x] Update `AppStartup.cs` — Wire additional services to PlayerUI
 - [x] Verify build passes and coverage ≥ 80%
 
-### Player Menu Bug Fixes
+### Player Menu Bug Fixes & Enhancements
 
 **Status**: Complete
 
@@ -67,6 +67,14 @@ Interactive console application for FSMP, providing menu-driven access to librar
 - [x] Show individual scan error messages instead of just count
 - [x] Make Directories menu loop (like Playlists already does)
 - [x] Add try-catch error handling to playlist create and delete
+- [x] Shuffle/Repeat toggle status messages
+- [x] Auto-play when queue loaded from Browse or Playlists
+- [x] Pause key changed from Space to `[K]` (Space was unreachable after `Trim()`)
+- [x] Resume after Stop re-loads track via `PlayTrackByIdAsync` (LibVLC requires re-load after stop)
+- [x] Queue display: sliding window (9 visible) with current track in middle 3 lines
+- [x] `[V]` View full queue command
+- [x] `[#]` Skip to track by number input
+- [x] 4 new skip-to-track tests added
 
 ---
 

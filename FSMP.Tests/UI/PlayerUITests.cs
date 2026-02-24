@@ -665,4 +665,63 @@ public class PlayerUITests : IDisposable
 
         output.ToString().Should().Contain("Shuffle: On");
     }
+
+    // ========== HandleInputAsync — Skip to track number ==========
+
+    [Fact]
+    public async Task HandleInputAsync_TrackNumber_ShouldJumpAndPlay()
+    {
+        var track1 = await CreateTrackAsync("Track1");
+        var track2 = await CreateTrackAsync("Track2");
+        var track3 = await CreateTrackAsync("Track3");
+        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId, track3.TrackId });
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("3");
+
+        _activePlaylist.CurrentIndex.Should().Be(2);
+        _audioMock.Verify(a => a.PlayTrackAsync(
+            It.Is<Track>(t => t.TrackId == track3.TrackId),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task HandleInputAsync_TrackNumber_Zero_ShouldNotJump()
+    {
+        var track1 = await CreateTrackAsync("Track1");
+        _activePlaylist.SetQueue(new[] { track1.TrackId });
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("0");
+
+        _audioMock.Verify(a => a.PlayTrackAsync(
+            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task HandleInputAsync_TrackNumber_OutOfRange_ShouldNotJump()
+    {
+        var track1 = await CreateTrackAsync("Track1");
+        _activePlaylist.SetQueue(new[] { track1.TrackId });
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("5");
+
+        _audioMock.Verify(a => a.PlayTrackAsync(
+            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task HandleInputAsync_TrackNumber_EmptyQueue_ShouldNotJump()
+    {
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("1");
+
+        _audioMock.Verify(a => a.PlayTrackAsync(
+            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 }

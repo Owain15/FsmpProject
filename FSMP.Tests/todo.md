@@ -37,8 +37,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 **Database/** (3 files, ~48 tests):
 - `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs` (20 tests incl. Playlist/PlaylistTrack config), `MigrationTests.cs`
 
-**UI/** (9 files, ~241 tests):
-- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlaybackUITests.cs`, `PlayerUITests.cs` (40 tests)
+**UI/** (9 files, ~245 tests):
+- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlaybackUITests.cs`, `PlayerUITests.cs` (48 tests)
 - `MetadataEditorTests.cs`, `LibraryManagerTests.cs`, `StatisticsViewerTests.cs`
 - `PrintTests.cs` (incl. 13 NewDisplay tests), `AppStartupTests.cs`
 
@@ -57,7 +57,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests | **Tests**: 846 passing | **Overall Coverage**: 96.42%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes | **Tests**: 836 passing (1 pre-existing E2E failure) | **Overall Coverage**: 96.42%
 
 | Project | Coverage |
 |---------|----------|
@@ -92,10 +92,12 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ### Console UI Restructure Tests
 
-- [ ] Update `PlayerUITests.cs` — Add tests for B/L/D/X hotkeys, sub-screen launches, exit behavior
+- [x] Update `PlayerUITests.cs` — Add tests for B/L/D/X hotkeys, sub-screen launches, exit behavior
+- [x] Update pause/resume tests from Space to K key
+- [x] Add skip-to-track tests (4 tests: valid jump, zero, out-of-range, empty queue)
 - [ ] Update or remove `MenuSystemTests.cs` — Reflect simplified/removed MenuSystem
 - [ ] Update `PrintTests.cs` — Test updated NewDisplay with navigation hotkeys
-- [ ] Verify all existing tests still pass after refactor
+- [x] Verify all existing tests still pass after refactor
 
 ### Cross-Platform Migration Tests (when migration begins)
 
@@ -108,5 +110,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature + Audio coverage improvement (52 new tests) + FSMO Slices 1-10 tests
-**Next Action**: None (FSMO feature complete)
+**Status**: Complete (v1) + Playlist feature + Audio coverage improvement (52 new tests) + FSMO Slices 1-10 tests + Player bug fix tests
+**Next Action**: Update MenuSystemTests and PrintTests for UI restructure

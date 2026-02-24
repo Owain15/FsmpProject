@@ -133,6 +133,14 @@ public class PlayerUI
                 _output.WriteLine();
                 _output.WriteLine("Goodbye!");
                 break;
+            default:
+                if (int.TryParse(command, out var trackNum)
+                    && trackNum >= 1 && trackNum <= _activePlaylist.Count)
+                {
+                    _activePlaylist.JumpTo(trackNum - 1);
+                    await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId!.Value);
+                }
+                break;
         }
     }
 
@@ -327,10 +335,16 @@ public class PlayerUI
         foreach (var item in items)
             _output.WriteLine($"  {item}");
         _output.WriteLine();
-        _output.WriteLine("  0) Back");
+        _output.WriteLine("  [#] Skip to track  [0] Back");
         _output.WriteLine();
         _output.Write("Select: ");
-        _input.ReadLine();
+        var input = _input.ReadLine()?.Trim();
+        if (int.TryParse(input, out var trackNum)
+            && trackNum >= 1 && trackNum <= _activePlaylist.Count)
+        {
+            _activePlaylist.JumpTo(trackNum - 1);
+            await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId!.Value);
+        }
     }
 
     private async Task BrowseAsync()

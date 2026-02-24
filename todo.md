@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 96.42% | **Tests**: 846 all passing | **Build**: Passing
+**Overall coverage**: 96.42% | **Tests**: 836 passing (1 pre-existing E2E failure) | **Build**: Passing
 
 ---
 
@@ -112,7 +112,7 @@ Replace the 8-option main menu with the Player screen as the primary UI. Navigat
 
 ---
 
-## Player Menu Bug Fixes
+## Player Menu Bug Fixes & Enhancements
 
 **Status**: Complete
 
@@ -123,6 +123,14 @@ Replace the 8-option main menu with the Player screen as the primary UI. Navigat
 | 3 | Show scan error details instead of just count | **Complete** | PlayerUI.cs |
 | 4 | Directories menu loops (like Playlists) | **Complete** | PlayerUI.cs |
 | 5 | Error handling on playlist create/delete | **Complete** | PlayerUI.cs |
+| 6 | Shuffle/Repeat status messages | **Complete** | PlayerUI.cs |
+| 7 | Auto-play on queue load (Browse/Playlists) | **Complete** | PlayerUI.cs |
+| 8 | Pause key changed from Space to [K] (Space unreachable after Trim) | **Complete** | PlayerUI.cs, Print.cs |
+| 9 | Resume after Stop re-loads track (LibVLC requirement) | **Complete** | PlayerUI.cs |
+| 10 | Queue display: sliding window with current track centered | **Complete** | PlayerUI.cs |
+| 11 | [V] View full queue | **Complete** | PlayerUI.cs |
+| 12 | [#] Skip to track by number | **Complete** | PlayerUI.cs, Print.cs |
+| 13 | Skip-to-track tests (4 new tests) | **Complete** | PlayerUITests.cs |
 
 ---
 
