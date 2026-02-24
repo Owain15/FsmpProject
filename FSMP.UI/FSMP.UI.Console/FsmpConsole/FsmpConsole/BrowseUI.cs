@@ -17,6 +17,7 @@ public class BrowseUI
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action? _onClear;
+    private string? _statusMessage;
 
     public BrowseUI(UnitOfWork unitOfWork, IAudioService audioService, ActivePlaylistService activePlaylist, TextReader input, TextWriter output, Action? onClear = null)
     {
@@ -42,77 +43,85 @@ public class BrowseUI
     /// </summary>
     public async Task DisplayArtistsAsync()
     {
-        var artists = (await _unitOfWork.Artists.GetAllAsync()).ToList();
-
-        if (artists.Count == 0)
+        while (true)
         {
-            _output.WriteLine("\nNo artists in library. Scan a library first.");
-            return;
-        }
+            var artists = (await _unitOfWork.Artists.GetAllAsync()).ToList();
 
-        _onClear?.Invoke();
-        Print.WriteSelectionMenu(_output, "Artists",
-            artists.Select(a => a.Name).ToList(),
-            prompt: null, backLabel: null);
-
-        WriteDivider();
-        WriteQueueOptions("all artists");
-        _output.WriteLine("  0) Back");
-        WritePrompt();
-
-        var input = _input.ReadLine()?.Trim();
-        if (input == "0" || string.IsNullOrEmpty(input))
-            return;
-
-        if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
-        {
-            var allTrackIds = new List<int>();
-            foreach (var artist in artists)
+            if (artists.Count == 0)
             {
-                var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
-                if (a?.Tracks != null)
-                    allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
+                _output.WriteLine("\nNo artists in library. Scan a library first.");
+                return;
             }
-            if (allTrackIds.Count > 0)
+
+            _onClear?.Invoke();
+            if (_statusMessage != null)
             {
-                _activePlaylist.SetQueue(allTrackIds);
-                _output.WriteLine($"  Set queue: {allTrackIds.Count} tracks.");
+                _output.WriteLine(_statusMessage);
+                _statusMessage = null;
+            }
+            Print.WriteSelectionMenu(_output, "Artists",
+                artists.Select(a => a.Name).ToList(),
+                prompt: null, backLabel: null);
+
+            WriteDivider();
+            WriteQueueOptions("all artists");
+            _output.WriteLine("  0) Back");
+            WritePrompt();
+
+            var input = _input.ReadLine()?.Trim();
+            if (input == "0" || string.IsNullOrEmpty(input))
+                return;
+
+            if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
+            {
+                var allTrackIds = new List<int>();
+                foreach (var artist in artists)
+                {
+                    var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
+                    if (a?.Tracks != null)
+                        allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
+                }
+                if (allTrackIds.Count > 0)
+                {
+                    _activePlaylist.SetQueue(allTrackIds);
+                    _output.WriteLine($"  Set queue: {allTrackIds.Count} tracks.");
+                }
+                else
+                {
+                    _output.WriteLine("  No tracks to queue.");
+                }
+                return;
+            }
+
+            if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
+            {
+                var allTrackIds = new List<int>();
+                foreach (var artist in artists)
+                {
+                    var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
+                    if (a?.Tracks != null)
+                        allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
+                }
+                if (allTrackIds.Count > 0)
+                {
+                    AppendToQueue(allTrackIds);
+                    _statusMessage = $"  Added {allTrackIds.Count} tracks to queue.";
+                }
+                else
+                {
+                    _statusMessage = "  No tracks to add.";
+                }
+                continue;
+            }
+
+            if (int.TryParse(input, out var index) && index >= 1 && index <= artists.Count)
+            {
+                await DisplayAlbumsByArtistAsync(artists[index - 1].ArtistId);
             }
             else
             {
-                _output.WriteLine("  No tracks to queue.");
+                _output.WriteLine("Invalid selection.");
             }
-            return;
-        }
-
-        if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
-        {
-            var allTrackIds = new List<int>();
-            foreach (var artist in artists)
-            {
-                var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
-                if (a?.Tracks != null)
-                    allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
-            }
-            if (allTrackIds.Count > 0)
-            {
-                AppendToQueue(allTrackIds);
-                _output.WriteLine($"  Added {allTrackIds.Count} tracks to queue.");
-            }
-            else
-            {
-                _output.WriteLine("  No tracks to add.");
-            }
-            return;
-        }
-
-        if (int.TryParse(input, out var index) && index >= 1 && index <= artists.Count)
-        {
-            await DisplayAlbumsByArtistAsync(artists[index - 1].ArtistId);
-        }
-        else
-        {
-            _output.WriteLine("Invalid selection.");
         }
     }
 
@@ -121,83 +130,91 @@ public class BrowseUI
     /// </summary>
     public async Task DisplayAlbumsByArtistAsync(int artistId)
     {
-        var albums = (await _unitOfWork.Albums.GetByArtistAsync(artistId)).ToList();
-        var artist = await _unitOfWork.Artists.GetByIdAsync(artistId);
-
-        if (artist == null)
+        while (true)
         {
-            _output.WriteLine("\nArtist not found.");
-            return;
-        }
+            var albums = (await _unitOfWork.Albums.GetByArtistAsync(artistId)).ToList();
+            var artist = await _unitOfWork.Artists.GetByIdAsync(artistId);
 
-        if (albums.Count == 0)
-        {
-            _output.WriteLine();
-            _output.WriteLine($"== Albums by {artist.Name} ==");
-            _output.WriteLine();
-            _output.WriteLine("  No albums found.");
-            return;
-        }
-
-        _onClear?.Invoke();
-        var items = albums.Select(a =>
-        {
-            var yearStr = a.Year.HasValue ? $" ({a.Year})" : "";
-            return $"{a.Title}{yearStr}";
-        }).ToList();
-
-        Print.WriteSelectionMenu(_output, $"Albums by {artist.Name}",
-            items,
-            prompt: null, backLabel: null);
-
-        WriteDivider();
-        WriteQueueOptions($"all by {artist.Name}");
-        _output.WriteLine("  0) Back");
-        WritePrompt();
-
-        var input = _input.ReadLine()?.Trim();
-        if (input == "0" || string.IsNullOrEmpty(input))
-            return;
-
-        if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
-        {
-            var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
-            var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
-            if (trackIds.Count > 0)
+            if (artist == null)
             {
-                _activePlaylist.SetQueue(trackIds);
-                _output.WriteLine($"  Set queue: {trackIds.Count} tracks by {artist.Name}.");
+                _output.WriteLine("\nArtist not found.");
+                return;
+            }
+
+            if (albums.Count == 0)
+            {
+                _output.WriteLine();
+                _output.WriteLine($"== Albums by {artist.Name} ==");
+                _output.WriteLine();
+                _output.WriteLine("  No albums found.");
+                return;
+            }
+
+            _onClear?.Invoke();
+            if (_statusMessage != null)
+            {
+                _output.WriteLine(_statusMessage);
+                _statusMessage = null;
+            }
+            var items = albums.Select(a =>
+            {
+                var yearStr = a.Year.HasValue ? $" ({a.Year})" : "";
+                return $"{a.Title}{yearStr}";
+            }).ToList();
+
+            Print.WriteSelectionMenu(_output, $"Albums by {artist.Name}",
+                items,
+                prompt: null, backLabel: null);
+
+            WriteDivider();
+            WriteQueueOptions($"all by {artist.Name}");
+            _output.WriteLine("  0) Back");
+            WritePrompt();
+
+            var input = _input.ReadLine()?.Trim();
+            if (input == "0" || string.IsNullOrEmpty(input))
+                return;
+
+            if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
+            {
+                var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
+                var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
+                if (trackIds.Count > 0)
+                {
+                    _activePlaylist.SetQueue(trackIds);
+                    _output.WriteLine($"  Set queue: {trackIds.Count} tracks by {artist.Name}.");
+                }
+                else
+                {
+                    _output.WriteLine("  No tracks to queue.");
+                }
+                return;
+            }
+
+            if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
+            {
+                var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
+                var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
+                if (trackIds.Count > 0)
+                {
+                    AppendToQueue(trackIds);
+                    _statusMessage = $"  Added {trackIds.Count} tracks by {artist.Name} to queue.";
+                }
+                else
+                {
+                    _statusMessage = "  No tracks to add.";
+                }
+                continue;
+            }
+
+            if (int.TryParse(input, out var idx) && idx >= 1 && idx <= albums.Count)
+            {
+                await DisplayTracksByAlbumAsync(albums[idx - 1].AlbumId);
             }
             else
             {
-                _output.WriteLine("  No tracks to queue.");
+                _output.WriteLine("Invalid selection.");
             }
-            return;
-        }
-
-        if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
-        {
-            var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
-            var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
-            if (trackIds.Count > 0)
-            {
-                AppendToQueue(trackIds);
-                _output.WriteLine($"  Added {trackIds.Count} tracks by {artist.Name} to queue.");
-            }
-            else
-            {
-                _output.WriteLine("  No tracks to add.");
-            }
-            return;
-        }
-
-        if (int.TryParse(input, out var idx) && idx >= 1 && idx <= albums.Count)
-        {
-            await DisplayTracksByAlbumAsync(albums[idx - 1].AlbumId);
-        }
-        else
-        {
-            _output.WriteLine("Invalid selection.");
         }
     }
 
@@ -207,68 +224,76 @@ public class BrowseUI
     /// </summary>
     public async Task DisplayTracksByAlbumAsync(int albumId)
     {
-        var album = await _unitOfWork.Albums.GetWithTracksAsync(albumId);
-
-        if (album == null)
+        while (true)
         {
-            _output.WriteLine("Album not found.");
-            return;
-        }
+            var album = await _unitOfWork.Albums.GetWithTracksAsync(albumId);
 
-        var tracks = album.Tracks.ToList();
-
-        if (tracks.Count == 0)
-        {
-            _output.WriteLine();
-            _output.WriteLine($"== {album.Title} ==");
-            _output.WriteLine();
-            _output.WriteLine("  No tracks in this album.");
-            return;
-        }
-
-        _onClear?.Invoke();
-        Print.WriteSelectionMenu(_output, album.Title,
-            tracks.Select(t =>
+            if (album == null)
             {
-                var durationStr = t.Duration.HasValue
-                    ? $" [{t.Duration.Value.Minutes}:{t.Duration.Value.Seconds:D2}]"
-                    : "";
-                return $"{t.DisplayTitle}{durationStr}";
-            }).ToList(),
-            prompt: null, backLabel: null);
+                _output.WriteLine("Album not found.");
+                return;
+            }
 
-        WriteDivider();
-        WriteQueueOptions($"all from {album.Title}");
-        _output.WriteLine("  0) Back");
-        WritePrompt();
+            var tracks = album.Tracks.ToList();
 
-        var input = _input.ReadLine()?.Trim();
-        if (input == "0" || string.IsNullOrEmpty(input))
-            return;
+            if (tracks.Count == 0)
+            {
+                _output.WriteLine();
+                _output.WriteLine($"== {album.Title} ==");
+                _output.WriteLine();
+                _output.WriteLine("  No tracks in this album.");
+                return;
+            }
 
-        if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
-        {
-            var trackIds = tracks.Select(t => t.TrackId).ToList();
-            _activePlaylist.SetQueue(trackIds);
-            _output.WriteLine($"  Set queue: {trackIds.Count} tracks from {album.Title}.");
-            return;
-        }
+            _onClear?.Invoke();
+            if (_statusMessage != null)
+            {
+                _output.WriteLine(_statusMessage);
+                _statusMessage = null;
+            }
+            Print.WriteSelectionMenu(_output, album.Title,
+                tracks.Select(t =>
+                {
+                    var durationStr = t.Duration.HasValue
+                        ? $" [{t.Duration.Value.Minutes}:{t.Duration.Value.Seconds:D2}]"
+                        : "";
+                    return $"{t.DisplayTitle}{durationStr}";
+                }).ToList(),
+                prompt: null, backLabel: null);
 
-        if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
-        {
-            var trackIds = tracks.Select(t => t.TrackId).ToList();
-            AppendToQueue(trackIds);
-            _output.WriteLine($"  Added {trackIds.Count} tracks from {album.Title} to queue.");
-            return;
-        }
+            WriteDivider();
+            WriteQueueOptions($"all from {album.Title}");
+            _output.WriteLine("  0) Back");
+            WritePrompt();
 
-        if (int.TryParse(input, out var idx) && idx >= 1 && idx <= tracks.Count)
-        {
-            await QueueTrackAsync(tracks[idx - 1].TrackId);
-        }
-        else
-        {
-            _output.WriteLine("Invalid selection.");
+            var input = _input.ReadLine()?.Trim();
+            if (input == "0" || string.IsNullOrEmpty(input))
+                return;
+
+            if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
+            {
+                var trackIds = tracks.Select(t => t.TrackId).ToList();
+                _activePlaylist.SetQueue(trackIds);
+                _output.WriteLine($"  Set queue: {trackIds.Count} tracks from {album.Title}.");
+                return;
+            }
+
+            if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
+            {
+                var trackIds = tracks.Select(t => t.TrackId).ToList();
+                AppendToQueue(trackIds);
+                _statusMessage = $"  Added {trackIds.Count} tracks from {album.Title} to queue.";
+                continue;
+            }
+
+            if (int.TryParse(input, out var idx) && idx >= 1 && idx <= tracks.Count)
+            {
+                await QueueTrackAsync(tracks[idx - 1].TrackId);
+            }
+            else
+            {
+                _output.WriteLine("Invalid selection.");
+            }
         }
     }
 
@@ -353,6 +378,7 @@ public class BrowseUI
 
         var currentQueue = _activePlaylist.PlayOrder.ToList();
         var currentIdx = _activePlaylist.CurrentIndex;
+        var wasShuffled = _activePlaylist.IsShuffled;
 
         foreach (var id in trackIds)
         {
@@ -363,5 +389,7 @@ public class BrowseUI
         _activePlaylist.SetQueue(currentQueue);
         if (currentIdx >= 0)
             _activePlaylist.JumpTo(currentIdx);
+        if (wasShuffled)
+            _activePlaylist.ToggleShuffle();
     }
 }

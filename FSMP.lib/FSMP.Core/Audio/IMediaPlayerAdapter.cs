@@ -7,7 +7,7 @@ namespace FSMP.Core.Audio;
 public interface IMediaPlayerAdapter : IDisposable
 {
     // Playback control
-    void Play();
+    bool Play();
     void Pause();
     void Stop();
 

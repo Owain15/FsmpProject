@@ -36,11 +36,12 @@ public class MockMediaPlayerAdapter : IMediaPlayerAdapter
     public event EventHandler? EncounteredError;
     public event EventHandler<long>? TimeChanged;
 
-    public void Play()
+    public bool Play()
     {
         if (ShouldThrowOnPlay)
             throw new InvalidOperationException("Test exception");
         PlayCallCount++;
+        return true;
     }
 
     public void Pause()

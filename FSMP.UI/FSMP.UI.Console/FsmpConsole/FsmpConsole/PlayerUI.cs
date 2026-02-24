@@ -58,7 +58,10 @@ public class PlayerUI
             _onClear?.Invoke();
             await DisplayPlayerStateAsync();
 
-            var line = _input.ReadLine()?.Trim().ToUpperInvariant();
+            var raw = _input.ReadLine();
+            if (raw == null)
+                break; // end of input stream
+            var line = raw.Trim().ToUpperInvariant();
             if (string.IsNullOrEmpty(line))
                 continue;
 
@@ -139,6 +142,10 @@ public class PlayerUI
                 {
                     _activePlaylist.JumpTo(trackNum - 1);
                     await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId!.Value);
+                }
+                else
+                {
+                    _statusMessage = "Invalid selection.";
                 }
                 break;
         }
@@ -251,9 +258,25 @@ public class PlayerUI
         var track = await _unitOfWork.Tracks.GetByIdAsync(trackId);
         if (track != null)
         {
-            await _audioService.PlayTrackAsync(track);
-            _isPlaying = true;
-            _isStopped = false;
+            try
+            {
+                var playTask = Task.Run(() => _audioService.PlayTrackAsync(track));
+                var completed = await Task.WhenAny(playTask, Task.Delay(TimeSpan.FromSeconds(10)));
+                if (completed != playTask)
+                {
+                    _isPlaying = false;
+                    _statusMessage = "Playback timed out loading track.";
+                    return;
+                }
+                await playTask; // propagate any exception
+                _isPlaying = true;
+                _isStopped = false;
+            }
+            catch (Exception ex)
+            {
+                _isPlaying = false;
+                _statusMessage = $"Playback error: {ex.Message}";
+            }
         }
     }
 
@@ -405,75 +428,87 @@ public class PlayerUI
             {
                 await ViewPlaylistAsync(playlists[idx - 1].PlaylistId);
             }
+            else
+            {
+                _output.WriteLine("Invalid selection.");
+            }
         }
     }
 
     private async Task ViewPlaylistAsync(int playlistId)
     {
-        var playlist = await _playlistService.GetPlaylistWithTracksAsync(playlistId);
-        if (playlist == null)
+        while (true)
         {
-            _output.WriteLine("Playlist not found.");
-            return;
-        }
-
-        var tracks = playlist.PlaylistTracks.OrderBy(pt => pt.Position).ToList();
-
-        _output.WriteLine();
-        _output.WriteLine($"== {playlist.Name} ==");
-        if (!string.IsNullOrEmpty(playlist.Description))
-            _output.WriteLine($"  {playlist.Description}");
-        _output.WriteLine();
-
-        if (tracks.Count == 0)
-        {
-            _output.WriteLine("  (no tracks)");
-        }
-        else
-        {
-            foreach (var pt in tracks)
+            var playlist = await _playlistService.GetPlaylistWithTracksAsync(playlistId);
+            if (playlist == null)
             {
-                var track = await _unitOfWork.Tracks.GetByIdAsync(pt.TrackId);
-                var title = track?.DisplayTitle ?? "Unknown";
-                var artist = track?.DisplayArtist ?? "";
-                var artistSuffix = !string.IsNullOrEmpty(artist) ? $" - {artist}" : "";
-                _output.WriteLine($"  {pt.Position + 1}) {title}{artistSuffix}");
+                _output.WriteLine("Playlist not found.");
+                return;
             }
-        }
 
-        _output.WriteLine();
-        _output.WriteLine("  L) Load into Player queue");
-        _output.WriteLine("  D) Delete playlist");
-        _output.WriteLine("  0) Back");
-        _output.WriteLine();
-        _output.Write("Select: ");
+            var tracks = playlist.PlaylistTracks.OrderBy(pt => pt.Position).ToList();
 
-        var input = _input.ReadLine()?.Trim()?.ToLowerInvariant();
+            _output.WriteLine();
+            _output.WriteLine($"== {playlist.Name} ==");
+            if (!string.IsNullOrEmpty(playlist.Description))
+                _output.WriteLine($"  {playlist.Description}");
+            _output.WriteLine();
 
-        switch (input)
-        {
-            case "l":
-                if (tracks.Count > 0)
+            if (tracks.Count == 0)
+            {
+                _output.WriteLine("  (no tracks)");
+            }
+            else
+            {
+                foreach (var pt in tracks)
                 {
-                    _activePlaylist.SetQueue(tracks.Select(pt => pt.TrackId).ToList());
-                    _output.WriteLine($"Loaded {tracks.Count} tracks into player queue.");
+                    var track = await _unitOfWork.Tracks.GetByIdAsync(pt.TrackId);
+                    var title = track?.DisplayTitle ?? "Unknown";
+                    var artist = track?.DisplayArtist ?? "";
+                    var artistSuffix = !string.IsNullOrEmpty(artist) ? $" - {artist}" : "";
+                    _output.WriteLine($"  {pt.Position + 1}) {title}{artistSuffix}");
                 }
-                else
-                {
-                    _output.WriteLine("No tracks to load.");
-                }
-                break;
-            case "d":
-                try
-                {
-                    await _playlistService.DeletePlaylistAsync(playlistId);
-                    _output.WriteLine("Playlist deleted.");
-                }
-                catch (Exception ex)
-                {
-                    _output.WriteLine($"Error deleting playlist: {ex.Message}");
-                }
-                break;
+            }
+
+            _output.WriteLine();
+            _output.WriteLine("  L) Load into Player queue");
+            _output.WriteLine("  D) Delete playlist");
+            _output.WriteLine("  0) Back");
+            _output.WriteLine();
+            _output.Write("Select: ");
+
+            var input = _input.ReadLine()?.Trim()?.ToLowerInvariant();
+            if (input == "0" || string.IsNullOrEmpty(input))
+                return;
+
+            switch (input)
+            {
+                case "l":
+                    if (tracks.Count > 0)
+                    {
+                        _activePlaylist.SetQueue(tracks.Select(pt => pt.TrackId).ToList());
+                        _output.WriteLine($"Loaded {tracks.Count} tracks into player queue.");
+                    }
+                    else
+                    {
+                        _output.WriteLine("No tracks to load.");
+                    }
+                    continue;
+                case "d":
+                    try
+                    {
+                        await _playlistService.DeletePlaylistAsync(playlistId);
+                        _output.WriteLine("Playlist deleted.");
+                    }
+                    catch (Exception ex)
+                    {
+                        _output.WriteLine($"Error deleting playlist: {ex.Message}");
+                    }
+                    return; // playlist gone, back to list
+                default:
+                    _output.WriteLine("Invalid selection.");
+                    break;
+            }
         }
     }
 
@@ -553,6 +588,9 @@ public class PlayerUI
                     }
                     _output.WriteLine($"  Duration: {result.Duration.TotalSeconds:F1}s");
                 }
+                break;
+            default:
+                _output.WriteLine("Invalid selection.");
                 break;
         }
         }

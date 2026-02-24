@@ -278,7 +278,6 @@ public class LibVlcAudioPlayerTests : IDisposable
 
         await _player.PlayAsync();
 
-        _mockAdapter.SetMediaCallCount.Should().Be(1);
         _mockAdapter.PlayCallCount.Should().Be(1);
     }
 

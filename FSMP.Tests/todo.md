@@ -57,7 +57,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes | **Tests**: 836 passing (1 pre-existing E2E failure) | **Overall Coverage**: 96.42%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes | **Tests**: 842 passing (1 pre-existing E2E failure) | **Overall Coverage**: 96.42%
 
 | Project | Coverage |
 |---------|----------|

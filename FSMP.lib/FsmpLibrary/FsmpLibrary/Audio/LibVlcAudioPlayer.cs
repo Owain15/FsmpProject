@@ -108,8 +108,8 @@ public class LibVlcAudioPlayer : IAudioPlayer
         if (!_adapter.HasMedia)
             throw new InvalidOperationException("No media loaded. Call LoadAsync first.");
 
-        _adapter.SetMedia();
-        _adapter.Play();
+        if (!_adapter.Play())
+            throw new InvalidOperationException("LibVLC failed to start playback.");
 
         return Task.CompletedTask;
     }

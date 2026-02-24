@@ -184,7 +184,7 @@ public class BrowseUITests : IDisposable
     {
         await CreateArtistAsync("Bonobo");
 
-        var (browse, output) = CreateBrowseWithOutput("999\n");
+        var (browse, output) = CreateBrowseWithOutput("999\n0\n");
 
         await browse.DisplayArtistsAsync();
 
@@ -197,8 +197,8 @@ public class BrowseUITests : IDisposable
         var artist = await CreateArtistAsync("Bonobo");
         await CreateAlbumAsync("Migration", artist.ArtistId, 2017);
 
-        // Select artist 1, then back from albums
-        var (browse, output) = CreateBrowseWithOutput("1\n0\n");
+        // Select artist 1, then back from albums, then back from artists
+        var (browse, output) = CreateBrowseWithOutput("1\n0\n0\n");
 
         await browse.DisplayArtistsAsync();
 
@@ -269,7 +269,7 @@ public class BrowseUITests : IDisposable
         var artist = await CreateArtistAsync("Bonobo");
         await CreateAlbumAsync("Migration", artist.ArtistId);
 
-        var (browse, output) = CreateBrowseWithOutput("999\n");
+        var (browse, output) = CreateBrowseWithOutput("999\n0\n");
 
         await browse.DisplayAlbumsByArtistAsync(artist.ArtistId);
 
@@ -283,8 +283,8 @@ public class BrowseUITests : IDisposable
         var album = await CreateAlbumAsync("Migration", artist.ArtistId);
         await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
 
-        // Select album 1, then back from tracks
-        var (browse, output) = CreateBrowseWithOutput("1\n0\n");
+        // Select album 1, then back from tracks, then back from albums
+        var (browse, output) = CreateBrowseWithOutput("1\n0\n0\n");
 
         await browse.DisplayAlbumsByArtistAsync(artist.ArtistId);
 
@@ -357,7 +357,7 @@ public class BrowseUITests : IDisposable
         var album = await CreateAlbumAsync("Migration", artist.ArtistId);
         await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
 
-        var (browse, output) = CreateBrowseWithOutput("999\n");
+        var (browse, output) = CreateBrowseWithOutput("999\n0\n");
 
         await browse.DisplayTracksByAlbumAsync(album.AlbumId);
 
@@ -371,8 +371,8 @@ public class BrowseUITests : IDisposable
         var album = await CreateAlbumAsync("Migration", artist.ArtistId);
         var track = await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
 
-        // Select track 1, then choose Q to set as queue
-        var (browse, output, playlist) = CreateBrowseWithOutputAndPlaylist("1\nQ\n");
+        // Select track 1, then choose Q to set as queue, then exit
+        var (browse, output, playlist) = CreateBrowseWithOutputAndPlaylist("1\nQ\n0\n");
 
         await browse.DisplayTracksByAlbumAsync(album.AlbumId);
 
@@ -525,7 +525,7 @@ public class BrowseUITests : IDisposable
         var track1 = await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
         var track2 = await CreateTrackAsync("Bambro", album.AlbumId, artist.ArtistId);
 
-        var input = new StringReader("Q\n");
+        var input = new StringReader("Q\n0\n");
         var output = new StringWriter();
         var activePlaylist = new ActivePlaylistService();
         var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
@@ -545,7 +545,7 @@ public class BrowseUITests : IDisposable
         var track2 = await CreateTrackAsync("Bambro", album.AlbumId, artist.ArtistId);
         var existingTrack = await CreateTrackAsync("Existing");
 
-        var input = new StringReader("A\n");
+        var input = new StringReader("A\n0\n");
         var output = new StringWriter();
         var activePlaylist = new ActivePlaylistService();
         activePlaylist.SetQueue(new[] { existingTrack.TrackId });
@@ -567,7 +567,7 @@ public class BrowseUITests : IDisposable
         var track1 = await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
         var track2 = await CreateTrackAsync("Bambro", album.AlbumId, artist.ArtistId);
 
-        var input = new StringReader("Q\n");
+        var input = new StringReader("Q\n0\n");
         var output = new StringWriter();
         var activePlaylist = new ActivePlaylistService();
         var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
@@ -586,7 +586,7 @@ public class BrowseUITests : IDisposable
         var track1 = await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
         var existingTrack = await CreateTrackAsync("Existing");
 
-        var input = new StringReader("A\n");
+        var input = new StringReader("A\n0\n");
         var output = new StringWriter();
         var activePlaylist = new ActivePlaylistService();
         activePlaylist.SetQueue(new[] { existingTrack.TrackId });
@@ -596,6 +596,106 @@ public class BrowseUITests : IDisposable
 
         activePlaylist.Count.Should().Be(2);
         output.ToString().Should().Contain("Added 1 tracks by Bonobo to queue");
+    }
+
+    // ========== Q Action Returns to Player ==========
+
+    [Fact]
+    public async Task DisplayTracksByAlbumAsync_QueueAll_ShouldReturnImmediately()
+    {
+        var artist = await CreateArtistAsync("Bonobo");
+        var album = await CreateAlbumAsync("Migration", artist.ArtistId);
+        await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
+
+        // Q should return — no trailing 0 needed
+        var input = new StringReader("Q\n");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
+
+        await browse.DisplayTracksByAlbumAsync(album.AlbumId);
+
+        activePlaylist.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task DisplayAlbumsByArtistAsync_QueueAll_ShouldReturnImmediately()
+    {
+        var artist = await CreateArtistAsync("Bonobo");
+        var album = await CreateAlbumAsync("Migration", artist.ArtistId);
+        await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
+
+        var input = new StringReader("Q\n");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
+
+        await browse.DisplayAlbumsByArtistAsync(artist.ArtistId);
+
+        activePlaylist.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task DisplayArtistsAsync_QueueAll_ShouldReturnImmediately()
+    {
+        var artist = await CreateArtistAsync("Bonobo");
+        var album = await CreateAlbumAsync("Migration", artist.ArtistId);
+        await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
+
+        var input = new StringReader("Q\n");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
+
+        await browse.DisplayArtistsAsync();
+
+        activePlaylist.Count.Should().Be(1);
+    }
+
+    // ========== A Action Shows Status Message ==========
+
+    [Fact]
+    public async Task DisplayTracksByAlbumAsync_AddAll_ShouldShowStatusMessageAfterRedraw()
+    {
+        var artist = await CreateArtistAsync("Bonobo");
+        var album = await CreateAlbumAsync("Migration", artist.ArtistId);
+        await CreateTrackAsync("Kerala", album.AlbumId, artist.ArtistId);
+
+        var input = new StringReader("A\n0\n");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        activePlaylist.SetQueue(new[] { 999 }); // existing track
+        var clearCount = 0;
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output, () => clearCount++);
+
+        await browse.DisplayTracksByAlbumAsync(album.AlbumId);
+
+        clearCount.Should().Be(2); // initial draw + redraw after A
+        output.ToString().Should().Contain("Added 1 tracks from Migration to queue");
+    }
+
+    // ========== AppendToQueue Preserves Shuffle ==========
+
+    [Fact]
+    public async Task AppendToQueue_ShouldPreserveShuffleState()
+    {
+        var track1 = await CreateTrackAsync("Kerala");
+        var track2 = await CreateTrackAsync("Cirrus");
+        var track3 = await CreateTrackAsync("Bambro");
+
+        var input = new StringReader("A\n");
+        var output = new StringWriter();
+        var activePlaylist = new ActivePlaylistService();
+        activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        activePlaylist.ToggleShuffle(); // enable shuffle
+        activePlaylist.IsShuffled.Should().BeTrue();
+
+        var browse = new BrowseUI(_unitOfWork, _audioMock.Object, activePlaylist, input, output);
+
+        await browse.QueueTrackAsync(track3.TrackId);
+
+        activePlaylist.IsShuffled.Should().BeTrue();
+        activePlaylist.Count.Should().Be(3);
     }
 
     // ========== RunAsync Integration Test ==========

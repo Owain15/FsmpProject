@@ -38,7 +38,7 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
             }
         }
 
-        _libVLC = new LibVLC("--quiet");
+        _libVLC = new LibVLC("--quiet", "--aout=wasapi");
         _mediaPlayer = new MediaPlayer(_libVLC);
 
         _mediaPlayer.Playing += (s, e) => Playing?.Invoke(this, EventArgs.Empty);
@@ -62,7 +62,11 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
     public event EventHandler? EncounteredError;
     public event EventHandler<long>? TimeChanged;
 
-    public void Play() => _mediaPlayer.Play();
+    public bool Play()
+    {
+        _mediaPlayer.Media = _currentMedia;
+        return _mediaPlayer.Play();
+    }
     public void Pause() => _mediaPlayer.Pause();
     public void Stop() => _mediaPlayer.Stop();
 

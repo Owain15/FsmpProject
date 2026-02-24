@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 96.42% | **Tests**: 836 passing (1 pre-existing E2E failure) | **Build**: Passing
+**Overall coverage**: 96.42% | **Tests**: 842 passing (1 pre-existing E2E failure) | **Build**: Passing
 
 ---
 
