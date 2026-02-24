@@ -57,7 +57,7 @@ namespace FsmpConsole
 
 			output.WriteLine();
 			output.WriteLine(separator);
-			output.WriteLine("[N] Next  [P] Prev  [Space] Pause/Resume  [R] Restart");
+			output.WriteLine("[N] Next  [P] Prev  [K] Pause/Resume  [R] Restart");
 			output.WriteLine("[S] Stop  [M] Repeat  [H] Shuffle");
 			output.WriteLine();
 			output.WriteLine("[B] Browse  [L] Playlists  [D] Directories  [X] Exit");

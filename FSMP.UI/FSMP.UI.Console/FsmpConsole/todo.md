@@ -50,13 +50,23 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ### Console UI Restructure: Player as Main Screen
 
-**Status**: Not started | **Plan**: [.claude/plans/lexical-growing-acorn.md](../../../../.claude/plans/lexical-growing-acorn.md)
+**Status**: Complete | **Plan**: [.claude/plans/lexical-growing-acorn.md](../../../../.claude/plans/lexical-growing-acorn.md)
 
-- [ ] Expand `PlayerUI.cs` — Add dependencies (PlaylistService, ConfigurationService, LibraryScanService), add hotkeys: `[B]` Browse, `[L]` Playlists, `[D]` Directories, `[X]` Exit. Remove `[Q]` back-to-menu.
-- [ ] Update `Print.cs` — Update `NewDisplay` to show B/L/D/X navigation hotkeys in controls section
-- [ ] Simplify or remove `MenuSystem.cs` — PlayerUI is now the main entry point
-- [ ] Update `AppStartup.cs` — Wire additional services to PlayerUI
-- [ ] Verify build passes and coverage ≥ 80%
+- [x] Expand `PlayerUI.cs` — Add dependencies (PlaylistService, ConfigurationService, LibraryScanService), add hotkeys: `[B]` Browse, `[L]` Playlists, `[D]` Directories, `[X]` Exit. Remove `[Q]` back-to-menu.
+- [x] Update `Print.cs` — Update `NewDisplay` to show B/L/D/X navigation hotkeys in controls section
+- [x] Simplify or remove `MenuSystem.cs` — PlayerUI is now the main entry point
+- [x] Update `AppStartup.cs` — Wire additional services to PlayerUI
+- [x] Verify build passes and coverage ≥ 80%
+
+### Player Menu Bug Fixes
+
+**Status**: Complete
+
+- [x] Fix `RestartTrackAsync` — resume playback after seek to zero
+- [x] Add directory path validation (`Directory.Exists`) before adding
+- [x] Show individual scan error messages instead of just count
+- [x] Make Directories menu loop (like Playlists already does)
+- [x] Add try-catch error handling to playlist create and delete
 
 ---
 

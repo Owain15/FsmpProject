@@ -21,6 +21,7 @@ public class PlayerUI
     private readonly TextWriter _output;
     private readonly Action? _onClear;
     private bool _isPlaying;
+    private bool _isStopped;
     private bool _exitRequested;
     private string? _statusMessage;
 
@@ -98,7 +99,7 @@ public class PlayerUI
             case "P":
                 await PreviousTrackAsync();
                 break;
-            case " ":
+            case "K":
                 await TogglePauseAsync();
                 break;
             case "R":
@@ -115,9 +116,11 @@ public class PlayerUI
                 break;
             case "B":
                 await BrowseAsync();
+                await AutoPlayIfQueuedAsync();
                 break;
             case "L":
                 await ManagePlaylistsAsync();
+                await AutoPlayIfQueuedAsync();
                 break;
             case "D":
                 await ManageDirectoriesAsync();
@@ -164,11 +167,22 @@ public class PlayerUI
         {
             await _audioService.PauseAsync();
             _isPlaying = false;
+            _statusMessage = "Paused.";
         }
         else if (_activePlaylist.CurrentTrackId.HasValue)
         {
-            await _audioService.ResumeAsync();
-            _isPlaying = true;
+            if (_isStopped)
+            {
+                // After stop, must re-load the track
+                await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
+                _isStopped = false;
+            }
+            else
+            {
+                await _audioService.ResumeAsync();
+                _isPlaying = true;
+            }
+            _statusMessage = "Playing.";
         }
     }
 
@@ -177,6 +191,7 @@ public class PlayerUI
         if (_activePlaylist.CurrentTrackId.HasValue)
         {
             await _audioService.SeekAsync(TimeSpan.Zero);
+            await _audioService.ResumeAsync();
             _isPlaying = true;
         }
     }
@@ -185,6 +200,8 @@ public class PlayerUI
     {
         await _audioService.StopAsync();
         _isPlaying = false;
+        _isStopped = true;
+        _statusMessage = "Stopped.";
     }
 
     private void ToggleRepeatMode()
@@ -196,11 +213,26 @@ public class PlayerUI
             RepeatMode.All => RepeatMode.None,
             _ => RepeatMode.None
         };
+        _statusMessage = $"Repeat: {_activePlaylist.RepeatMode}";
     }
 
     private void ToggleShuffle()
     {
+        if (_activePlaylist.Count == 0)
+        {
+            _statusMessage = "No tracks in queue to shuffle.";
+            return;
+        }
         _activePlaylist.ToggleShuffle();
+        _statusMessage = _activePlaylist.IsShuffled ? "Shuffle: ON" : "Shuffle: OFF";
+    }
+
+    private async Task AutoPlayIfQueuedAsync()
+    {
+        if (!_isPlaying && _activePlaylist.CurrentTrackId.HasValue)
+        {
+            await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
+        }
     }
 
     private async Task PlayTrackByIdAsync(int trackId)
@@ -210,6 +242,7 @@ public class PlayerUI
         {
             await _audioService.PlayTrackAsync(track);
             _isPlaying = true;
+            _isStopped = false;
         }
     }
 
@@ -284,8 +317,15 @@ public class PlayerUI
                 {
                     _output.Write("Description (optional): ");
                     var desc = _input.ReadLine()?.Trim();
-                    var created = await _playlistService.CreatePlaylistAsync(name, string.IsNullOrEmpty(desc) ? null : desc);
-                    _output.WriteLine($"Created playlist: {created.Name}");
+                    try
+                    {
+                        var created = await _playlistService.CreatePlaylistAsync(name, string.IsNullOrEmpty(desc) ? null : desc);
+                        _output.WriteLine($"Created playlist: {created.Name}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _output.WriteLine($"Error creating playlist: {ex.Message}");
+                    }
                 }
                 continue;
             }
@@ -353,14 +393,23 @@ public class PlayerUI
                 }
                 break;
             case "d":
-                await _playlistService.DeletePlaylistAsync(playlistId);
-                _output.WriteLine("Playlist deleted.");
+                try
+                {
+                    await _playlistService.DeletePlaylistAsync(playlistId);
+                    _output.WriteLine("Playlist deleted.");
+                }
+                catch (Exception ex)
+                {
+                    _output.WriteLine($"Error deleting playlist: {ex.Message}");
+                }
                 break;
         }
     }
 
     private async Task ManageDirectoriesAsync()
     {
+        while (true)
+        {
         var config = await _configService.LoadConfigurationAsync();
 
         _output.WriteLine();
@@ -384,6 +433,8 @@ public class PlayerUI
         _output.Write("Select: ");
 
         var input = _input.ReadLine()?.Trim()?.ToLowerInvariant();
+        if (input == "0" || string.IsNullOrEmpty(input))
+            return;
 
         switch (input)
         {
@@ -392,8 +443,15 @@ public class PlayerUI
                 var newPath = _input.ReadLine()?.Trim();
                 if (!string.IsNullOrEmpty(newPath))
                 {
-                    await _configService.AddLibraryPathAsync(newPath);
-                    _output.WriteLine("Path added.");
+                    if (!Directory.Exists(newPath))
+                    {
+                        _output.WriteLine($"Directory not found: {newPath}");
+                    }
+                    else
+                    {
+                        await _configService.AddLibraryPathAsync(newPath);
+                        _output.WriteLine("Path added.");
+                    }
                 }
                 break;
             case "r":
@@ -417,10 +475,15 @@ public class PlayerUI
                     var result = await _scanService.ScanAllLibrariesAsync(config.LibraryPaths);
                     _output.WriteLine($"Scan complete: {result.TracksAdded} added, {result.TracksUpdated} updated, {result.TracksRemoved} removed");
                     if (result.Errors.Count > 0)
-                        _output.WriteLine($"  {result.Errors.Count} error(s) occurred.");
+                    {
+                        _output.WriteLine($"  {result.Errors.Count} error(s):");
+                        foreach (var error in result.Errors)
+                            _output.WriteLine($"    - {error}");
+                    }
                     _output.WriteLine($"  Duration: {result.Duration.TotalSeconds:F1}s");
                 }
                 break;
+        }
         }
     }
 }
