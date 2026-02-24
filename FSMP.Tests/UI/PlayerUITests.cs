@@ -317,9 +317,11 @@ public class PlayerUITests : IDisposable
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("N");
-
-        output.ToString().Should().Contain("End of queue");
         _audioMock.Verify(a => a.StopAsync(), Times.Once);
+
+        // Feedback appears on next display cycle
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("End of queue");
     }
 
     [Fact]
@@ -397,6 +399,8 @@ public class PlayerUITests : IDisposable
 
         await player.HandleInputAsync("P");
 
+        // Feedback appears on next display cycle
+        await player.DisplayPlayerStateAsync();
         output.ToString().Should().Contain("Beginning of queue");
     }
 

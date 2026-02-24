@@ -16,14 +16,16 @@ public class BrowseUI
     private readonly ActivePlaylistService _activePlaylist;
     private readonly TextReader _input;
     private readonly TextWriter _output;
+    private readonly Action? _onClear;
 
-    public BrowseUI(UnitOfWork unitOfWork, IAudioService audioService, ActivePlaylistService activePlaylist, TextReader input, TextWriter output)
+    public BrowseUI(UnitOfWork unitOfWork, IAudioService audioService, ActivePlaylistService activePlaylist, TextReader input, TextWriter output, Action? onClear = null)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
         _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
+        _onClear = onClear;
     }
 
     /// <summary>
@@ -35,7 +37,8 @@ public class BrowseUI
     }
 
     /// <summary>
-    /// Lists all artists and lets the user select one to browse albums.
+    /// Lists all artists and lets the user select one to browse albums,
+    /// or queue all tracks.
     /// </summary>
     public async Task DisplayArtistsAsync()
     {
@@ -47,13 +50,61 @@ public class BrowseUI
             return;
         }
 
+        _onClear?.Invoke();
         Print.WriteSelectionMenu(_output, "Artists",
             artists.Select(a => a.Name).ToList(),
-            "Select artist");
+            prompt: null, backLabel: null);
+
+        WriteDivider();
+        WriteQueueOptions("all artists");
+        _output.WriteLine("  0) Back");
+        WritePrompt();
 
         var input = _input.ReadLine()?.Trim();
         if (input == "0" || string.IsNullOrEmpty(input))
             return;
+
+        if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
+        {
+            var allTrackIds = new List<int>();
+            foreach (var artist in artists)
+            {
+                var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
+                if (a?.Tracks != null)
+                    allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
+            }
+            if (allTrackIds.Count > 0)
+            {
+                _activePlaylist.SetQueue(allTrackIds);
+                _output.WriteLine($"  Set queue: {allTrackIds.Count} tracks.");
+            }
+            else
+            {
+                _output.WriteLine("  No tracks to queue.");
+            }
+            return;
+        }
+
+        if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
+        {
+            var allTrackIds = new List<int>();
+            foreach (var artist in artists)
+            {
+                var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
+                if (a?.Tracks != null)
+                    allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
+            }
+            if (allTrackIds.Count > 0)
+            {
+                AppendToQueue(allTrackIds);
+                _output.WriteLine($"  Added {allTrackIds.Count} tracks to queue.");
+            }
+            else
+            {
+                _output.WriteLine("  No tracks to add.");
+            }
+            return;
+        }
 
         if (int.TryParse(input, out var index) && index >= 1 && index <= artists.Count)
         {
@@ -66,7 +117,7 @@ public class BrowseUI
     }
 
     /// <summary>
-    /// Lists albums for the given artist. If no albums exist, shows tracks directly.
+    /// Lists albums for the given artist. Offers Q/A to queue all tracks by artist.
     /// </summary>
     public async Task DisplayAlbumsByArtistAsync(int artistId)
     {
@@ -88,21 +139,61 @@ public class BrowseUI
             return;
         }
 
+        _onClear?.Invoke();
+        var items = albums.Select(a =>
+        {
+            var yearStr = a.Year.HasValue ? $" ({a.Year})" : "";
+            return $"{a.Title}{yearStr}";
+        }).ToList();
+
         Print.WriteSelectionMenu(_output, $"Albums by {artist.Name}",
-            albums.Select(a =>
-            {
-                var yearStr = a.Year.HasValue ? $" ({a.Year})" : "";
-                return $"{a.Title}{yearStr}";
-            }).ToList(),
-            "Select album");
+            items,
+            prompt: null, backLabel: null);
+
+        WriteDivider();
+        WriteQueueOptions($"all by {artist.Name}");
+        _output.WriteLine("  0) Back");
+        WritePrompt();
 
         var input = _input.ReadLine()?.Trim();
         if (input == "0" || string.IsNullOrEmpty(input))
             return;
 
-        if (int.TryParse(input, out var index) && index >= 1 && index <= albums.Count)
+        if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
         {
-            await DisplayTracksByAlbumAsync(albums[index - 1].AlbumId);
+            var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
+            var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
+            if (trackIds.Count > 0)
+            {
+                _activePlaylist.SetQueue(trackIds);
+                _output.WriteLine($"  Set queue: {trackIds.Count} tracks by {artist.Name}.");
+            }
+            else
+            {
+                _output.WriteLine("  No tracks to queue.");
+            }
+            return;
+        }
+
+        if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
+        {
+            var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
+            var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
+            if (trackIds.Count > 0)
+            {
+                AppendToQueue(trackIds);
+                _output.WriteLine($"  Added {trackIds.Count} tracks by {artist.Name} to queue.");
+            }
+            else
+            {
+                _output.WriteLine("  No tracks to add.");
+            }
+            return;
+        }
+
+        if (int.TryParse(input, out var idx) && idx >= 1 && idx <= albums.Count)
+        {
+            await DisplayTracksByAlbumAsync(albums[idx - 1].AlbumId);
         }
         else
         {
@@ -111,7 +202,8 @@ public class BrowseUI
     }
 
     /// <summary>
-    /// Lists tracks for the given album and lets the user select one to play.
+    /// Lists tracks for the given album. Offers Q/A to queue all album tracks,
+    /// and number selection for individual track queue actions.
     /// </summary>
     public async Task DisplayTracksByAlbumAsync(int albumId)
     {
@@ -134,6 +226,7 @@ public class BrowseUI
             return;
         }
 
+        _onClear?.Invoke();
         Print.WriteSelectionMenu(_output, album.Title,
             tracks.Select(t =>
             {
@@ -142,15 +235,36 @@ public class BrowseUI
                     : "";
                 return $"{t.DisplayTitle}{durationStr}";
             }).ToList(),
-            "Select track");
+            prompt: null, backLabel: null);
+
+        WriteDivider();
+        WriteQueueOptions($"all from {album.Title}");
+        _output.WriteLine("  0) Back");
+        WritePrompt();
 
         var input = _input.ReadLine()?.Trim();
         if (input == "0" || string.IsNullOrEmpty(input))
             return;
 
-        if (int.TryParse(input, out var index) && index >= 1 && index <= tracks.Count)
+        if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
         {
-            await PlayTrackAsync(tracks[index - 1].TrackId);
+            var trackIds = tracks.Select(t => t.TrackId).ToList();
+            _activePlaylist.SetQueue(trackIds);
+            _output.WriteLine($"  Set queue: {trackIds.Count} tracks from {album.Title}.");
+            return;
+        }
+
+        if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
+        {
+            var trackIds = tracks.Select(t => t.TrackId).ToList();
+            AppendToQueue(trackIds);
+            _output.WriteLine($"  Added {trackIds.Count} tracks from {album.Title} to queue.");
+            return;
+        }
+
+        if (int.TryParse(input, out var idx) && idx >= 1 && idx <= tracks.Count)
+        {
+            await QueueTrackAsync(tracks[idx - 1].TrackId);
         }
         else
         {
@@ -159,9 +273,9 @@ public class BrowseUI
     }
 
     /// <summary>
-    /// Plays the track with the given ID and displays now-playing info.
+    /// Shows track details and offers Q (set as queue) / A (add to queue) for the selected track.
     /// </summary>
-    public async Task PlayTrackAsync(int trackId)
+    public async Task QueueTrackAsync(int trackId)
     {
         var track = await _unitOfWork.Tracks.GetByIdAsync(trackId);
 
@@ -185,28 +299,69 @@ public class BrowseUI
         if (track.Rating.HasValue)
             fields.Add(("Rating:", $"{track.Rating}/5"));
 
-        Print.WriteDetailCard(_output, "Now Playing", fields);
+        Print.WriteDetailCard(_output, "Track Details", fields);
 
-        // Add to active playlist queue and play
-        if (_activePlaylist.Count == 0)
+        WriteDivider();
+        _output.WriteLine("  Q) Play now (replace queue with this track)");
+        _output.WriteLine("  A) Add to end of queue");
+        _output.WriteLine("  0) Back");
+        WritePrompt();
+
+        var input = _input.ReadLine()?.Trim();
+
+        if (input?.Equals("q", StringComparison.OrdinalIgnoreCase) == true)
         {
             _activePlaylist.SetQueue(new[] { track.TrackId });
+            _output.WriteLine($"  Set queue: {track.DisplayTitle}.");
         }
-        else
+        else if (input?.Equals("a", StringComparison.OrdinalIgnoreCase) == true)
         {
-            // Append to end of queue — set queue to current + new track
-            var currentQueue = _activePlaylist.PlayOrder.ToList();
-            if (!currentQueue.Contains(track.TrackId))
-            {
-                currentQueue.Add(track.TrackId);
-                var currentIdx = _activePlaylist.CurrentIndex;
-                _activePlaylist.SetQueue(currentQueue);
-                if (currentIdx >= 0)
-                    _activePlaylist.JumpTo(currentIdx);
-            }
+            AppendToQueue(new List<int> { track.TrackId });
+            _output.WriteLine($"  Added {track.DisplayTitle} to queue.");
+        }
+    }
+
+    /// <summary>
+    /// Writes the Q and A queue option lines to the output.
+    /// </summary>
+    private void WriteQueueOptions(string description)
+    {
+        _output.WriteLine($"  Q) Play {description} now (replace queue)");
+        _output.WriteLine($"  A) Add {description} to end of queue");
+    }
+
+    private void WriteDivider()
+    {
+        _output.WriteLine();
+        _output.WriteLine("-----------------");
+        _output.WriteLine();
+    }
+
+    private void WritePrompt()
+    {
+        WriteDivider();
+        _output.Write("Select: ");
+    }
+
+    private void AppendToQueue(List<int> trackIds)
+    {
+        if (_activePlaylist.Count == 0)
+        {
+            _activePlaylist.SetQueue(trackIds);
+            return;
         }
 
-        await _audioService.PlayTrackAsync(track);
-        _output.WriteLine("  Added to player queue.");
+        var currentQueue = _activePlaylist.PlayOrder.ToList();
+        var currentIdx = _activePlaylist.CurrentIndex;
+
+        foreach (var id in trackIds)
+        {
+            if (!currentQueue.Contains(id))
+                currentQueue.Add(id);
+        }
+
+        _activePlaylist.SetQueue(currentQueue);
+        if (currentIdx >= 0)
+            _activePlaylist.JumpTo(currentIdx);
     }
 }

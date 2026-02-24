@@ -18,6 +18,7 @@ public class MenuSystem
     private readonly ActivePlaylistService _activePlaylist;
     private readonly TextReader _input;
     private readonly TextWriter _output;
+    private readonly Action? _onClear;
 
     public MenuSystem(
         IAudioService audioService,
@@ -28,7 +29,8 @@ public class MenuSystem
         PlaylistService playlistService,
         ActivePlaylistService activePlaylist,
         TextReader input,
-        TextWriter output)
+        TextWriter output,
+        Action? onClear = null)
     {
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
@@ -38,6 +40,7 @@ public class MenuSystem
         _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
+        _onClear = onClear;
     }
 
     /// <summary>
@@ -48,7 +51,7 @@ public class MenuSystem
         var playerUI = new PlayerUI(
             _activePlaylist, _audioService, _unitOfWork,
             _playlistService, _configService, _scanService,
-            _input, _output);
+            _input, _output, _onClear);
         await playerUI.RunAsync();
     }
 }

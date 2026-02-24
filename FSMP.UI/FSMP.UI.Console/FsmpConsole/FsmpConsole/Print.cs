@@ -18,13 +18,20 @@ namespace FsmpConsole
 			bool isPlaying,
 			IList<string> queueItems,
 			RepeatMode repeatMode,
-			bool shuffleEnabled)
+			bool shuffleEnabled,
+			string? statusMessage = null)
 		{
 			ArgumentNullException.ThrowIfNull(output);
 			ArgumentNullException.ThrowIfNull(queueItems);
 
 			output.WriteLine(title);
 			output.WriteLine(separator);
+
+			if (!string.IsNullOrEmpty(statusMessage))
+			{
+				output.WriteLine($"  {statusMessage}");
+				output.WriteLine();
+			}
 
 			var trackTitle = currentTrack?.DisplayTitle ?? "(none)";
 			var artist = currentTrack?.DisplayArtist ?? "";
@@ -65,7 +72,7 @@ namespace FsmpConsole
 			TextWriter output,
 			string title,
 			IList<string> items,
-			string prompt = "Select",
+			string? prompt = "Select",
 			string? backLabel = "Back")
 		{
 			ArgumentNullException.ThrowIfNull(output);
@@ -79,8 +86,11 @@ namespace FsmpConsole
 				output.WriteLine($"  {i + 1}) {items[i]}");
 			if (backLabel != null)
 				output.WriteLine($"  0) {backLabel}");
-			output.WriteLine();                        // space
-			output.Write($"{prompt}: ");               // prompt
+			if (prompt != null)
+			{
+				output.WriteLine();                    // space
+				output.Write($"{prompt}: ");           // prompt
+			}
 		}
 
 		/// <summary>

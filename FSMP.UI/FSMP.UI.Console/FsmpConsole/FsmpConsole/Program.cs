@@ -2,7 +2,7 @@ using FsmpConsole;
 
 try
 {
-    var app = new AppStartup(Console.In, Console.Out);
+    var app = new AppStartup(Console.In, Console.Out, onClear: Console.Clear);
     await app.RunAsync();
 }
 catch (Exception ex)

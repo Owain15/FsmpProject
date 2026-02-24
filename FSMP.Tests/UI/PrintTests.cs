@@ -364,6 +364,27 @@ public class PrintTests
     }
 
     [Fact]
+    public void NewDisplay_WithStatusMessage_ShouldDisplayMessage()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false, "Path added.");
+
+        output.ToString().Should().Contain("Path added.");
+    }
+
+    [Fact]
+    public void NewDisplay_WithNullStatusMessage_ShouldNotShowExtra()
+    {
+        var output = new StringWriter();
+
+        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false, null);
+
+        // Should still work normally
+        output.ToString().Should().Contain("Queue: (empty)");
+    }
+
+    [Fact]
     public void NewDisplay_ShouldShowControls()
     {
         var output = new StringWriter();

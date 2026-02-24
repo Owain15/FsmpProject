@@ -20,13 +20,15 @@ public class AppStartup
     private readonly TextWriter _output;
     private readonly string? _configPathOverride;
     private readonly string? _dbPathOverride;
+    private readonly Action? _onClear;
 
-    public AppStartup(TextReader input, TextWriter output, string? configPathOverride = null, string? dbPathOverride = null)
+    public AppStartup(TextReader input, TextWriter output, string? configPathOverride = null, string? dbPathOverride = null, Action? onClear = null)
     {
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _configPathOverride = configPathOverride;
         _dbPathOverride = dbPathOverride;
+        _onClear = onClear;
     }
 
     /// <summary>
@@ -110,8 +112,9 @@ public class AppStartup
         var playlistService = new PlaylistService(unitOfWork);
         var activePlaylist = new ActivePlaylistService();
 
-        // 6. Launch menu
-        var menu = new MenuSystem(audioService, configService, statsService, scanService, unitOfWork, playlistService, activePlaylist, _input, _output);
+        // 6. Clear startup messages and launch menu
+        _onClear?.Invoke();
+        var menu = new MenuSystem(audioService, configService, statsService, scanService, unitOfWork, playlistService, activePlaylist, _input, _output, _onClear);
         await menu.RunAsync();
     }
 }

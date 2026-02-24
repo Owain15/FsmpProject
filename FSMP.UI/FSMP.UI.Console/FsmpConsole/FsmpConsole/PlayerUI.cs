@@ -19,8 +19,10 @@ public class PlayerUI
     private readonly LibraryScanService _scanService;
     private readonly TextReader _input;
     private readonly TextWriter _output;
+    private readonly Action? _onClear;
     private bool _isPlaying;
     private bool _exitRequested;
+    private string? _statusMessage;
 
     public PlayerUI(
         ActivePlaylistService activePlaylist,
@@ -30,7 +32,8 @@ public class PlayerUI
         ConfigurationService configService,
         LibraryScanService scanService,
         TextReader input,
-        TextWriter output)
+        TextWriter output,
+        Action? onClear = null)
     {
         _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
@@ -40,6 +43,7 @@ public class PlayerUI
         _scanService = scanService ?? throw new ArgumentNullException(nameof(scanService));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
+        _onClear = onClear;
     }
 
     /// <summary>
@@ -50,6 +54,7 @@ public class PlayerUI
         _exitRequested = false;
         while (!_exitRequested)
         {
+            _onClear?.Invoke();
             await DisplayPlayerStateAsync();
 
             var line = _input.ReadLine()?.Trim().ToUpperInvariant();
@@ -67,6 +72,8 @@ public class PlayerUI
     {
         var currentTrack = await GetCurrentTrackAsync();
         var queueItems = await BuildQueueDisplayAsync();
+        var message = _statusMessage;
+        _statusMessage = null;
 
         Print.NewDisplay(
             _output,
@@ -74,7 +81,8 @@ public class PlayerUI
             _isPlaying,
             queueItems,
             _activePlaylist.RepeatMode,
-            _activePlaylist.IsShuffled);
+            _activePlaylist.IsShuffled,
+            message);
     }
 
     /// <summary>
@@ -133,7 +141,7 @@ public class PlayerUI
         {
             await _audioService.StopAsync();
             _isPlaying = false;
-            _output.WriteLine("  End of queue.");
+            _statusMessage = "End of queue.";
         }
     }
 
@@ -146,7 +154,7 @@ public class PlayerUI
         }
         else
         {
-            _output.WriteLine("  Beginning of queue.");
+            _statusMessage = "Beginning of queue.";
         }
     }
 
@@ -237,7 +245,7 @@ public class PlayerUI
 
     private async Task BrowseAsync()
     {
-        var browseUI = new BrowseUI(_unitOfWork, _audioService, _activePlaylist, _input, _output);
+        var browseUI = new BrowseUI(_unitOfWork, _audioService, _activePlaylist, _input, _output, _onClear);
         await browseUI.RunAsync();
     }
 
