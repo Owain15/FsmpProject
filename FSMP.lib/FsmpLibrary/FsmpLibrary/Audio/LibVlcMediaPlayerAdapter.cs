@@ -18,7 +18,9 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
     private Media? _currentMedia;
     private bool _disposed;
 
-    public LibVlcMediaPlayerAdapter()
+    public LibVlcMediaPlayerAdapter() : this("--quiet", "--aout=wasapi") { }
+
+    public LibVlcMediaPlayerAdapter(params string[] vlcOptions)
     {
         lock (_initLock)
         {
@@ -38,7 +40,7 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
             }
         }
 
-        _libVLC = new LibVLC("--quiet", "--aout=wasapi");
+        _libVLC = new LibVLC(vlcOptions);
         _mediaPlayer = new MediaPlayer(_libVLC);
 
         _mediaPlayer.Playing += (s, e) => Playing?.Invoke(this, EventArgs.Empty);

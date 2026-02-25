@@ -1,9 +1,11 @@
 using FSMP.Core;
+using FSMP.Core.Interfaces;
 using FluentAssertions;
 using FsmpConsole;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
 using FSMP.Core.Models;
+using FSMP.Tests.TestHelpers;
 using FsmpLibrary.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -15,6 +17,7 @@ public class PlayerUITests : IDisposable
     private readonly FsmpDbContext _context;
     private readonly UnitOfWork _unitOfWork;
     private readonly Mock<IAudioService> _audioMock;
+    private readonly MockAudioPlayer _mockPlayer;
     private readonly Mock<IMetadataService> _metadataMock;
     private readonly ActivePlaylistService _activePlaylist;
     private readonly PlaylistService _playlistService;
@@ -32,6 +35,8 @@ public class PlayerUITests : IDisposable
 
         _unitOfWork = new UnitOfWork(_context);
         _audioMock = new Mock<IAudioService>();
+        _mockPlayer = new MockAudioPlayer();
+        _audioMock.Setup(a => a.Player).Returns(_mockPlayer);
         _metadataMock = new Mock<IMetadataService>();
         _activePlaylist = new ActivePlaylistService();
         _playlistService = new PlaylistService(_unitOfWork);
@@ -723,5 +728,126 @@ public class PlayerUITests : IDisposable
 
         _audioMock.Verify(a => a.PlayTrackAsync(
             It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // ========== PlayTrackByIdAsync — Null Track ==========
+
+    [Fact]
+    public async Task HandleInputAsync_Next_WithNonExistentTrack_ShouldShowNotFoundMessage()
+    {
+        // First track exists, second doesn't — MoveNext returns 9999
+        var track1 = await CreateTrackAsync("RealTrack");
+        _activePlaylist.SetQueue(new[] { track1.TrackId, 9999 });
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("N");
+
+        _audioMock.Verify(a => a.PlayTrackAsync(
+            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("Track 9999 not found in database.");
+    }
+
+    // ========== PlayTrackByIdAsync — Success Message ==========
+
+    [Fact]
+    public async Task HandleInputAsync_Next_SuccessfulPlay_ShouldShowNowPlayingMessage()
+    {
+        var track1 = await CreateTrackAsync("Track1");
+        var track2 = await CreateTrackAsync("Kerala", "Bonobo");
+        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("N");
+
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("Now playing: Kerala");
+    }
+
+    // ========== PlaybackCompleted — Auto-advance ==========
+
+    [Fact]
+    public async Task RunAsync_PlaybackCompleted_ShouldAdvanceToNextTrack()
+    {
+        var track1 = await CreateTrackAsync("Track1");
+        var track2 = await CreateTrackAsync("Track2");
+        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+
+        // Input: play track 1, then simulate completion (handled in loop), then exit
+        // We need to trigger PlaybackCompleted between loop iterations.
+        // Use a custom input reader that fires the event after the first read.
+        var inputSequence = new PlaybackCompletedInputReader(
+            new[] { "1", "X" },
+            _mockPlayer,
+            fireCompletedAfterRead: 0);
+
+        var output = new StringWriter();
+        var player = new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork,
+            _playlistService, _configService, _scanService, inputSequence, output);
+
+        await player.RunAsync();
+
+        // Should have played track1 (from "1" input), then track2 (from auto-advance)
+        _audioMock.Verify(a => a.PlayTrackAsync(
+            It.Is<Track>(t => t.TrackId == track2.TrackId),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task RunAsync_PlaybackCompleted_AtEndOfQueue_ShouldShowEndMessage()
+    {
+        var track1 = await CreateTrackAsync("Track1");
+        _activePlaylist.SetQueue(new[] { track1.TrackId });
+
+        var inputSequence = new PlaybackCompletedInputReader(
+            new[] { "1", "X" },
+            _mockPlayer,
+            fireCompletedAfterRead: 0);
+
+        var output = new StringWriter();
+        var player = new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork,
+            _playlistService, _configService, _scanService, inputSequence, output);
+
+        await player.RunAsync();
+
+        output.ToString().Should().Contain("End of queue.");
+    }
+
+    /// <summary>
+    /// Custom TextReader that fires PlaybackCompleted on the mock player after a specific ReadLine call.
+    /// </summary>
+    private class PlaybackCompletedInputReader : TextReader
+    {
+        private readonly string[] _lines;
+        private readonly MockAudioPlayer _player;
+        private readonly int _fireAfterRead;
+        private int _readCount;
+
+        public PlaybackCompletedInputReader(string[] lines, MockAudioPlayer player, int fireCompletedAfterRead)
+        {
+            _lines = lines;
+            _player = player;
+            _fireAfterRead = fireCompletedAfterRead;
+        }
+
+        public override string? ReadLine()
+        {
+            if (_readCount >= _lines.Length)
+                return null;
+
+            var line = _lines[_readCount];
+            var currentRead = _readCount;
+            _readCount++;
+
+            if (currentRead == _fireAfterRead)
+            {
+                _player.SimulatePlaybackCompleted();
+            }
+
+            return line;
+        }
     }
 }

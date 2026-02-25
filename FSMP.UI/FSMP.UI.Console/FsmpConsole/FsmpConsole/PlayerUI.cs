@@ -23,6 +23,7 @@ public class PlayerUI
     private bool _isPlaying;
     private bool _isStopped;
     private bool _exitRequested;
+    private volatile bool _trackEnded;
     private string? _statusMessage;
 
     public PlayerUI(
@@ -53,8 +54,25 @@ public class PlayerUI
     public async Task RunAsync()
     {
         _exitRequested = false;
+
+        _audioService.Player.PlaybackCompleted += (s, e) =>
+        {
+            _isPlaying = false;
+            _trackEnded = true;
+        };
+
         while (!_exitRequested)
         {
+            if (_trackEnded)
+            {
+                _trackEnded = false;
+                var nextId = _activePlaylist.MoveNext();
+                if (nextId.HasValue)
+                    await PlayTrackByIdAsync(nextId.Value);
+                else
+                    _statusMessage = "End of queue.";
+            }
+
             _onClear?.Invoke();
             await DisplayPlayerStateAsync();
 
@@ -256,27 +274,30 @@ public class PlayerUI
     private async Task PlayTrackByIdAsync(int trackId)
     {
         var track = await _unitOfWork.Tracks.GetByIdAsync(trackId);
-        if (track != null)
+        if (track == null)
         {
-            try
-            {
-                var playTask = Task.Run(() => _audioService.PlayTrackAsync(track));
-                var completed = await Task.WhenAny(playTask, Task.Delay(TimeSpan.FromSeconds(10)));
-                if (completed != playTask)
-                {
-                    _isPlaying = false;
-                    _statusMessage = "Playback timed out loading track.";
-                    return;
-                }
-                await playTask; // propagate any exception
-                _isPlaying = true;
-                _isStopped = false;
-            }
-            catch (Exception ex)
+            _statusMessage = $"Track {trackId} not found in database.";
+            return;
+        }
+        try
+        {
+            var playTask = Task.Run(() => _audioService.PlayTrackAsync(track));
+            var completed = await Task.WhenAny(playTask, Task.Delay(TimeSpan.FromSeconds(30)));
+            if (completed != playTask)
             {
                 _isPlaying = false;
-                _statusMessage = $"Playback error: {ex.Message}";
+                _statusMessage = "Playback timed out loading track.";
+                return;
             }
+            await playTask; // propagate any exception
+            _isPlaying = true;
+            _isStopped = false;
+            _statusMessage = $"Now playing: {track.DisplayTitle}";
+        }
+        catch (Exception ex)
+        {
+            _isPlaying = false;
+            _statusMessage = $"Playback error: {ex.Message}";
         }
     }
 

@@ -1,9 +1,11 @@
 using FSMP.Core;
+using FSMP.Core.Interfaces;
 using FluentAssertions;
 using FsmpConsole;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
 using FSMP.Core.Models;
+using FSMP.Tests.TestHelpers;
 using FsmpLibrary.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -29,6 +31,7 @@ public class MenuSystemTests : IDisposable
 
         _unitOfWork = new UnitOfWork(_context);
         _audioMock = new Mock<IAudioService>();
+        _audioMock.Setup(a => a.Player).Returns(new MockAudioPlayer());
         _metadataMock = new Mock<IMetadataService>();
 
         _configDir = Path.Combine(Path.GetTempPath(), "FSMP_MenuTests", Guid.NewGuid().ToString());
