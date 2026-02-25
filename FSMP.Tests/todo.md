@@ -37,10 +37,12 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 **Database/** (3 files, ~48 tests):
 - `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs` (20 tests incl. Playlist/PlaylistTrack config), `MigrationTests.cs`
 
-**UI/** (9 files, ~245 tests):
-- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlaybackUITests.cs`, `PlayerUITests.cs` (48 tests)
-- `MetadataEditorTests.cs`, `LibraryManagerTests.cs`, `StatisticsViewerTests.cs`
+**UI/** (7 files, ~214 tests):
+- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlayerUITests.cs` (48 tests)
+- `MetadataEditorTests.cs`, `StatisticsViewerTests.cs`
 - `PrintTests.cs` (incl. 13 NewDisplay tests), `AppStartupTests.cs`
+
+> Removed: `PlaybackUITests.cs` and `LibraryManagerTests.cs` (dead code — classes superseded by PlayerUI)
 
 **Audio/** (2 files, 52 tests):
 - `LibVlcAudioPlayerTests.cs` (50 tests) -- Constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, dispose
@@ -57,14 +59,14 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes | **Tests**: 842 passing (1 pre-existing E2E failure) | **Overall Coverage**: 96.42%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Dead code cleanup | **Tests**: 821 passing | **Overall Coverage**: 93.99%
 
 | Project | Coverage |
 |---------|----------|
-| FsmpConsole | 95.60% |
-| FsmpDataAcsses | 98.52% |
-| FsmpLibrary | 86.26% |
-| FSMP.Core | 100% |
+| FsmpConsole | 80.37% |
+| FsmpDataAcsses | 98.46% |
+| FsmpLibrary | 95.43% |
+| FSMP.Core | 99.53% |
 | FSMO | 96.39% |
 
 ---
@@ -95,8 +97,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - [x] Update `PlayerUITests.cs` — Add tests for B/L/D/X hotkeys, sub-screen launches, exit behavior
 - [x] Update pause/resume tests from Space to K key
 - [x] Add skip-to-track tests (4 tests: valid jump, zero, out-of-range, empty queue)
-- [ ] Update or remove `MenuSystemTests.cs` — Reflect simplified/removed MenuSystem
-- [ ] Update `PrintTests.cs` — Test updated NewDisplay with navigation hotkeys
+- [x] MenuSystemTests.cs — Already tests thin-wrapper behavior (launches PlayerUI, exits with X)
+- [x] PrintTests.cs — Updated with [L] Playlists and [D] Directories hotkey assertions
 - [x] Verify all existing tests still pass after refactor
 
 ### Cross-Platform Migration Tests (when migration begins)

@@ -16,16 +16,16 @@ Interactive console application for FSMP, providing menu-driven access to librar
 ### UI Components
 
 - `BrowseUI.cs` -- Hierarchical Artist -> Album -> Track browser with track selection and playback
-- `PlaybackUI.cs` -- Now Playing display (title, artist, album, duration, bit rate, play count, rating) + playback controls
 - `MetadataEditor.cs` -- Search tracks, display file metadata + custom overrides, edit CustomTitle/CustomArtist/CustomAlbum/Rating/IsFavorite/Comment with clear ("-") support
-- `LibraryManager.cs` -- List/add/remove library paths, trigger single or all-library scans
 - `StatisticsViewer.cs` -- Overview, most played, recently played, favorites, genre breakdown
 - `PlayerUI.cs` -- Music player view with queue display, playback controls (next/prev/pause/resume/stop/restart), repeat mode cycling, shuffle toggle
 - `Print.cs` -- Utilities: NewDisplay (player view), FormatTable, FormatProgressBar, FormatMetadataCard
 
 ## Current Status
 
-**Status**: Complete (v1) | **Coverage**: 94.20% | **Tests**: see FSMP.Tests
+**Status**: Complete (v1) | **Coverage**: 80.37% | **Tests**: see FSMP.Tests
+
+> Note: Coverage dropped after removing dead code (PlaybackUI.cs, LibraryManager.cs) that was superseded by PlayerUI.cs but had been inflating coverage numbers.
 
 ---
 

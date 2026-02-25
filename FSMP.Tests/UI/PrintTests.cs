@@ -395,6 +395,8 @@ public class PrintTests
         text.Should().Contain("[N] Next");
         text.Should().Contain("[S] Stop");
         text.Should().Contain("[B] Browse");
+        text.Should().Contain("[L] Playlists");
+        text.Should().Contain("[D] Directories");
         text.Should().Contain("[X] Exit");
     }
 }
