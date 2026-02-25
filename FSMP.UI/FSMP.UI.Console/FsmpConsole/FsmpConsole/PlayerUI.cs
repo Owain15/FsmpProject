@@ -25,6 +25,7 @@ public class PlayerUI
     private bool _exitRequested;
     private volatile bool _trackEnded;
     private string? _statusMessage;
+    private bool _playerEventSubscribed;
 
     public PlayerUI(
         ActivePlaylistService activePlaylist,
@@ -55,11 +56,14 @@ public class PlayerUI
     {
         _exitRequested = false;
 
-        _audioService.Player.PlaybackCompleted += (s, e) =>
+        // Initialize audio player on background thread to avoid blocking the UI.
+        // If init fails or takes too long, the UI still renders — player init will
+        // be retried lazily when the user first plays a track.
+        _ = Task.Run(() =>
         {
-            _isPlaying = false;
-            _trackEnded = true;
-        };
+            try { EnsurePlayerEventSubscribed(); }
+            catch { /* player init deferred to first play */ }
+        });
 
         while (!_exitRequested)
         {
@@ -263,6 +267,17 @@ public class PlayerUI
         _statusMessage = _activePlaylist.IsShuffled ? "Shuffle: ON" : "Shuffle: OFF";
     }
 
+    private void EnsurePlayerEventSubscribed()
+    {
+        if (_playerEventSubscribed) return;
+        _playerEventSubscribed = true;
+        _audioService.Player.PlaybackCompleted += (s, e) =>
+        {
+            _isPlaying = false;
+            _trackEnded = true;
+        };
+    }
+
     private async Task AutoPlayIfQueuedAsync()
     {
         if (!_isPlaying && _activePlaylist.CurrentTrackId.HasValue)
@@ -290,6 +305,7 @@ public class PlayerUI
                 return;
             }
             await playTask; // propagate any exception
+            EnsurePlayerEventSubscribed();
             _isPlaying = true;
             _isStopped = false;
             _statusMessage = $"Now playing: {track.DisplayTitle}";
