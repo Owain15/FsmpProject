@@ -9,21 +9,40 @@ namespace FsmpLibrary.Services;
 public class AudioService : IAudioService
 {
     private readonly IAudioPlayerFactory _playerFactory;
+    private readonly float _initialVolume;
     private IAudioPlayer? _player;
     private bool _disposed;
 
     /// <summary>
-    /// Initializes a new instance of the AudioService.
+    /// Initializes a new instance of the AudioService with default volume (0.75).
     /// </summary>
-    /// <param name="playerFactory">Factory for creating audio player instances.</param>
-    /// <exception cref="ArgumentNullException">Thrown when playerFactory is null.</exception>
     public AudioService(IAudioPlayerFactory playerFactory)
+        : this(playerFactory, 0.75f)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the AudioService with the specified initial volume.
+    /// </summary>
+    public AudioService(IAudioPlayerFactory playerFactory, float initialVolume)
     {
         _playerFactory = playerFactory ?? throw new ArgumentNullException(nameof(playerFactory));
+        _initialVolume = Math.Clamp(initialVolume, 0f, 1f);
     }
 
     /// <inheritdoc/>
-    public IAudioPlayer Player => _player ??= _playerFactory.CreatePlayer();
+    public IAudioPlayer Player
+    {
+        get
+        {
+            if (_player == null)
+            {
+                _player = _playerFactory.CreatePlayer();
+                _player.Volume = _initialVolume;
+            }
+            return _player;
+        }
+    }
 
     /// <inheritdoc/>
     public Track? CurrentTrack { get; private set; }
@@ -32,7 +51,11 @@ public class AudioService : IAudioService
     public float Volume
     {
         get => Player.Volume;
-        set => Player.Volume = value;
+        set
+        {
+            Player.Volume = value;
+            VolumeChanged?.Invoke(this, value);
+        }
     }
 
     /// <inheritdoc/>
@@ -44,6 +67,9 @@ public class AudioService : IAudioService
 
     /// <inheritdoc/>
     public event EventHandler<TrackChangedEventArgs>? TrackChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<float>? VolumeChanged;
 
     /// <inheritdoc/>
     public async Task PlayTrackAsync(Track track, CancellationToken cancellationToken = default)

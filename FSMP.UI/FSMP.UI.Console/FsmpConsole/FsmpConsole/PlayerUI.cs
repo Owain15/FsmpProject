@@ -56,14 +56,16 @@ public class PlayerUI
     {
         _exitRequested = false;
 
-        // Initialize audio player on background thread to avoid blocking the UI.
-        // If init fails or takes too long, the UI still renders — player init will
-        // be retried lazily when the user first plays a track.
-        _ = Task.Run(() =>
+        // Initialize audio player with timeout to avoid blocking the UI if LibVLC hangs.
+        var initTask = Task.Run(() =>
         {
             try { EnsurePlayerEventSubscribed(); }
             catch { /* player init deferred to first play */ }
         });
+        if (await Task.WhenAny(initTask, Task.Delay(TimeSpan.FromSeconds(5))) != initTask)
+        {
+            _statusMessage = "Audio player still loading...";
+        }
 
         while (!_exitRequested)
         {
@@ -305,7 +307,6 @@ public class PlayerUI
                 return;
             }
             await playTask; // propagate any exception
-            EnsurePlayerEventSubscribed();
             _isPlaying = true;
             _isStopped = false;
             _statusMessage = $"Now playing: {track.DisplayTitle}";

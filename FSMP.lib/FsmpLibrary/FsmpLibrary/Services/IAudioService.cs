@@ -57,6 +57,9 @@ public interface IAudioService : IDisposable
 
     /// <summary>Raised when the current track changes.</summary>
     event EventHandler<TrackChangedEventArgs>? TrackChanged;
+
+    /// <summary>Raised when the volume changes.</summary>
+    event EventHandler<float>? VolumeChanged;
 }
 
 /// <summary>

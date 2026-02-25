@@ -95,10 +95,16 @@ public class AppStartup
 
         using var services = new ServiceCollection()
             .AddSingleton<IAudioPlayerFactory, LibVlcAudioPlayerFactory>()
-            .AddSingleton<IAudioService, AudioService>()
+            .AddSingleton<IAudioService>(sp =>
+                new AudioService(sp.GetRequiredService<IAudioPlayerFactory>(), config.DefaultVolume / 100f))
             .BuildServiceProvider();
 
         var audioService = services.GetRequiredService<IAudioService>();
+        audioService.VolumeChanged += async (_, vol) =>
+        {
+            config.DefaultVolume = (int)(vol * 100);
+            await configService.SaveConfigurationAsync(config);
+        };
 
         // 4. Auto-scan if enabled
         if (config.AutoScanOnStartup && config.LibraryPaths.Count > 0)
