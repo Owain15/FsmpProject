@@ -41,3 +41,38 @@ A Windows console application for playing audio files organized in an Artist / A
 **In Progress** — EF Core DbContext, repository pattern, configuration/metadata/scan/playback services, full menu system.
 
 **Planned** — Cross-platform support (Windows + Android) via .NET MAUI with ExoPlayer FFmpeg for WMA on Android.
+
+---
+
+## Solution Structure
+
+| Project | Layer | Responsibility |
+|---------|-------|----------------|
+| **FsmpConsole** | UI | Console presentation, user input, menu navigation |
+| **FSMP.MAUI** | UI | Cross-platform MAUI UI (Views, ViewModels) — *planned* |
+| **FsmpLibrary** | Business Logic | Core business logic, audio playback orchestration, service interfaces |
+| **FSMO** | Business Logic | Organising music files into Artist/Album/Track directory structure |
+| **FSMP.Core** | Business Logic | Cross-platform abstractions (IAudioPlayer), platform-agnostic services, shared models — *planned* |
+| **FSMP.Platform.Windows** | Platform | Windows-specific IAudioPlayer implementation (LibVLCSharp/WMPLib) — *planned* |
+| **FsmpDataAcsses** | Data Access | Entity models, DbContext, repositories, migrations |
+| **FSMP.Tests** | Testing | Unit tests, integration tests, coverage verification |
+
+---
+
+## Architecture & Boundaries
+
+FSMP follows a **three-tier layered architecture**:
+
+```
+UI Layer  (FsmpConsole, FSMP.MAUI)
+    ↓
+Business Logic Layer  (FsmpLibrary, FSMO, FSMP.Core)
+    ↓
+Data Access Layer  (FsmpDataAcsses)
+```
+
+**Boundary rules:**
+- **UI projects** handle presentation only — user input, menus, display formatting. They must not contain playback logic, file scanning, or direct database access.
+- **Business logic projects** handle domain logic, orchestration, and service interfaces. They must not contain UI code or direct database queries.
+- **Data access projects** handle persistence — entities, repositories, queries, migrations. They must not contain UI or business logic.
+- **Platform projects** provide platform-specific implementations of interfaces defined in the business logic layer. They must not contain UI or business logic.

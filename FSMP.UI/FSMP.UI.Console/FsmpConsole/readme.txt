@@ -4,6 +4,24 @@ FSMP - File System Music Player (Console)
 FSMP is a Windows console application for playing and managing audio files
 (WAV, WMA, MP3) organised in an Artist/Album/Track directory structure.
 
+Responsibilities
+----------------
+This project is responsible for:
+- Console presentation and display formatting (Print.cs)
+- User input handling and menu navigation
+- Displaying output to the user (browse, statistics, settings screens)
+- Wiring up dependency injection and launching the application (Program.cs)
+
+This project is NOT responsible for:
+- Audio playback logic (see FsmpLibrary / FSMP.Platform.Windows)
+- Database access or queries (see FsmpDataAcsses)
+- File scanning or directory organisation (see FsmpLibrary / FSMO)
+- Metadata parsing (see FsmpLibrary with TagLibSharp)
+
+How It Fits In:
+  UI Layer — depends on FsmpLibrary (business logic) and FsmpDataAcsses (data).
+  Nothing depends on this project.
+
 Features
 --------
 - Browse & Play    : Navigate artists, albums and tracks; play audio files.

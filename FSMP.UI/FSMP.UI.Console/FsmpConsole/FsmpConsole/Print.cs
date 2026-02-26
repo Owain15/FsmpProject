@@ -57,7 +57,8 @@ namespace FsmpConsole
 
 			output.WriteLine();
 			output.WriteLine(separator);
-			output.WriteLine("[N] Next  [P] Prev  [K] Pause/Resume  [R] Restart");
+			var kLabel = isPlaying ? "Pause" : "Resume";
+			output.WriteLine($"[N] Next  [P] Prev  [K] {kLabel}  [R] Restart");
 			output.WriteLine("[S] Stop  [M] Repeat  [H] Shuffle  [#] Skip to track");
 			output.WriteLine();
 			output.WriteLine("[B] Browse  [L] Playlists  [D] Directories  [X] Exit");

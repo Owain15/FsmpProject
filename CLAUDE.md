@@ -52,6 +52,27 @@ FSMP (File System Music Player) is a Windows-only C# .NET 10.0 console applicati
 
 **Platform**: Windows-only (uses COM interop with Windows Media Player)
 
+## Project Responsibilities
+
+Each project has a clear responsibility boundary. **Do not add functionality to the wrong project.** When in doubt, check the table below and the project's README.
+
+| Project | Layer | Path | Responsible For | NOT Responsible For |
+|---------|-------|------|-----------------|---------------------|
+| **FsmpConsole** | UI | `FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole/` | Console presentation, user input, menus, display formatting (`Print.cs`) | Playback logic, database access, file scanning, metadata parsing |
+| **FSMP.MAUI** | UI | `FSMP.UI/FSMP.MAUI/` *(planned)* | Cross-platform MAUI UI (Views, ViewModels, navigation) | Business logic, database, playback implementation |
+| **FsmpLibrary** | Business Logic | `FSMP.lib/FsmpLibrary/FsmpLibrary/` | Core business logic, playback orchestration (via IAudioPlayer), service interfaces, metadata management | UI, direct database queries, platform-specific playback |
+| **FSMO** | Business Logic | `FSMP.lib/FSMO/` | Organising music files into Artist/Album/Track directory structure | Playback, database, UI |
+| **FSMP.Core** | Business Logic | `FSMP.lib/FSMP.Core/` *(planned)* | Cross-platform abstractions (IAudioPlayer), platform-agnostic services, shared models | Platform-specific implementations, UI |
+| **FSMP.Platform.Windows** | Platform | `FSMP.lib/FSMP.Platform.Windows/` *(planned)* | Windows-specific IAudioPlayer implementation (LibVLCSharp/WMPLib) | UI, business logic, cross-platform code |
+| **FsmpDataAcsses** | Data Access | `FSMP.db/entity/FsmpDataAcsses/FsmpDataAcsses/` | Entity models, DbContext, repositories, migrations, database queries | UI, business logic, playback |
+| **FSMP.Tests** | Testing | `FSMP.Tests/` | Unit tests, integration tests, test helpers, coverage verification | Production code |
+
+**Boundary rules:**
+- **UI projects** → presentation only (input, menus, display). No playback logic, scanning, or database access.
+- **Business logic projects** → domain logic, orchestration, service interfaces. No UI or direct database queries.
+- **Data access projects** → persistence (entities, repositories, queries, migrations). No UI or business logic.
+- **Platform projects** → implement interfaces from the business logic layer. No UI or business logic.
+
 ## Build & Development Commands
 
 **IMPORTANT**: This project uses COM interop (WMPLib) which requires Visual Studio's MSBuild. The standard `dotnet build` command will fail with error MSB4803.
