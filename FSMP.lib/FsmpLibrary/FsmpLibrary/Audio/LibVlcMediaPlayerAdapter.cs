@@ -72,6 +72,36 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
     public void Pause() => _mediaPlayer.Pause();
     public void Stop() => _mediaPlayer.Stop();
 
+    public async Task StopAndWaitAsync(CancellationToken cancellationToken = default)
+    {
+        if (!_mediaPlayer.IsPlaying)
+            return;
+
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        void OnStopped(object? s, EventArgs e) => tcs.TrySetResult();
+        _mediaPlayer.Stopped += OnStopped;
+
+        try
+        {
+            _mediaPlayer.Stop();
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(2));
+            cts.Token.Register(() => tcs.TrySetCanceled(cts.Token));
+
+            await tcs.Task.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            // Timeout — stop didn't fire within 2s, proceed anyway
+        }
+        finally
+        {
+            _mediaPlayer.Stopped -= OnStopped;
+        }
+    }
+
     public void SetMedia() => _mediaPlayer.Media = _currentMedia;
 
     public void DisposeCurrentMedia()

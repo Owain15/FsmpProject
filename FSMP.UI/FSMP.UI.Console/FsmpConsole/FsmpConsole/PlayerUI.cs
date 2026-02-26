@@ -298,15 +298,7 @@ public class PlayerUI
         }
         try
         {
-            var playTask = Task.Run(() => _audioService.PlayTrackAsync(track));
-            var completed = await Task.WhenAny(playTask, Task.Delay(TimeSpan.FromSeconds(30)));
-            if (completed != playTask)
-            {
-                _isPlaying = false;
-                _statusMessage = "Playback timed out loading track.";
-                return;
-            }
-            await playTask; // propagate any exception
+            await _audioService.PlayTrackAsync(track);
             _isPlaying = true;
             _isStopped = false;
             _statusMessage = $"Now playing: {track.DisplayTitle}";

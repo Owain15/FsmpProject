@@ -10,6 +10,7 @@ public interface IMediaPlayerAdapter : IDisposable
     bool Play();
     void Pause();
     void Stop();
+    Task StopAndWaitAsync(CancellationToken cancellationToken = default);
 
     // Media management
     Task LoadMediaAsync(string filePath, CancellationToken cancellationToken = default);

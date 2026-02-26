@@ -82,10 +82,10 @@ public class LibVlcAudioPlayer : IAudioPlayer
         if (!File.Exists(filePath))
             throw new FileNotFoundException("Audio file not found.", filePath);
 
-        // Stop current playback
+        // Stop current playback and wait for LibVLC to fully stop
         if (State == PlaybackState.Playing || State == PlaybackState.Paused)
         {
-            _adapter.Stop();
+            await _adapter.StopAndWaitAsync(cancellationToken);
         }
 
         // Dispose previous media if exists

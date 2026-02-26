@@ -54,6 +54,12 @@ public class MockMediaPlayerAdapter : IMediaPlayerAdapter
         StopCallCount++;
     }
 
+    public Task StopAndWaitAsync(CancellationToken cancellationToken = default)
+    {
+        Stop();
+        return Task.CompletedTask;
+    }
+
     public Task LoadMediaAsync(string filePath, CancellationToken cancellationToken = default)
     {
         if (ShouldThrowOnLoad)
