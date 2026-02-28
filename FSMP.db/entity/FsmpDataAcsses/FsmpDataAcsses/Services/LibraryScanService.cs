@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 using FsmpLibrary.Services;
 using ScanResult = FSMP.Core.Models.ScanResult;
@@ -9,7 +10,7 @@ namespace FsmpDataAcsses.Services;
 /// Scans library directories for audio files and imports them into the database.
 /// Creates or reuses Artist and Album entities based on file metadata.
 /// </summary>
-public class LibraryScanService
+public class LibraryScanService : ILibraryScanService
 {
     private static readonly HashSet<string> SupportedExtensions =
         new(StringComparer.OrdinalIgnoreCase) { ".wav", ".wma", ".mp3" };

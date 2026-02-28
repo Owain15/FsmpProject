@@ -1,3 +1,4 @@
+using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 
 namespace FsmpDataAcsses.Services;
@@ -5,7 +6,7 @@ namespace FsmpDataAcsses.Services;
 /// <summary>
 /// Manages playlist CRUD operations and track assignment via the database.
 /// </summary>
-public class PlaylistService
+public class PlaylistService : IPlaylistService
 {
     private readonly UnitOfWork _unitOfWork;
 

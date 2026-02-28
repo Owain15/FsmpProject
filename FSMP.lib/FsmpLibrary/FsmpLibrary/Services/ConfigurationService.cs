@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 
 namespace FsmpLibrary.Services;
@@ -6,7 +7,7 @@ namespace FsmpLibrary.Services;
 /// <summary>
 /// Manages application configuration stored as JSON.
 /// </summary>
-public class ConfigurationService
+public class ConfigurationService : IConfigurationService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

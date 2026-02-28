@@ -1,3 +1,4 @@
+using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,7 @@ namespace FsmpDataAcsses.Repositories;
 /// <summary>
 /// Specialized repository for Album entities with music-specific queries.
 /// </summary>
-public class AlbumRepository : Repository<Album>
+public class AlbumRepository : Repository<Album>, IAlbumRepository
 {
     public AlbumRepository(FsmpDbContext context) : base(context)
     {

@@ -1,3 +1,4 @@
+using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,7 @@ namespace FsmpDataAcsses.Repositories;
 /// <summary>
 /// Specialized repository for Artist entities with music-specific queries.
 /// </summary>
-public class ArtistRepository : Repository<Artist>
+public class ArtistRepository : Repository<Artist>, IArtistRepository
 {
     public ArtistRepository(FsmpDbContext context) : base(context)
     {
