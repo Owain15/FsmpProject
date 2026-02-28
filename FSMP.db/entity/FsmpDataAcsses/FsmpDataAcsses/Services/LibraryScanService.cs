@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using FSMP.Core.Models;
 using FsmpLibrary.Services;
+using ScanResult = FSMP.Core.Models.ScanResult;
 
 namespace FsmpDataAcsses.Services;
 
