@@ -409,46 +409,38 @@ public class PlayerUITests : IDisposable
         output.ToString().Should().Contain("Beginning of queue");
     }
 
-    // ========== HandleInputAsync — Pause/Resume (K) ==========
+    // ========== HandleInputAsync — Play/Stop Toggle (K) ==========
 
     [Fact]
-    public async Task HandleInputAsync_K_WhenPlaying_ShouldPause()
+    public async Task HandleInputAsync_K_WhenPlaying_ShouldStop()
     {
         var track = await CreateTrackAsync("Track1");
         _activePlaylist.SetQueue(new[] { track.TrackId });
 
         var (player, output) = CreatePlayerWithOutput("");
 
-        // First play a track to set _isPlaying = true
-        await player.HandleInputAsync("N");
-        _audioMock.Reset();
+        // Simulate the player being in Playing state
+        await _mockPlayer.PlayAsync();
+        _audioMock.Setup(a => a.Player).Returns(_mockPlayer);
 
-        // Better approach: use a 2-track queue, play next to set isPlaying
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track.TrackId, track2.TrackId });
-
-        // Play next track (moves from track1 to track2, sets _isPlaying = true)
-        await player.HandleInputAsync("N");
-        _audioMock.Reset();
-
-        // Now pause
+        // Now K should stop
         await player.HandleInputAsync("K");
 
-        _audioMock.Verify(a => a.PauseAsync(), Times.Once);
+        _audioMock.Verify(a => a.StopAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task HandleInputAsync_K_WhenNotPlaying_WithCurrentTrack_ShouldResume()
+    public async Task HandleInputAsync_K_WhenNotPlaying_WithCurrentTrack_ShouldPlayFromStart()
     {
         var track = await CreateTrackAsync("Track1");
         _activePlaylist.SetQueue(new[] { track.TrackId });
 
         var (player, output) = CreatePlayerWithOutput("");
 
-        // K when not playing but has current track → resume
+        // K when not playing but has current track → play from start
         await player.HandleInputAsync("K");
 
-        _audioMock.Verify(a => a.ResumeAsync(), Times.Once);
+        _audioMock.Verify(a => a.PlayTrackAsync(It.IsAny<Track>()), Times.Once);
     }
 
     [Fact]
@@ -458,8 +450,8 @@ public class PlayerUITests : IDisposable
 
         await player.HandleInputAsync("K");
 
-        _audioMock.Verify(a => a.ResumeAsync(), Times.Never);
-        _audioMock.Verify(a => a.PauseAsync(), Times.Never);
+        _audioMock.Verify(a => a.PlayTrackAsync(It.IsAny<Track>()), Times.Never);
+        _audioMock.Verify(a => a.StopAsync(), Times.Never);
     }
 
     // ========== HandleInputAsync — Restart (R) ==========

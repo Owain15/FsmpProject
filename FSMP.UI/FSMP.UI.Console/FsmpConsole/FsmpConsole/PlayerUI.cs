@@ -1,4 +1,5 @@
 using FSMP.Core;
+using FSMP.Core.Interfaces;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
 using FSMP.Core.Models;
@@ -20,8 +21,6 @@ public class PlayerUI
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action? _onClear;
-    private bool _isPlaying;
-    private bool _isStopped;
     private bool _exitRequested;
     private volatile bool _trackEnded;
     private string? _statusMessage;
@@ -48,6 +47,8 @@ public class PlayerUI
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _onClear = onClear;
     }
+
+    private bool IsPlaying => _audioService.Player.State == PlaybackState.Playing;
 
     /// <summary>
     /// Runs the player UI loop until the user chooses to go back.
@@ -106,7 +107,7 @@ public class PlayerUI
         Print.NewDisplay(
             _output,
             currentTrack,
-            _isPlaying,
+            IsPlaying,
             queueItems,
             _activePlaylist.RepeatMode,
             _activePlaylist.IsShuffled,
@@ -127,7 +128,7 @@ public class PlayerUI
                 await PreviousTrackAsync();
                 break;
             case "K":
-                await TogglePauseAsync();
+                await TogglePlayStopAsync();
                 break;
             case "R":
                 await RestartTrackAsync();
@@ -185,7 +186,6 @@ public class PlayerUI
         else
         {
             await _audioService.StopAsync();
-            _isPlaying = false;
             _statusMessage = "End of queue.";
         }
     }
@@ -203,27 +203,16 @@ public class PlayerUI
         }
     }
 
-    private async Task TogglePauseAsync()
+    private async Task TogglePlayStopAsync()
     {
-        if (_isPlaying)
+        if (IsPlaying)
         {
-            await _audioService.PauseAsync();
-            _isPlaying = false;
-            _statusMessage = "Paused.";
+            await _audioService.StopAsync();
+            _statusMessage = "Stopped.";
         }
         else if (_activePlaylist.CurrentTrackId.HasValue)
         {
-            if (_isStopped)
-            {
-                // After stop, must re-load the track
-                await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
-                _isStopped = false;
-            }
-            else
-            {
-                await _audioService.ResumeAsync();
-                _isPlaying = true;
-            }
+            await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
             _statusMessage = "Playing.";
         }
     }
@@ -234,15 +223,12 @@ public class PlayerUI
         {
             await _audioService.SeekAsync(TimeSpan.Zero);
             await _audioService.ResumeAsync();
-            _isPlaying = true;
         }
     }
 
     private async Task StopAsync()
     {
         await _audioService.StopAsync();
-        _isPlaying = false;
-        _isStopped = true;
         _statusMessage = "Stopped.";
     }
 
@@ -275,14 +261,13 @@ public class PlayerUI
         _playerEventSubscribed = true;
         _audioService.Player.PlaybackCompleted += (s, e) =>
         {
-            _isPlaying = false;
             _trackEnded = true;
         };
     }
 
     private async Task AutoPlayIfQueuedAsync()
     {
-        if (!_isPlaying && _activePlaylist.CurrentTrackId.HasValue)
+        if (!IsPlaying && _activePlaylist.CurrentTrackId.HasValue)
         {
             await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
         }
@@ -299,13 +284,10 @@ public class PlayerUI
         try
         {
             await _audioService.PlayTrackAsync(track);
-            _isPlaying = true;
-            _isStopped = false;
             _statusMessage = $"Now playing: {track.DisplayTitle}";
         }
         catch (Exception ex)
         {
-            _isPlaying = false;
             _statusMessage = $"Playback error: {ex.Message}";
         }
     }
