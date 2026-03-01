@@ -40,8 +40,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 **Database/** (3 files, ~48 tests):
 - `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs` (20 tests incl. Playlist/PlaylistTrack config), `MigrationTests.cs`
 
-**UI/** (7 files, ~214 tests):
-- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlayerUITests.cs` (48 tests)
+**UI/** (7 files, ~241 tests):
+- `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlayerUITests.cs` (75 tests — incl. 14 playlist + 13 directory UI-to-Core integration tests)
 - `MetadataEditorTests.cs`, `StatisticsViewerTests.cs`
 - `PrintTests.cs` (incl. 13 NewDisplay tests), `AppStartupTests.cs`
 
@@ -63,11 +63,11 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit + Queue state persistence | **Tests**: 877 passing | **Overall Coverage**: 93.99%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit + Queue state persistence + Playlist/Directory UI tests | **Tests**: 904 passing | **Overall Coverage**: 93.99%
 
 | Project | Coverage |
 |---------|----------|
-| FsmpConsole | 80.37% |
+| FsmpConsole | 88.2% |
 | FsmpDataAcsses | 98.46% |
 | FsmpLibrary | 95.43% |
 | FSMP.Core | 99.53% |

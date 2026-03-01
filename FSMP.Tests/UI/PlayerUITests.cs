@@ -591,6 +591,409 @@ public class PlayerUITests
         output.ToString().Should().Contain("End of queue.");
     }
 
+    // ========== ManagePlaylistsAsync Tests (L key) ==========
+
+    [Fact]
+    public async Task ManagePlaylists_ShouldCallGetAllPlaylistsAsync()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist>()));
+
+        var (player, output) = CreatePlayerWithOutput("0\n");
+        await player.HandleInputAsync("L");
+
+        _playlistsMock.Verify(p => p.GetAllPlaylistsAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_NoPlaylists_ShouldShowEmptyList()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist>()));
+
+        var (player, output) = CreatePlayerWithOutput("0\n");
+        await player.HandleInputAsync("L");
+
+        output.ToString().Should().Contain("Playlists");
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_Create_ShouldCallCreatePlaylistAsync()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist>()));
+        _playlistsMock.Setup(p => p.CreatePlaylistAsync("MyList", null))
+            .ReturnsAsync(Result.Success(new Playlist { Name = "MyList" }));
+
+        // First loop: C -> name -> empty desc -> back to list; Second loop: 0 -> exit
+        var (player, output) = CreatePlayerWithOutput("C\nMyList\n\n0\n");
+        await player.HandleInputAsync("L");
+
+        _playlistsMock.Verify(p => p.CreatePlaylistAsync("MyList", null), Times.Once);
+        output.ToString().Should().Contain("Created playlist: MyList");
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_Create_WithDescription_ShouldPassDescription()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist>()));
+        _playlistsMock.Setup(p => p.CreatePlaylistAsync("MyList", "A desc"))
+            .ReturnsAsync(Result.Success(new Playlist { Name = "MyList" }));
+
+        var (player, output) = CreatePlayerWithOutput("C\nMyList\nA desc\n0\n");
+        await player.HandleInputAsync("L");
+
+        _playlistsMock.Verify(p => p.CreatePlaylistAsync("MyList", "A desc"), Times.Once);
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_Create_EmptyName_ShouldNotCall()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist>()));
+
+        // C -> empty name -> back to list; 0 -> exit
+        var (player, output) = CreatePlayerWithOutput("C\n\n0\n");
+        await player.HandleInputAsync("L");
+
+        _playlistsMock.Verify(p => p.CreatePlaylistAsync(It.IsAny<string>(), It.IsAny<string?>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_CreateFails_ShouldShowError()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist>()));
+        _playlistsMock.Setup(p => p.CreatePlaylistAsync("Dup", null))
+            .ReturnsAsync(Result.Failure<Playlist>("Duplicate name"));
+
+        var (player, output) = CreatePlayerWithOutput("C\nDup\n\n0\n");
+        await player.HandleInputAsync("L");
+
+        output.ToString().Should().Contain("Error creating playlist: Duplicate name");
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_SelectPlaylist_ShouldCallGetPlaylistWithTracksAsync()
+    {
+        var playlist = new Playlist { PlaylistId = 5, Name = "Faves", PlaylistTracks = new List<PlaylistTrack>() };
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist> { playlist }));
+        _playlistsMock.Setup(p => p.GetPlaylistWithTracksAsync(5))
+            .ReturnsAsync(Result.Success<Playlist?>(new Playlist { PlaylistId = 5, Name = "Faves", PlaylistTracks = new List<PlaylistTrack>() }));
+
+        // Select playlist 1, then back from playlist view, then back from list
+        var (player, output) = CreatePlayerWithOutput("1\n0\n0\n");
+        await player.HandleInputAsync("L");
+
+        _playlistsMock.Verify(p => p.GetPlaylistWithTracksAsync(5), Times.Once);
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_SelectPlaylist_InvalidNumber_ShouldShowError()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist> { new() { PlaylistId = 1, Name = "A", PlaylistTracks = new List<PlaylistTrack>() } }));
+
+        // Select 5 (out of range) -> Invalid, then 0 -> exit
+        var (player, output) = CreatePlayerWithOutput("5\n0\n");
+        await player.HandleInputAsync("L");
+
+        output.ToString().Should().Contain("Invalid selection");
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_LoadPlaylist_ShouldCallLoadPlaylistIntoQueueAsync()
+    {
+        var playlist = new Playlist { PlaylistId = 3, Name = "Rock", PlaylistTracks = new List<PlaylistTrack>
+        {
+            new() { TrackId = 1, Position = 0 },
+            new() { TrackId = 2, Position = 1 }
+        }};
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist> { playlist }));
+        _playlistsMock.Setup(p => p.GetPlaylistWithTracksAsync(3))
+            .ReturnsAsync(Result.Success<Playlist?>(playlist));
+        _playlistsMock.Setup(p => p.LoadPlaylistIntoQueueAsync(3))
+            .ReturnsAsync(Result.Success());
+        _browserMock.Setup(b => b.GetTrackByIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(Result.Success<Track?>(new Track { Title = "T", FilePath = "f", FileHash = "h" }));
+
+        // Select playlist 1 -> L to load -> 0 back from playlist -> 0 back from list
+        var (player, output) = CreatePlayerWithOutput("1\nl\n0\n0\n");
+        await player.HandleInputAsync("L");
+
+        _playlistsMock.Verify(p => p.LoadPlaylistIntoQueueAsync(3), Times.Once);
+        output.ToString().Should().Contain("Loaded 2 tracks into player queue");
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_DeletePlaylist_ShouldCallDeletePlaylistAsync()
+    {
+        var playlist = new Playlist { PlaylistId = 7, Name = "Old", PlaylistTracks = new List<PlaylistTrack>() };
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist> { playlist }));
+        _playlistsMock.Setup(p => p.GetPlaylistWithTracksAsync(7))
+            .ReturnsAsync(Result.Success<Playlist?>(playlist));
+        _playlistsMock.Setup(p => p.DeletePlaylistAsync(7))
+            .ReturnsAsync(Result.Success());
+
+        // Select playlist 1 -> D to delete -> returns to list -> 0 back
+        var (player, output) = CreatePlayerWithOutput("1\nd\n0\n");
+        await player.HandleInputAsync("L");
+
+        _playlistsMock.Verify(p => p.DeletePlaylistAsync(7), Times.Once);
+        output.ToString().Should().Contain("Playlist deleted");
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_DeletePlaylist_Failure_ShouldShowError()
+    {
+        var playlist = new Playlist { PlaylistId = 7, Name = "Old", PlaylistTracks = new List<PlaylistTrack>() };
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist> { playlist }));
+        _playlistsMock.Setup(p => p.GetPlaylistWithTracksAsync(7))
+            .ReturnsAsync(Result.Success<Playlist?>(playlist));
+        _playlistsMock.Setup(p => p.DeletePlaylistAsync(7))
+            .ReturnsAsync(Result.Failure("DB error"));
+
+        var (player, output) = CreatePlayerWithOutput("1\nd\n0\n");
+        await player.HandleInputAsync("L");
+
+        output.ToString().Should().Contain("Error deleting playlist: DB error");
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_Back_ShouldReturn()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Success(new List<Playlist>()));
+
+        var (player, output) = CreatePlayerWithOutput("0\n");
+        await player.HandleInputAsync("L");
+
+        // Should not throw and should only call GetAllPlaylistsAsync once
+        _playlistsMock.Verify(p => p.GetAllPlaylistsAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ManagePlaylists_GetAllFails_ShouldShowError()
+    {
+        _playlistsMock.Setup(p => p.GetAllPlaylistsAsync())
+            .ReturnsAsync(Result.Failure<List<Playlist>>("Connection failed"));
+
+        var (player, output) = CreatePlayerWithOutput("");
+        await player.HandleInputAsync("L");
+
+        output.ToString().Should().Contain("Error: Connection failed");
+    }
+
+    // ========== ManageDirectoriesAsync Tests (D key) ==========
+
+    [Fact]
+    public async Task ManageDirectories_ShouldCallLoadConfigurationAsync()
+    {
+        _libraryMock.Setup(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }));
+
+        var (player, output) = CreatePlayerWithOutput("0\n");
+        await player.HandleInputAsync("D");
+
+        _libraryMock.Verify(l => l.LoadConfigurationAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ManageDirectories_NoPaths_ShouldShowNoneConfigured()
+    {
+        _libraryMock.Setup(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }));
+
+        var (player, output) = CreatePlayerWithOutput("0\n");
+        await player.HandleInputAsync("D");
+
+        output.ToString().Should().Contain("(none configured)");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_WithPaths_ShouldDisplayThem()
+    {
+        _libraryMock.Setup(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music", @"D:\Songs" } }));
+
+        var (player, output) = CreatePlayerWithOutput("0\n");
+        await player.HandleInputAsync("D");
+
+        var text = output.ToString();
+        text.Should().Contain(@"C:\Music");
+        text.Should().Contain(@"D:\Songs");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_AddPath_ShouldCallAddLibraryPathAsync()
+    {
+        _libraryMock.Setup(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }));
+        _libraryMock.Setup(l => l.AddLibraryPathAsync(@"C:\NewMusic"))
+            .ReturnsAsync(Result.Success());
+
+        // A -> enter path -> back to menu (need second LoadConfig call) -> 0
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\NewMusic" } }));
+
+        var (player, output) = CreatePlayerWithOutput("a\nC:\\NewMusic\n0\n");
+        await player.HandleInputAsync("D");
+
+        _libraryMock.Verify(l => l.AddLibraryPathAsync(@"C:\NewMusic"), Times.Once);
+        output.ToString().Should().Contain("Path added");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_AddPath_EmptyInput_ShouldNotCall()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }));
+
+        var (player, output) = CreatePlayerWithOutput("a\n\n0\n");
+        await player.HandleInputAsync("D");
+
+        _libraryMock.Verify(l => l.AddLibraryPathAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ManageDirectories_AddPath_Failure_ShouldShowError()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }));
+        _libraryMock.Setup(l => l.AddLibraryPathAsync("bad"))
+            .ReturnsAsync(Result.Failure("Path not found"));
+
+        var (player, output) = CreatePlayerWithOutput("a\nbad\n0\n");
+        await player.HandleInputAsync("D");
+
+        output.ToString().Should().Contain("Path not found");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_RemovePath_ShouldCallRemoveLibraryPathAsync()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }));
+        _libraryMock.Setup(l => l.RemoveLibraryPathAsync(@"C:\Music"))
+            .ReturnsAsync(Result.Success());
+
+        var (player, output) = CreatePlayerWithOutput("r\n1\n0\n");
+        await player.HandleInputAsync("D");
+
+        _libraryMock.Verify(l => l.RemoveLibraryPathAsync(@"C:\Music"), Times.Once);
+        output.ToString().Should().Contain("Path removed");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_RemovePath_InvalidNumber_ShouldNotCall()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }));
+
+        var (player, output) = CreatePlayerWithOutput("r\n5\n0\n");
+        await player.HandleInputAsync("D");
+
+        _libraryMock.Verify(l => l.RemoveLibraryPathAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ManageDirectories_RemovePath_Failure_ShouldShowError()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }));
+        _libraryMock.Setup(l => l.RemoveLibraryPathAsync(@"C:\Music"))
+            .ReturnsAsync(Result.Failure("Permission denied"));
+
+        var (player, output) = CreatePlayerWithOutput("r\n1\n0\n");
+        await player.HandleInputAsync("D");
+
+        output.ToString().Should().Contain("Permission denied");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_Scan_ShouldCallScanAllLibrariesAsync()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }));
+        _libraryMock.Setup(l => l.ScanAllLibrariesAsync())
+            .ReturnsAsync(Result.Success(new ScanResult { TracksAdded = 10, TracksUpdated = 2, TracksRemoved = 1, Duration = TimeSpan.FromSeconds(3.5) }));
+
+        var (player, output) = CreatePlayerWithOutput("s\n0\n");
+        await player.HandleInputAsync("D");
+
+        _libraryMock.Verify(l => l.ScanAllLibrariesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ManageDirectories_Scan_ShouldDisplayResults()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }));
+        _libraryMock.Setup(l => l.ScanAllLibrariesAsync())
+            .ReturnsAsync(Result.Success(new ScanResult { TracksAdded = 10, TracksUpdated = 2, TracksRemoved = 1, Duration = TimeSpan.FromSeconds(3.5) }));
+
+        var (player, output) = CreatePlayerWithOutput("s\n0\n");
+        await player.HandleInputAsync("D");
+
+        var text = output.ToString();
+        text.Should().Contain("10 added");
+        text.Should().Contain("2 updated");
+        text.Should().Contain("1 removed");
+        text.Should().Contain("3.5s");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_Scan_Failure_ShouldShowError()
+    {
+        _libraryMock.SetupSequence(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }))
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string> { @"C:\Music" } }));
+        _libraryMock.Setup(l => l.ScanAllLibrariesAsync())
+            .ReturnsAsync(Result.Failure<ScanResult>("Scan failed"));
+
+        var (player, output) = CreatePlayerWithOutput("s\n0\n");
+        await player.HandleInputAsync("D");
+
+        output.ToString().Should().Contain("Scan failed");
+    }
+
+    [Fact]
+    public async Task ManageDirectories_Back_ShouldReturn()
+    {
+        _libraryMock.Setup(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(new Configuration { LibraryPaths = new List<string>() }));
+
+        var (player, output) = CreatePlayerWithOutput("0\n");
+        await player.HandleInputAsync("D");
+
+        _libraryMock.Verify(l => l.LoadConfigurationAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ManageDirectories_LoadConfigFails_ShouldShowError()
+    {
+        _libraryMock.Setup(l => l.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Failure<Configuration>("Config corrupt"));
+
+        var (player, output) = CreatePlayerWithOutput("");
+        await player.HandleInputAsync("D");
+
+        output.ToString().Should().Contain("Error: Config corrupt");
+    }
+
     /// <summary>
     /// Custom TextReader that triggers the SubscribeToTrackEnd callback after a specific ReadLine call.
     /// </summary>

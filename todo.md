@@ -7,12 +7,12 @@
 | FsmpLibrary | Core business logic & models | Complete (v1) | 95.43% | [todo](FSMP.lib/FsmpLibrary/todo.md) |
 | FSMP.Core | Platform-agnostic player logic | In progress | 99.53% | [todo](FSMP.lib/FSMP.Core/todo.md) |
 | FsmpDataAcsses | EF Core data access layer | Complete (v1) | 98.46% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
-| FsmpConsole | Console UI application | Complete (v1) | 80.37% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
+| FsmpConsole | Console UI application | Complete (v1) | 88.2% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
 | FSMO | File System Music Organizer | Complete (10/10) | 96.39% | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 93.99% | **Tests**: 877 passing | **Build**: Passing
+**Overall coverage**: 94.3% | **Tests**: 904 passing | **Build**: Passing
 
 ---
 
