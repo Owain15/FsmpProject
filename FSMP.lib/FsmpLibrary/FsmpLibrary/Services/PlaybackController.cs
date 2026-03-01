@@ -7,13 +7,13 @@ namespace FsmpLibrary.Services;
 public class PlaybackController : IPlaybackController
 {
     private readonly IAudioService _audioService;
-    private readonly ActivePlaylistService _activePlaylist;
+    private readonly IActivePlaylistService _activePlaylist;
     private readonly ITrackRepository _trackRepository;
     private bool _playerEventSubscribed;
 
     public PlaybackController(
         IAudioService audioService,
-        ActivePlaylistService activePlaylist,
+        IActivePlaylistService activePlaylist,
         ITrackRepository trackRepository)
     {
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));

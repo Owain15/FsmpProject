@@ -62,6 +62,7 @@ public static class MauiProgram
         services.AddSingleton<IAudioPlayerFactory, LibVlcAudioPlayerFactory>();
         services.AddSingleton<IAudioService, AudioService>();
         services.AddSingleton<ActivePlaylistService>();
+        services.AddSingleton<IActivePlaylistService>(sp => sp.GetRequiredService<ActivePlaylistService>());
 
         // Pages
         services.AddTransient<LibraryPage>();

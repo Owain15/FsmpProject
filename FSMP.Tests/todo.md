@@ -28,8 +28,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `AudioServiceTests.cs`, `ConfigurationServiceTests.cs`, `MetadataServiceTests.cs`
 - `LibraryScanServiceTests.cs`, `PlaybackTrackingServiceTests.cs`, `StatisticsServiceTests.cs`
 - `PlaylistServiceTests.cs` (37 tests)
-- `PlaybackControllerTests.cs` (28 tests), `LibraryBrowserTests.cs` (12 tests)
-- `PlaylistManagerTests.cs` (11 tests), `LibraryManagerTests.cs` (10 tests)
+- `PlaybackControllerTests.cs` (30 tests — split ToggleRepeatMode into 3, mocked IActivePlaylistService), `LibraryBrowserTests.cs` (12 tests)
+- `PlaylistManagerTests.cs` (11 tests — mocked IActivePlaylistService), `LibraryManagerTests.cs` (10 tests)
 
 **Repositories/** (7 files, ~70 tests):
 - `RepositoryTests.cs`, `TrackRepositoryTests.cs`, `AlbumRepositoryTests.cs`
@@ -46,8 +46,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 > Removed: `PlaybackUITests.cs` and `LibraryManagerTests.cs` (dead code — classes superseded by PlayerUI)
 
-**Audio/** (2 files, 52 tests):
-- `LibVlcAudioPlayerTests.cs` (50 tests) -- Constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, dispose
+**Audio/** (2 files, 51 tests):
+- `LibVlcAudioPlayerTests.cs` (49 tests) -- Constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, dispose (removed redundant multi-method dispose test)
 - `LibVlcAudioPlayerFactoryTests.cs` (2 tests) -- Factory with adapter injection
 
 **Core/** (1 file, 37 tests):
@@ -61,7 +61,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor | **Tests**: 863 passing | **Overall Coverage**: 93.99%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit | **Tests**: 864 passing | **Overall Coverage**: 93.99%
 
 | Project | Coverage |
 |---------|----------|

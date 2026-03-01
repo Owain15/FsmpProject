@@ -7,11 +7,11 @@ namespace FsmpLibrary.Services;
 public class PlaylistManager : IPlaylistManager
 {
     private readonly IPlaylistService _playlistService;
-    private readonly ActivePlaylistService _activePlaylist;
+    private readonly IActivePlaylistService _activePlaylist;
 
     public PlaylistManager(
         IPlaylistService playlistService,
-        ActivePlaylistService activePlaylist)
+        IActivePlaylistService activePlaylist)
     {
         _playlistService = playlistService ?? throw new ArgumentNullException(nameof(playlistService));
         _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));

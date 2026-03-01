@@ -104,7 +104,7 @@ public class MockAudioPlayer : IAudioPlayer
         });
     }
 
-    private void SetState(PlaybackState newState)
+    public void SetState(PlaybackState newState)
     {
         var oldState = State;
         State = newState;

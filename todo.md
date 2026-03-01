@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 93.99% | **Tests**: 863 passing | **Build**: Passing
+**Overall coverage**: 93.99% | **Tests**: 864 passing | **Build**: Passing
 
 ---
 
@@ -136,7 +136,7 @@ Replace the 8-option main menu with the Player screen as the primary UI. Navigat
 
 ## Orchestration Service Refactor
 
-**Status**: Complete | **Tests**: 863 passing
+**Status**: Complete | **Tests**: 864 passing
 
 Replaced the god-object PlayerUI (6+ raw service deps) with a clean orchestration layer:
 - `Result<T>` pattern for structured success/failure in FSMP.Core
@@ -148,6 +148,21 @@ Replaced the god-object PlayerUI (6+ raw service deps) with a clean orchestratio
 - No direct `UnitOfWork` usage in any UI file
 - All UI error handling uses `result.IsSuccess` / `result.ErrorMessage`
 - ScanResult moved to FSMP.Core.Models, QueueItem DTO added
+
+---
+
+## Test Isolation Audit
+
+**Status**: Complete | **Tests**: 864 passing (net +1)
+
+Audited all tests to ensure each tests one function with no unnecessary dependencies:
+- Extracted `IActivePlaylistService` interface from `ActivePlaylistService` (FSMP.Core)
+- Updated `PlaybackController` and `PlaylistManager` to depend on `IActivePlaylistService`
+- Mocked `IActivePlaylistService` in `PlaybackControllerTests` and `PlaylistManagerTests`
+- Split `ToggleRepeatMode_CyclesThroughModes` into 3 independent tests
+- Fixed `TogglePlayStopAsync_StopsWhenPlaying` to use `SetState()` instead of calling `PlayAsync()`
+- Deleted redundant `AfterDispose_AllMethodsShouldThrowObjectDisposedException` (covered by individual tests)
+- Made `MockAudioPlayer.SetState()` public for direct state setup in tests
 
 ---
 

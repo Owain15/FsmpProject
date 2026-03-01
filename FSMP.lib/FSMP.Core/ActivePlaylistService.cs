@@ -1,6 +1,8 @@
+using FSMP.Core.Interfaces;
+
 namespace FSMP.Core;
 
-public class ActivePlaylistService
+public class ActivePlaylistService : IActivePlaylistService
 {
     private List<int> _originalOrder = new();
     private List<int> _playOrder = new();

@@ -10,27 +10,27 @@ namespace FSMP.Tests.Services;
 public class PlaylistManagerTests
 {
     private readonly Mock<IPlaylistService> _playlistServiceMock;
-    private readonly ActivePlaylistService _activePlaylist;
+    private readonly Mock<IActivePlaylistService> _activePlaylistMock;
     private readonly PlaylistManager _manager;
 
     public PlaylistManagerTests()
     {
         _playlistServiceMock = new Mock<IPlaylistService>();
-        _activePlaylist = new ActivePlaylistService();
-        _manager = new PlaylistManager(_playlistServiceMock.Object, _activePlaylist);
+        _activePlaylistMock = new Mock<IActivePlaylistService>();
+        _manager = new PlaylistManager(_playlistServiceMock.Object, _activePlaylistMock.Object);
     }
 
     [Fact]
     public void Constructor_ThrowsOnNullPlaylistService()
     {
-        var act = () => new PlaylistManager(null!, _activePlaylist);
+        var act = () => new PlaylistManager(null!, _activePlaylistMock.Object);
         act.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void Constructor_ThrowsOnNullActivePlaylist()
     {
-        var act = () => new PlaylistManager(_playlistServiceMock.Object, null!);
+        var act = () => new PlaylistManager(_playlistServiceMock.Object, (IActivePlaylistService)null!);
         act.Should().Throw<ArgumentNullException>();
     }
 
@@ -129,8 +129,8 @@ public class PlaylistManagerTests
         var result = await _manager.LoadPlaylistIntoQueueAsync(1);
 
         result.IsSuccess.Should().BeTrue();
-        _activePlaylist.Count.Should().Be(2);
-        _activePlaylist.PlayOrder.Should().BeEquivalentTo(new[] { 10, 20 });
+        _activePlaylistMock.Verify(p => p.SetQueue(It.Is<IReadOnlyList<int>>(
+            q => q.Count == 2 && q[0] == 10 && q[1] == 20)), Times.Once);
     }
 
     [Fact]

@@ -543,23 +543,5 @@ public class LibVlcAudioPlayerTests : IDisposable
         _player.State.Should().Be(stateBefore);
     }
 
-    [Fact]
-    public void AfterDispose_AllMethodsShouldThrowObjectDisposedException()
-    {
-        _player.Dispose();
-
-        var actLoad = () => _player.LoadAsync("test.mp3");
-        var actPlay = () => _player.PlayAsync();
-        var actPause = () => _player.PauseAsync();
-        var actStop = () => _player.StopAsync();
-        var actSeek = () => _player.SeekAsync(TimeSpan.Zero);
-
-        actLoad.Should().ThrowAsync<ObjectDisposedException>();
-        actPlay.Should().ThrowAsync<ObjectDisposedException>();
-        actPause.Should().ThrowAsync<ObjectDisposedException>();
-        actStop.Should().ThrowAsync<ObjectDisposedException>();
-        actSeek.Should().ThrowAsync<ObjectDisposedException>();
-    }
-
     #endregion
 }
