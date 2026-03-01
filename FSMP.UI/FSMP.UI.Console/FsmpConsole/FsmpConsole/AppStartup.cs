@@ -104,6 +104,19 @@ public class AppStartup
             await configService.SaveConfigurationAsync(config);
         };
 
+        // 3b. Eagerly initialize audio engine
+        var factory = services.GetRequiredService<IAudioPlayerFactory>();
+        _output.Write("Initializing audio engine...");
+        if (await factory.InitializeAsync())
+        {
+            _output.WriteLine(" ready.");
+        }
+        else
+        {
+            var errorMsg = (factory as LibVlcAudioPlayerFactory)?.InitializationError ?? "Unknown error";
+            _output.WriteLine($" failed: {errorMsg}. Playback will not be available.");
+        }
+
         // 4. Auto-scan if enabled
         if (config.AutoScanOnStartup && config.LibraryPaths.Count > 0)
         {

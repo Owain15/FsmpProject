@@ -37,8 +37,19 @@ public class AudioService : IAudioService
         {
             if (_player == null)
             {
-                _player = _playerFactory.CreatePlayer();
-                _player.Volume = _initialVolume;
+                try
+                {
+                    _player = _playerFactory.CreatePlayer();
+                    _player.Volume = _initialVolume;
+                }
+                catch (InvalidOperationException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException("Audio engine not available.", ex);
+                }
             }
             return _player;
         }

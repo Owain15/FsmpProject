@@ -10,4 +10,9 @@ public interface IAudioPlayerFactory
     /// </summary>
     /// <returns>A new <see cref="IAudioPlayer"/> instance.</returns>
     IAudioPlayer CreatePlayer();
+
+    /// <summary>
+    /// Eagerly initializes the underlying audio engine. Returns true if successful.
+    /// </summary>
+    Task<bool> InitializeAsync();
 }

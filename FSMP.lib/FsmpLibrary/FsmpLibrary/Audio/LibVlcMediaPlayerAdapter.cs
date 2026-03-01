@@ -18,9 +18,11 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
     private Media? _currentMedia;
     private bool _disposed;
 
-    public LibVlcMediaPlayerAdapter() : this("--quiet", "--aout=wasapi") { }
-
-    public LibVlcMediaPlayerAdapter(params string[] vlcOptions)
+    /// <summary>
+    /// Eagerly initializes the LibVLC core. Safe to call multiple times.
+    /// Throws if LibVLC native libraries cannot be loaded.
+    /// </summary>
+    public static void EnsureCoreInitialized()
     {
         lock (_initLock)
         {
@@ -39,6 +41,13 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
                 _coreInitialized = true;
             }
         }
+    }
+
+    public LibVlcMediaPlayerAdapter() : this("--quiet", "--aout=wasapi") { }
+
+    public LibVlcMediaPlayerAdapter(params string[] vlcOptions)
+    {
+        EnsureCoreInitialized();
 
         _libVLC = new LibVLC(vlcOptions);
         _mediaPlayer = new MediaPlayer(_libVLC);
