@@ -46,6 +46,7 @@ public class PlayerUI
         _exitRequested = false;
 
         // Initialize audio player with timeout to avoid blocking the UI if LibVLC hangs.
+        _output.WriteLine("Connecting audio events...");
         var initTask = Task.Run(() =>
         {
             try { _playback.SubscribeToTrackEnd(() => _trackEnded = true); }
@@ -66,7 +67,6 @@ public class PlayerUI
                     _statusMessage = advanceResult.ErrorMessage;
             }
 
-            _onClear?.Invoke();
             await DisplayPlayerStateAsync();
 
             var raw = _input.ReadLine();
@@ -106,6 +106,7 @@ public class PlayerUI
         var message = _statusMessage;
         _statusMessage = null;
 
+        _onClear?.Invoke();
         Print.NewDisplay(
             _output,
             currentTrack,

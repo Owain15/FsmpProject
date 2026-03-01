@@ -127,6 +127,7 @@ public class AppStartup
         }
 
         // 5. Create orchestration services
+        _output.Write("Restoring session...");
         var activePlaylist = new ActivePlaylistService();
         var playlistService = new PlaylistService(unitOfWork);
 
@@ -137,13 +138,15 @@ public class AppStartup
         if (savedState != null)
             activePlaylist.RestoreState(savedState);
 
+        _output.WriteLine(" done.");
+
         IPlaybackController playback = new PlaybackController(audioService, activePlaylist, unitOfWork.Tracks);
         ILibraryBrowser browser = new LibraryBrowser(unitOfWork.Artists, unitOfWork.Albums, unitOfWork.Tracks);
         IPlaylistManager playlists = new PlaylistManager(playlistService, activePlaylist);
         ILibraryManager library = new LibraryManager(configService, scanService);
 
-        // 6. Clear startup messages and launch menu
-        _onClear?.Invoke();
+        // 6. Launch menu (startup messages stay visible until PlayerUI renders)
+        _output.WriteLine("Starting player...");
         var menu = new MenuSystem(playback, playlists, library, browser, _input, _output, _onClear);
         await menu.RunAsync();
 
