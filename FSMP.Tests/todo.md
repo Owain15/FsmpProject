@@ -24,10 +24,12 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `PlaybackHistoryTests.cs`, `LibraryPathTests.cs`, `ConfigurationTests.cs`
 - `PlaylistTests.cs`, `PlaylistTrackTests.cs`
 
-**Services/** (7 files, ~151 tests):
+**Services/** (11 files, ~212 tests):
 - `AudioServiceTests.cs`, `ConfigurationServiceTests.cs`, `MetadataServiceTests.cs`
 - `LibraryScanServiceTests.cs`, `PlaybackTrackingServiceTests.cs`, `StatisticsServiceTests.cs`
 - `PlaylistServiceTests.cs` (37 tests)
+- `PlaybackControllerTests.cs` (28 tests), `LibraryBrowserTests.cs` (12 tests)
+- `PlaylistManagerTests.cs` (11 tests), `LibraryManagerTests.cs` (10 tests)
 
 **Repositories/** (7 files, ~70 tests):
 - `RepositoryTests.cs`, `TrackRepositoryTests.cs`, `AlbumRepositoryTests.cs`
@@ -59,7 +61,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Dead code cleanup | **Tests**: 821 passing | **Overall Coverage**: 93.99%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor | **Tests**: 863 passing | **Overall Coverage**: 93.99%
 
 | Project | Coverage |
 |---------|----------|
@@ -101,6 +103,16 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - [x] PrintTests.cs — Updated with [L] Playlists and [D] Directories hotkey assertions
 - [x] Verify all existing tests still pass after refactor
 
+### Orchestration Service Refactor Tests
+
+- [x] `PlaybackControllerTests.cs` — 28 tests (constructor null guards, play/stop/next/prev/restart, repeat/shuffle, jump, queue items, auto-advance)
+- [x] `LibraryBrowserTests.cs` — 12 tests (all methods + error paths)
+- [x] `PlaylistManagerTests.cs` — 11 tests (CRUD + load into queue)
+- [x] `LibraryManagerTests.cs` — 10 tests (config, add/remove path, scan)
+- [x] Rewrote `PlayerUITests.cs` — Mocks orchestration interfaces instead of raw services
+- [x] Rewrote `BrowseUITests.cs` — Mocks ILibraryBrowser + IPlaybackController
+- [x] Rewrote `MenuSystemTests.cs` — Mocks 4 orchestration interfaces
+
 ### Cross-Platform Migration Tests (when migration begins)
 
 - [x] Create `FSMP.Tests/Core/` directory for FSMP.Core tests
@@ -112,5 +124,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature + Audio coverage improvement (52 new tests) + FSMO Slices 1-10 tests + Player bug fix tests
-**Next Action**: Update MenuSystemTests and PrintTests for UI restructure
+**Status**: Complete (v1) + Playlist feature + Audio coverage + FSMO tests + Orchestration refactor tests (61 new tests)
+**Next Action**: Cross-platform migration tests when ready

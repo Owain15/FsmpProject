@@ -64,18 +64,17 @@ public class AppStartup
     public async Task RunAsync()
     {
         _output.WriteLine("\nFSMP - File System Music Player\n\n");
-		//_output.WriteLine();
 
-		// 1. Load configuration
-		_output.WriteLine("Getting Config...");
-		var configPath = GetConfigPath();
+        // 1. Load configuration
+        _output.WriteLine("Getting Config...");
+        var configPath = GetConfigPath();
         var configService = new ConfigurationService(configPath);
         var config = await configService.LoadConfigurationAsync();
         _output.WriteLine($"Config loaded from: {configPath}");
 
-		// 2. Initialize database
-		_output.WriteLine($"Getting Data Source...");
-		var dbPath = GetDatabasePath(config);
+        // 2. Initialize database
+        _output.WriteLine($"Getting Data Source...");
+        var dbPath = GetDatabasePath(config);
         var dbDir = Path.GetDirectoryName(dbPath);
         if (!string.IsNullOrEmpty(dbDir))
             Directory.CreateDirectory(dbDir);
@@ -91,7 +90,6 @@ public class AppStartup
         using var unitOfWork = new UnitOfWork(context);
         var metadataService = new MetadataService();
         var scanService = new LibraryScanService(unitOfWork, metadataService);
-        var statsService = new StatisticsService(unitOfWork);
 
         using var services = new ServiceCollection()
             .AddSingleton<IAudioPlayerFactory, LibVlcAudioPlayerFactory>()
@@ -114,13 +112,18 @@ public class AppStartup
             _output.WriteLine($"Scan complete: {result.TracksAdded} added, {result.TracksUpdated} updated, {result.TracksRemoved} removed");
         }
 
-        // 5. Create playlist + player services
-        var playlistService = new PlaylistService(unitOfWork);
+        // 5. Create orchestration services
         var activePlaylist = new ActivePlaylistService();
+        var playlistService = new PlaylistService(unitOfWork);
+
+        IPlaybackController playback = new PlaybackController(audioService, activePlaylist, unitOfWork.Tracks);
+        ILibraryBrowser browser = new LibraryBrowser(unitOfWork.Artists, unitOfWork.Albums, unitOfWork.Tracks);
+        IPlaylistManager playlists = new PlaylistManager(playlistService, activePlaylist);
+        ILibraryManager library = new LibraryManager(configService, scanService);
 
         // 6. Clear startup messages and launch menu
         _onClear?.Invoke();
-        var menu = new MenuSystem(audioService, configService, statsService, scanService, unitOfWork, playlistService, activePlaylist, _input, _output, _onClear);
+        var menu = new MenuSystem(playback, playlists, library, browser, _input, _output, _onClear);
         await menu.RunAsync();
     }
 }

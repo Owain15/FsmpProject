@@ -1,171 +1,86 @@
 using FSMP.Core;
 using FSMP.Core.Interfaces;
+using FSMP.Core.Models;
 using FluentAssertions;
 using FsmpConsole;
-using FsmpDataAcsses;
-using FsmpDataAcsses.Services;
-using FSMP.Core.Models;
-using FSMP.Tests.TestHelpers;
-using FsmpLibrary.Services;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace FSMP.Tests.UI;
 
-public class MenuSystemTests : IDisposable
+public class MenuSystemTests
 {
-    private readonly FsmpDbContext _context;
-    private readonly UnitOfWork _unitOfWork;
-    private readonly Mock<IAudioService> _audioMock;
-    private readonly Mock<IMetadataService> _metadataMock;
-    private readonly string _configDir;
-    private readonly ConfigurationService _configService;
+    private readonly Mock<IPlaybackController> _playbackMock;
+    private readonly Mock<IPlaylistManager> _playlistsMock;
+    private readonly Mock<ILibraryManager> _libraryMock;
+    private readonly Mock<ILibraryBrowser> _browserMock;
 
     public MenuSystemTests()
     {
-        var options = new DbContextOptionsBuilder<FsmpDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-        _context = new FsmpDbContext(options);
-        _context.Database.EnsureCreated();
+        _playbackMock = new Mock<IPlaybackController>();
+        _playlistsMock = new Mock<IPlaylistManager>();
+        _libraryMock = new Mock<ILibraryManager>();
+        _browserMock = new Mock<ILibraryBrowser>();
 
-        _unitOfWork = new UnitOfWork(_context);
-        _audioMock = new Mock<IAudioService>();
-        _audioMock.Setup(a => a.Player).Returns(new MockAudioPlayer());
-        _metadataMock = new Mock<IMetadataService>();
-
-        _configDir = Path.Combine(Path.GetTempPath(), "FSMP_MenuTests", Guid.NewGuid().ToString());
-        Directory.CreateDirectory(_configDir);
-        _configService = new ConfigurationService(Path.Combine(_configDir, "config.json"));
+        // Default setups
+        _playbackMock.Setup(p => p.GetCurrentTrackAsync()).ReturnsAsync(Result.Success<Track?>(null));
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>())).ReturnsAsync(Result.Success(new List<QueueItem>()));
+        _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.None);
+        _playbackMock.Setup(p => p.IsShuffled).Returns(false);
+        _playbackMock.Setup(p => p.IsPlaying).Returns(false);
+        _playbackMock.Setup(p => p.QueueCount).Returns(0);
     }
-
-    public void Dispose()
-    {
-        _unitOfWork.Dispose();
-        if (Directory.Exists(_configDir))
-            Directory.Delete(_configDir, recursive: true);
-    }
-
-    // --- Helpers ---
 
     private (MenuSystem menu, StringWriter output) CreateMenuWithOutput(string inputLines)
     {
         var input = new StringReader(inputLines);
         var output = new StringWriter();
-        var statsService = new StatisticsService(_unitOfWork);
-        var scanService = new LibraryScanService(_unitOfWork, _metadataMock.Object);
-        var playlistService = new PlaylistService(_unitOfWork);
-        var activePlaylist = new ActivePlaylistService();
-
         var menu = new MenuSystem(
-            _audioMock.Object,
-            _configService,
-            statsService,
-            scanService,
-            _unitOfWork,
-            playlistService,
-            activePlaylist,
-            input,
-            output);
-
+            _playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object,
+            input, output);
         return (menu, output);
     }
 
     // ========== Constructor Tests ==========
 
     [Fact]
-    public void Constructor_WithNullAudioService_ShouldThrow()
+    public void Constructor_WithNullPlayback_ShouldThrow()
     {
-        var act = () => new MenuSystem(null!, _configService,
-            new StatisticsService(_unitOfWork),
-            new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
-            TextReader.Null, TextWriter.Null);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("audioService");
+        var act = () => new MenuSystem(null!, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("playback");
     }
 
     [Fact]
-    public void Constructor_WithNullConfigService_ShouldThrow()
+    public void Constructor_WithNullPlaylists_ShouldThrow()
     {
-        var act = () => new MenuSystem(_audioMock.Object, null!,
-            new StatisticsService(_unitOfWork),
-            new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
-            TextReader.Null, TextWriter.Null);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("configService");
+        var act = () => new MenuSystem(_playbackMock.Object, null!, _libraryMock.Object, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("playlists");
     }
 
     [Fact]
-    public void Constructor_WithNullScanService_ShouldThrow()
+    public void Constructor_WithNullLibrary_ShouldThrow()
     {
-        var act = () => new MenuSystem(_audioMock.Object, _configService,
-            new StatisticsService(_unitOfWork),
-            null!,
-            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
-            TextReader.Null, TextWriter.Null);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("scanService");
+        var act = () => new MenuSystem(_playbackMock.Object, _playlistsMock.Object, null!, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("library");
     }
 
     [Fact]
-    public void Constructor_WithNullUnitOfWork_ShouldThrow()
+    public void Constructor_WithNullBrowser_ShouldThrow()
     {
-        var act = () => new MenuSystem(_audioMock.Object, _configService,
-            new StatisticsService(_unitOfWork),
-            new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            null!, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
-            TextReader.Null, TextWriter.Null);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("unitOfWork");
-    }
-
-    [Fact]
-    public void Constructor_WithNullPlaylistService_ShouldThrow()
-    {
-        var act = () => new MenuSystem(_audioMock.Object, _configService,
-            new StatisticsService(_unitOfWork),
-            new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, null!, new ActivePlaylistService(),
-            TextReader.Null, TextWriter.Null);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("playlistService");
-    }
-
-    [Fact]
-    public void Constructor_WithNullActivePlaylist_ShouldThrow()
-    {
-        var act = () => new MenuSystem(_audioMock.Object, _configService,
-            new StatisticsService(_unitOfWork),
-            new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, new PlaylistService(_unitOfWork), null!,
-            TextReader.Null, TextWriter.Null);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("activePlaylist");
+        var act = () => new MenuSystem(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, null!, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("browser");
     }
 
     [Fact]
     public void Constructor_WithNullInput_ShouldThrow()
     {
-        var act = () => new MenuSystem(_audioMock.Object, _configService,
-            new StatisticsService(_unitOfWork),
-            new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
-            null!, TextWriter.Null);
-
+        var act = () => new MenuSystem(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, null!, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("input");
     }
 
     [Fact]
     public void Constructor_WithNullOutput_ShouldThrow()
     {
-        var act = () => new MenuSystem(_audioMock.Object, _configService,
-            new StatisticsService(_unitOfWork),
-            new LibraryScanService(_unitOfWork, _metadataMock.Object),
-            _unitOfWork, new PlaylistService(_unitOfWork), new ActivePlaylistService(),
-            TextReader.Null, null!);
-
+        var act = () => new MenuSystem(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, TextReader.Null, null!);
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
 

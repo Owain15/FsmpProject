@@ -16,13 +16,15 @@ Cross-platform business logic for playlist management, active playback queue, an
 - [x] Create `ActivePlaylistService.cs` (in-memory playlist queue with shuffle, repeat, next/prev)
 - [x] ActivePlaylistService tests (37 tests in FSMP.Tests/Core/)
 
+### Orchestration Service Refactor
+
+- [x] `Result.cs` and `Result<T>` with IsSuccess, Value, ErrorMessage
+- [x] `QueueItem.cs` display DTO
+- [x] `ScanResult.cs` moved from FsmpLibrary
+- [x] Data access interfaces: `ITrackRepository`, `IArtistRepository`, `IAlbumRepository`
+- [x] Service interfaces: `IPlaylistService`, `ILibraryScanService`, `IConfigurationService`
+- [x] Orchestration interfaces: `IPlaybackController`, `ILibraryBrowser`, `IPlaylistManager`, `ILibraryManager`
+
 ## Current Status
 
-**Status**: Complete (for current feature) | **Coverage**: -- | **Tests**: 37 passing
-
----
-
-## Progress Summary
-
-**Status**: All playlist-related FSMP.Core work complete
-**Next Action**: PlaylistRepository (Batch 9, FsmpDataAcsses)
+**Status**: Complete | **Coverage**: 99.53% | **Tests**: 37+ passing

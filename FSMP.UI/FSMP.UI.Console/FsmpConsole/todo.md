@@ -7,18 +7,18 @@ Interactive console application for FSMP, providing menu-driven access to librar
 ### Application Startup
 
 - `Program.cs` -- Entry point with top-level exception handling, delegating to AppStartup
-- `AppStartup.cs` -- Testable startup: loads config, initializes SQLite + EF migrations, wires DI (UnitOfWork, MetadataService, LibraryScanService, StatisticsService, AudioService), auto-scans on startup, launches MenuSystem
+- `AppStartup.cs` -- Testable startup: loads config, initializes SQLite + EF migrations, wires DI (orchestration services via FSMP.Core interfaces), auto-scans on startup, launches MenuSystem
 
 ### Menu System
 
-- `MenuSystem.cs` -- Main event loop with 8 options: Browse & Play, Player, Playlists, Scan Libraries, View Statistics, Manage Libraries, Settings, Exit
+- `MenuSystem.cs` -- Entry point that launches PlayerUI (4 orchestration deps: IPlaybackController, IPlaylistManager, ILibraryManager, ILibraryBrowser)
 
 ### UI Components
 
-- `BrowseUI.cs` -- Hierarchical Artist -> Album -> Track browser with track selection and playback
+- `BrowseUI.cs` -- Hierarchical Artist -> Album -> Track browser (2 deps: ILibraryBrowser, IPlaybackController)
 - `MetadataEditor.cs` -- Search tracks, display file metadata + custom overrides, edit CustomTitle/CustomArtist/CustomAlbum/Rating/IsFavorite/Comment with clear ("-") support
 - `StatisticsViewer.cs` -- Overview, most played, recently played, favorites, genre breakdown
-- `PlayerUI.cs` -- Music player view with queue display, playback controls (next/prev/pause/resume/stop/restart), repeat mode cycling, shuffle toggle
+- `PlayerUI.cs` -- Music player view with queue display, playback controls, sub-screens (4 deps: IPlaybackController, IPlaylistManager, ILibraryManager, ILibraryBrowser)
 - `Print.cs` -- Utilities: NewDisplay (player view), FormatTable, FormatProgressBar, FormatMetadataCard
 
 ## Current Status
@@ -78,6 +78,20 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ---
 
+## Orchestration Service Refactor
+
+**Status**: Complete
+
+- [x] PlayerUI refactored: 4 orchestration deps (IPlaybackController, IPlaylistManager, ILibraryManager, ILibraryBrowser) replacing 6+ raw services
+- [x] BrowseUI refactored: 2 deps (ILibraryBrowser, IPlaybackController) replacing UnitOfWork + raw services
+- [x] MenuSystem refactored: 4 orchestration deps replacing 10 params
+- [x] AppStartup updated: wires orchestration implementations, passes to MenuSystem
+- [x] No direct UnitOfWork usage in any UI file
+- [x] All UI error handling uses `result.IsSuccess` / `result.ErrorMessage`
+- [x] StatisticsService removed from main flow
+
+---
+
 ## Future Work
 
 ### Cross-Platform Migration (when Phase 8 begins)
@@ -91,5 +105,5 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist/Player UI integration (Batches 13-14 complete)
-**Next Action**: All playlist/player feature tests complete (Batches 15-16)
+**Status**: Complete (v1) + Playlist/Player UI + Orchestration refactor
+**Next Action**: Cross-platform migration when ready

@@ -1,7 +1,6 @@
 using FSMP.Core;
-using FsmpDataAcsses;
+using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
-using FsmpLibrary.Services;
 
 namespace FsmpConsole;
 
@@ -11,20 +10,18 @@ namespace FsmpConsole;
 /// </summary>
 public class BrowseUI
 {
-    private readonly UnitOfWork _unitOfWork;
-    private readonly IAudioService _audioService;
-    private readonly ActivePlaylistService _activePlaylist;
+    private readonly ILibraryBrowser _browser;
+    private readonly IPlaybackController _playback;
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action? _onClear;
     private string? _statusMessage;
     private bool _returnToMain;
 
-    public BrowseUI(UnitOfWork unitOfWork, IAudioService audioService, ActivePlaylistService activePlaylist, TextReader input, TextWriter output, Action? onClear = null)
+    public BrowseUI(ILibraryBrowser browser, IPlaybackController playback, TextReader input, TextWriter output, Action? onClear = null)
     {
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
-        _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));
+        _browser = browser ?? throw new ArgumentNullException(nameof(browser));
+        _playback = playback ?? throw new ArgumentNullException(nameof(playback));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _onClear = onClear;
@@ -47,7 +44,13 @@ public class BrowseUI
     {
         while (true)
         {
-            var artists = (await _unitOfWork.Artists.GetAllAsync()).ToList();
+            var artistsResult = await _browser.GetAllArtistsAsync();
+            if (!artistsResult.IsSuccess)
+            {
+                _output.WriteLine($"\nError: {artistsResult.ErrorMessage}");
+                return;
+            }
+            var artists = artistsResult.Value!;
 
             if (artists.Count == 0)
             {
@@ -76,17 +79,11 @@ public class BrowseUI
 
             if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
             {
-                var allTrackIds = new List<int>();
-                foreach (var artist in artists)
+                var trackIdsResult = await _browser.GetAllTrackIdsAsync();
+                if (trackIdsResult.IsSuccess && trackIdsResult.Value!.Count > 0)
                 {
-                    var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
-                    if (a?.Tracks != null)
-                        allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
-                }
-                if (allTrackIds.Count > 0)
-                {
-                    _activePlaylist.SetQueue(allTrackIds);
-                    _output.WriteLine($"  Set queue: {allTrackIds.Count} tracks.");
+                    _playback.SetQueue(trackIdsResult.Value);
+                    _output.WriteLine($"  Set queue: {trackIdsResult.Value.Count} tracks.");
                 }
                 else
                 {
@@ -98,17 +95,11 @@ public class BrowseUI
 
             if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
             {
-                var allTrackIds = new List<int>();
-                foreach (var artist in artists)
+                var trackIdsResult = await _browser.GetAllTrackIdsAsync();
+                if (trackIdsResult.IsSuccess && trackIdsResult.Value!.Count > 0)
                 {
-                    var a = await _unitOfWork.Artists.GetWithTracksAsync(artist.ArtistId);
-                    if (a?.Tracks != null)
-                        allTrackIds.AddRange(a.Tracks.Select(t => t.TrackId));
-                }
-                if (allTrackIds.Count > 0)
-                {
-                    AppendToQueue(allTrackIds);
-                    _output.WriteLine($"  Added {allTrackIds.Count} tracks to queue.");
+                    _playback.AppendToQueue(trackIdsResult.Value);
+                    _output.WriteLine($"  Added {trackIdsResult.Value.Count} tracks to queue.");
                 }
                 else
                 {
@@ -137,14 +128,16 @@ public class BrowseUI
     {
         while (true)
         {
-            var albums = (await _unitOfWork.Albums.GetByArtistAsync(artistId)).ToList();
-            var artist = await _unitOfWork.Artists.GetByIdAsync(artistId);
+            var albumsResult = await _browser.GetAlbumsByArtistAsync(artistId);
+            var artistResult = await _browser.GetArtistByIdAsync(artistId);
 
-            if (artist == null)
+            if (!artistResult.IsSuccess || artistResult.Value == null)
             {
                 _output.WriteLine("\nArtist not found.");
                 return;
             }
+            var artist = artistResult.Value;
+            var albums = albumsResult.IsSuccess ? albumsResult.Value! : new List<Album>();
 
             if (albums.Count == 0)
             {
@@ -182,11 +175,11 @@ public class BrowseUI
 
             if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
             {
-                var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
-                var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
+                var trackIdsResult = await _browser.GetAllTrackIdsByArtistAsync(artistId);
+                var trackIds = trackIdsResult.IsSuccess ? trackIdsResult.Value! : new List<int>();
                 if (trackIds.Count > 0)
                 {
-                    _activePlaylist.SetQueue(trackIds);
+                    _playback.SetQueue(trackIds);
                     _output.WriteLine($"  Set queue: {trackIds.Count} tracks by {artist.Name}.");
                 }
                 else
@@ -199,11 +192,11 @@ public class BrowseUI
 
             if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
             {
-                var artistWithTracks = await _unitOfWork.Artists.GetWithTracksAsync(artistId);
-                var trackIds = artistWithTracks?.Tracks?.Select(t => t.TrackId).ToList() ?? new List<int>();
+                var trackIdsResult = await _browser.GetAllTrackIdsByArtistAsync(artistId);
+                var trackIds = trackIdsResult.IsSuccess ? trackIdsResult.Value! : new List<int>();
                 if (trackIds.Count > 0)
                 {
-                    AppendToQueue(trackIds);
+                    _playback.AppendToQueue(trackIds);
                     _output.WriteLine($"  Added {trackIds.Count} tracks by {artist.Name} to queue.");
                 }
                 else
@@ -234,14 +227,14 @@ public class BrowseUI
     {
         while (true)
         {
-            var album = await _unitOfWork.Albums.GetWithTracksAsync(albumId);
+            var albumResult = await _browser.GetAlbumWithTracksAsync(albumId);
 
-            if (album == null)
+            if (!albumResult.IsSuccess || albumResult.Value == null)
             {
                 _output.WriteLine("Album not found.");
                 return;
             }
-
+            var album = albumResult.Value;
             var tracks = album.Tracks.ToList();
 
             if (tracks.Count == 0)
@@ -281,7 +274,7 @@ public class BrowseUI
             if (input.Equals("q", StringComparison.OrdinalIgnoreCase))
             {
                 var trackIds = tracks.Select(t => t.TrackId).ToList();
-                _activePlaylist.SetQueue(trackIds);
+                _playback.SetQueue(trackIds);
                 _output.WriteLine($"  Set queue: {trackIds.Count} tracks from {album.Title}.");
                 _returnToMain = true;
                 return;
@@ -290,7 +283,7 @@ public class BrowseUI
             if (input.Equals("a", StringComparison.OrdinalIgnoreCase))
             {
                 var trackIds = tracks.Select(t => t.TrackId).ToList();
-                AppendToQueue(trackIds);
+                _playback.AppendToQueue(trackIds);
                 _output.WriteLine($"  Added {trackIds.Count} tracks from {album.Title} to queue.");
                 _returnToMain = true;
                 return;
@@ -313,13 +306,13 @@ public class BrowseUI
     /// </summary>
     public async Task QueueTrackAsync(int trackId)
     {
-        var track = await _unitOfWork.Tracks.GetByIdAsync(trackId);
-
-        if (track == null)
+        var trackResult = await _browser.GetTrackByIdAsync(trackId);
+        if (!trackResult.IsSuccess || trackResult.Value == null)
         {
             _output.WriteLine("Track not found.");
             return;
         }
+        var track = trackResult.Value;
 
         var fields = new List<(string Label, string Value)>
         {
@@ -347,21 +340,18 @@ public class BrowseUI
 
         if (input?.Equals("q", StringComparison.OrdinalIgnoreCase) == true)
         {
-            _activePlaylist.SetQueue(new[] { track.TrackId });
+            _playback.SetQueue(new[] { track.TrackId });
             _output.WriteLine($"  Set queue: {track.DisplayTitle}.");
             _returnToMain = true;
         }
         else if (input?.Equals("a", StringComparison.OrdinalIgnoreCase) == true)
         {
-            AppendToQueue(new List<int> { track.TrackId });
+            _playback.AppendToQueue(new List<int> { track.TrackId });
             _output.WriteLine($"  Added {track.DisplayTitle} to queue.");
             _returnToMain = true;
         }
     }
 
-    /// <summary>
-    /// Writes the Q and A queue option lines to the output.
-    /// </summary>
     private void WriteQueueOptions(string description)
     {
         _output.WriteLine($"  Q) Play {description} now (replace queue)");
@@ -379,30 +369,5 @@ public class BrowseUI
     {
         WriteDivider();
         _output.Write("Select: ");
-    }
-
-    private void AppendToQueue(List<int> trackIds)
-    {
-        if (_activePlaylist.Count == 0)
-        {
-            _activePlaylist.SetQueue(trackIds);
-            return;
-        }
-
-        var currentQueue = _activePlaylist.PlayOrder.ToList();
-        var currentIdx = _activePlaylist.CurrentIndex;
-        var wasShuffled = _activePlaylist.IsShuffled;
-
-        foreach (var id in trackIds)
-        {
-            if (!currentQueue.Contains(id))
-                currentQueue.Add(id);
-        }
-
-        _activePlaylist.SetQueue(currentQueue);
-        if (currentIdx >= 0)
-            _activePlaylist.JumpTo(currentIdx);
-        if (wasShuffled)
-            _activePlaylist.ToggleShuffle();
     }
 }

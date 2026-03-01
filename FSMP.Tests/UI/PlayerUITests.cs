@@ -1,165 +1,84 @@
 using FSMP.Core;
 using FSMP.Core.Interfaces;
+using FSMP.Core.Models;
 using FluentAssertions;
 using FsmpConsole;
-using FsmpDataAcsses;
-using FsmpDataAcsses.Services;
-using FSMP.Core.Models;
-using FSMP.Tests.TestHelpers;
-using FsmpLibrary.Services;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace FSMP.Tests.UI;
 
-public class PlayerUITests : IDisposable
+public class PlayerUITests
 {
-    private readonly FsmpDbContext _context;
-    private readonly UnitOfWork _unitOfWork;
-    private readonly Mock<IAudioService> _audioMock;
-    private readonly MockAudioPlayer _mockPlayer;
-    private readonly Mock<IMetadataService> _metadataMock;
-    private readonly ActivePlaylistService _activePlaylist;
-    private readonly PlaylistService _playlistService;
-    private readonly ConfigurationService _configService;
-    private readonly LibraryScanService _scanService;
-    private readonly string _configDir;
+    private readonly Mock<IPlaybackController> _playbackMock;
+    private readonly Mock<IPlaylistManager> _playlistsMock;
+    private readonly Mock<ILibraryManager> _libraryMock;
+    private readonly Mock<ILibraryBrowser> _browserMock;
 
     public PlayerUITests()
     {
-        var options = new DbContextOptionsBuilder<FsmpDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-        _context = new FsmpDbContext(options);
-        _context.Database.EnsureCreated();
+        _playbackMock = new Mock<IPlaybackController>();
+        _playlistsMock = new Mock<IPlaylistManager>();
+        _libraryMock = new Mock<ILibraryManager>();
+        _browserMock = new Mock<ILibraryBrowser>();
 
-        _unitOfWork = new UnitOfWork(_context);
-        _audioMock = new Mock<IAudioService>();
-        _mockPlayer = new MockAudioPlayer();
-        _audioMock.Setup(a => a.Player).Returns(_mockPlayer);
-        _metadataMock = new Mock<IMetadataService>();
-        _activePlaylist = new ActivePlaylistService();
-        _playlistService = new PlaylistService(_unitOfWork);
-
-        _configDir = Path.Combine(Path.GetTempPath(), "FSMP_PlayerUITests", Guid.NewGuid().ToString());
-        Directory.CreateDirectory(_configDir);
-        _configService = new ConfigurationService(Path.Combine(_configDir, "config.json"));
-        _scanService = new LibraryScanService(_unitOfWork, _metadataMock.Object);
+        // Default setups
+        _playbackMock.Setup(p => p.GetCurrentTrackAsync()).ReturnsAsync(Result.Success<Track?>(null));
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>())).ReturnsAsync(Result.Success(new List<QueueItem>()));
+        _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.None);
+        _playbackMock.Setup(p => p.IsShuffled).Returns(false);
+        _playbackMock.Setup(p => p.IsPlaying).Returns(false);
+        _playbackMock.Setup(p => p.QueueCount).Returns(0);
     }
-
-    public void Dispose()
-    {
-        _unitOfWork.Dispose();
-        if (Directory.Exists(_configDir))
-            Directory.Delete(_configDir, recursive: true);
-    }
-
-    // --- Helpers ---
 
     private (PlayerUI player, StringWriter output) CreatePlayerWithOutput(string inputLines)
     {
         var input = new StringReader(inputLines);
         var output = new StringWriter();
-        var player = new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork,
-            _playlistService, _configService, _scanService, input, output);
+        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, input, output);
         return (player, output);
-    }
-
-    private async Task<Track> CreateTrackAsync(string title, string? artistName = null, string? albumTitle = null, TimeSpan? duration = null)
-    {
-        Artist? artist = null;
-        if (artistName != null)
-        {
-            artist = new Artist { Name = artistName, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
-            await _unitOfWork.Artists.AddAsync(artist);
-            await _unitOfWork.SaveAsync();
-        }
-
-        Album? album = null;
-        if (albumTitle != null)
-        {
-            album = new Album
-            {
-                Title = albumTitle,
-                ArtistId = artist?.ArtistId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-            };
-            await _unitOfWork.Albums.AddAsync(album);
-            await _unitOfWork.SaveAsync();
-        }
-
-        var track = new Track
-        {
-            Title = title,
-            FilePath = $@"C:\Music\{title}.mp3",
-            FileHash = Guid.NewGuid().ToString(),
-            ArtistId = artist?.ArtistId,
-            AlbumId = album?.AlbumId,
-            Duration = duration ?? TimeSpan.FromSeconds(200),
-            ImportedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        };
-        await _unitOfWork.Tracks.AddAsync(track);
-        await _unitOfWork.SaveAsync();
-        return track;
     }
 
     // ========== Constructor Tests ==========
 
     [Fact]
-    public void Constructor_WithNullActivePlaylist_ShouldThrow()
+    public void Constructor_WithNullPlayback_ShouldThrow()
     {
-        var act = () => new PlayerUI(null!, _audioMock.Object, _unitOfWork, _playlistService, _configService, _scanService, TextReader.Null, TextWriter.Null);
-        act.Should().Throw<ArgumentNullException>().WithParameterName("activePlaylist");
+        var act = () => new PlayerUI(null!, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("playback");
     }
 
     [Fact]
-    public void Constructor_WithNullAudioService_ShouldThrow()
+    public void Constructor_WithNullPlaylists_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, null!, _unitOfWork, _playlistService, _configService, _scanService, TextReader.Null, TextWriter.Null);
-        act.Should().Throw<ArgumentNullException>().WithParameterName("audioService");
+        var act = () => new PlayerUI(_playbackMock.Object, null!, _libraryMock.Object, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("playlists");
     }
 
     [Fact]
-    public void Constructor_WithNullUnitOfWork_ShouldThrow()
+    public void Constructor_WithNullLibrary_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, null!, _playlistService, _configService, _scanService, TextReader.Null, TextWriter.Null);
-        act.Should().Throw<ArgumentNullException>().WithParameterName("unitOfWork");
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, null!, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("library");
     }
 
     [Fact]
-    public void Constructor_WithNullPlaylistService_ShouldThrow()
+    public void Constructor_WithNullBrowser_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, null!, _configService, _scanService, TextReader.Null, TextWriter.Null);
-        act.Should().Throw<ArgumentNullException>().WithParameterName("playlistService");
-    }
-
-    [Fact]
-    public void Constructor_WithNullConfigService_ShouldThrow()
-    {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, null!, _scanService, TextReader.Null, TextWriter.Null);
-        act.Should().Throw<ArgumentNullException>().WithParameterName("configService");
-    }
-
-    [Fact]
-    public void Constructor_WithNullScanService_ShouldThrow()
-    {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, _configService, null!, TextReader.Null, TextWriter.Null);
-        act.Should().Throw<ArgumentNullException>().WithParameterName("scanService");
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, null!, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("browser");
     }
 
     [Fact]
     public void Constructor_WithNullInput_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, _configService, _scanService, null!, TextWriter.Null);
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, null!, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("input");
     }
 
     [Fact]
     public void Constructor_WithNullOutput_ShouldThrow()
     {
-        var act = () => new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork, _playlistService, _configService, _scanService, TextReader.Null, null!);
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, TextReader.Null, null!);
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
 
@@ -180,7 +99,6 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task RunAsync_EmptyInput_ShouldContinueLoop()
     {
-        // Empty line then X
         var (player, output) = CreatePlayerWithOutput("\nX\n");
 
         await player.RunAsync();
@@ -192,7 +110,6 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task RunAsync_LowercaseX_ShouldExit()
     {
-        // Input is uppercased, so "x" becomes "X"
         var (player, output) = CreatePlayerWithOutput("x\n");
 
         await player.RunAsync();
@@ -220,8 +137,15 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task DisplayPlayerStateAsync_WithTrack_ShouldShowTrackInfo()
     {
-        var track = await CreateTrackAsync("Kerala", "Bonobo", "Migration");
-        _activePlaylist.SetQueue(new[] { track.TrackId });
+        var track = new Track { TrackId = 1, Title = "Kerala", FilePath = "k.mp3", FileHash = "a",
+            Artist = new Artist { Name = "Bonobo" },
+            Album = new Album { Title = "Migration" } };
+        _playbackMock.Setup(p => p.GetCurrentTrackAsync()).ReturnsAsync(Result.Success<Track?>(track));
+        _playbackMock.Setup(p => p.QueueCount).Returns(1);
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>())).ReturnsAsync(Result.Success(new List<QueueItem>
+        {
+            new() { Index = 0, Title = "Kerala", Artist = "Bonobo", IsCurrent = true }
+        }));
 
         var (player, output) = CreatePlayerWithOutput("");
 
@@ -246,9 +170,12 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task DisplayPlayerStateAsync_WithQueue_ShouldShowQueueItems()
     {
-        var track1 = await CreateTrackAsync("Track1", "Artist1");
-        var track2 = await CreateTrackAsync("Track2", "Artist2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        _playbackMock.Setup(p => p.QueueCount).Returns(2);
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>())).ReturnsAsync(Result.Success(new List<QueueItem>
+        {
+            new() { Index = 0, Title = "Track1", Artist = "Artist1", IsCurrent = true },
+            new() { Index = 1, Title = "Track2", Artist = "Artist2", IsCurrent = false }
+        }));
 
         var (player, output) = CreatePlayerWithOutput("");
 
@@ -263,7 +190,7 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task DisplayPlayerStateAsync_ShouldShowRepeatModeNone()
     {
-        _activePlaylist.RepeatMode = RepeatMode.None;
+        _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.None);
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.DisplayPlayerStateAsync();
@@ -298,33 +225,26 @@ public class PlayerUITests : IDisposable
     // ========== HandleInputAsync — Next (N) ==========
 
     [Fact]
-    public async Task HandleInputAsync_Next_WithNextTrack_ShouldPlayNext()
+    public async Task HandleInputAsync_Next_ShouldCallNextTrackAsync()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        _playbackMock.Setup(p => p.NextTrackAsync()).ReturnsAsync(Result.Success());
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("N");
 
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.Is<Track>(t => t.TrackId == track2.TrackId),
-            It.IsAny<CancellationToken>()), Times.Once);
+        _playbackMock.Verify(p => p.NextTrackAsync(), Times.Once);
     }
 
     [Fact]
     public async Task HandleInputAsync_Next_AtEndNoRepeat_ShouldShowEndOfQueue()
     {
-        var track = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track.TrackId });
+        _playbackMock.Setup(p => p.NextTrackAsync()).ReturnsAsync(Result.Failure("End of queue."));
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("N");
-        _audioMock.Verify(a => a.StopAsync(), Times.Once);
 
-        // Feedback appears on next display cycle
         await player.DisplayPlayerStateAsync();
         output.ToString().Should().Contain("End of queue");
     }
@@ -332,6 +252,8 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task HandleInputAsync_Next_EmptyQueue_ShouldNotThrow()
     {
+        _playbackMock.Setup(p => p.NextTrackAsync()).ReturnsAsync(Result.Failure("End of queue."));
+
         var (player, output) = CreatePlayerWithOutput("");
 
         var act = async () => await player.HandleInputAsync("N");
@@ -339,72 +261,29 @@ public class PlayerUITests : IDisposable
         await act.Should().NotThrowAsync();
     }
 
-    [Fact]
-    public async Task HandleInputAsync_Next_RepeatOne_ShouldReplayCurrentTrack()
-    {
-        var track = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track.TrackId });
-        _activePlaylist.RepeatMode = RepeatMode.One;
-
-        var (player, output) = CreatePlayerWithOutput("");
-
-        await player.HandleInputAsync("N");
-
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.Is<Track>(t => t.TrackId == track.TrackId),
-            It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task HandleInputAsync_Next_RepeatAll_ShouldWrapAround()
-    {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
-        _activePlaylist.RepeatMode = RepeatMode.All;
-
-        // Move to last track
-        _activePlaylist.MoveNext();
-
-        var (player, output) = CreatePlayerWithOutput("");
-
-        await player.HandleInputAsync("N");
-
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.Is<Track>(t => t.TrackId == track1.TrackId),
-            It.IsAny<CancellationToken>()), Times.Once);
-    }
-
     // ========== HandleInputAsync — Previous (P) ==========
 
     [Fact]
-    public async Task HandleInputAsync_Previous_WithPreviousTrack_ShouldPlayPrevious()
+    public async Task HandleInputAsync_Previous_ShouldCallPreviousTrackAsync()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
-        _activePlaylist.MoveNext(); // move to track2
+        _playbackMock.Setup(p => p.PreviousTrackAsync()).ReturnsAsync(Result.Success());
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("P");
 
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.Is<Track>(t => t.TrackId == track1.TrackId),
-            It.IsAny<CancellationToken>()), Times.Once);
+        _playbackMock.Verify(p => p.PreviousTrackAsync(), Times.Once);
     }
 
     [Fact]
     public async Task HandleInputAsync_Previous_AtBeginning_ShouldShowBeginningOfQueue()
     {
-        var track = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track.TrackId });
+        _playbackMock.Setup(p => p.PreviousTrackAsync()).ReturnsAsync(Result.Failure("Beginning of queue."));
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("P");
 
-        // Feedback appears on next display cycle
         await player.DisplayPlayerStateAsync();
         output.ToString().Should().Contain("Beginning of queue");
     }
@@ -412,71 +291,55 @@ public class PlayerUITests : IDisposable
     // ========== HandleInputAsync — Play/Stop Toggle (K) ==========
 
     [Fact]
-    public async Task HandleInputAsync_K_WhenPlaying_ShouldStop()
+    public async Task HandleInputAsync_K_ShouldCallTogglePlayStopAsync()
     {
-        var track = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track.TrackId });
+        _playbackMock.Setup(p => p.TogglePlayStopAsync()).ReturnsAsync(Result.Success());
 
         var (player, output) = CreatePlayerWithOutput("");
 
-        // Simulate the player being in Playing state
-        await _mockPlayer.PlayAsync();
-        _audioMock.Setup(a => a.Player).Returns(_mockPlayer);
-
-        // Now K should stop
         await player.HandleInputAsync("K");
 
-        _audioMock.Verify(a => a.StopAsync(), Times.Once);
+        _playbackMock.Verify(p => p.TogglePlayStopAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task HandleInputAsync_K_WhenNotPlaying_WithCurrentTrack_ShouldPlayFromStart()
+    public async Task HandleInputAsync_K_WhenNotPlaying_NoCurrentTrack_ShouldShowError()
     {
-        var track = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track.TrackId });
+        _playbackMock.Setup(p => p.TogglePlayStopAsync()).ReturnsAsync(Result.Failure("No track selected."));
 
-        var (player, output) = CreatePlayerWithOutput("");
-
-        // K when not playing but has current track → play from start
-        await player.HandleInputAsync("K");
-
-        _audioMock.Verify(a => a.PlayTrackAsync(It.IsAny<Track>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task HandleInputAsync_K_WhenNotPlaying_NoCurrentTrack_ShouldDoNothing()
-    {
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("K");
 
-        _audioMock.Verify(a => a.PlayTrackAsync(It.IsAny<Track>()), Times.Never);
-        _audioMock.Verify(a => a.StopAsync(), Times.Never);
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("No track selected");
     }
 
     // ========== HandleInputAsync — Restart (R) ==========
 
     [Fact]
-    public async Task HandleInputAsync_Restart_WithCurrentTrack_ShouldSeekToZero()
+    public async Task HandleInputAsync_Restart_ShouldCallRestartTrackAsync()
     {
-        var track = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track.TrackId });
+        _playbackMock.Setup(p => p.RestartTrackAsync()).ReturnsAsync(Result.Success());
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("R");
 
-        _audioMock.Verify(a => a.SeekAsync(TimeSpan.Zero), Times.Once);
+        _playbackMock.Verify(p => p.RestartTrackAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task HandleInputAsync_Restart_NoCurrentTrack_ShouldDoNothing()
+    public async Task HandleInputAsync_Restart_NoCurrentTrack_ShouldShowError()
     {
+        _playbackMock.Setup(p => p.RestartTrackAsync()).ReturnsAsync(Result.Failure("No track selected."));
+
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("R");
 
-        _audioMock.Verify(a => a.SeekAsync(It.IsAny<TimeSpan>()), Times.Never);
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("No track selected");
     }
 
     // ========== HandleInputAsync — Stop (S) ==========
@@ -484,113 +347,82 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task HandleInputAsync_Stop_ShouldCallStopAsync()
     {
+        _playbackMock.Setup(p => p.StopAsync()).ReturnsAsync(Result.Success());
+
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("S");
 
-        _audioMock.Verify(a => a.StopAsync(), Times.Once);
+        _playbackMock.Verify(p => p.StopAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task HandleInputAsync_Stop_ShouldSetNotPlaying()
+    public async Task HandleInputAsync_Stop_ShouldShowStopped()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        _playbackMock.Setup(p => p.StopAsync()).ReturnsAsync(Result.Success());
 
         var (player, output) = CreatePlayerWithOutput("");
 
-        // Play next to set isPlaying = true
-        await player.HandleInputAsync("N");
-
-        // Stop
         await player.HandleInputAsync("S");
 
-        // Display state — should show Stopped
         await player.DisplayPlayerStateAsync();
-
         output.ToString().Should().Contain("Stopped");
     }
 
     // ========== HandleInputAsync — Repeat Mode (M) ==========
 
     [Fact]
-    public async Task HandleInputAsync_RepeatMode_ShouldCycleNoneToOne()
+    public async Task HandleInputAsync_RepeatMode_ShouldCallToggleRepeatMode()
     {
-        _activePlaylist.RepeatMode = RepeatMode.None;
+        _playbackMock.Setup(p => p.ToggleRepeatMode()).Returns(Result.Success());
+        _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.One);
+
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("M");
 
-        _activePlaylist.RepeatMode.Should().Be(RepeatMode.One);
-    }
-
-    [Fact]
-    public async Task HandleInputAsync_RepeatMode_ShouldCycleOneToAll()
-    {
-        _activePlaylist.RepeatMode = RepeatMode.One;
-        var (player, output) = CreatePlayerWithOutput("");
-
-        await player.HandleInputAsync("M");
-
-        _activePlaylist.RepeatMode.Should().Be(RepeatMode.All);
-    }
-
-    [Fact]
-    public async Task HandleInputAsync_RepeatMode_ShouldCycleAllToNone()
-    {
-        _activePlaylist.RepeatMode = RepeatMode.All;
-        var (player, output) = CreatePlayerWithOutput("");
-
-        await player.HandleInputAsync("M");
-
-        _activePlaylist.RepeatMode.Should().Be(RepeatMode.None);
+        _playbackMock.Verify(p => p.ToggleRepeatMode(), Times.Once);
     }
 
     // ========== HandleInputAsync — Shuffle (H) ==========
 
     [Fact]
-    public async Task HandleInputAsync_Shuffle_ShouldToggleShuffle()
+    public async Task HandleInputAsync_Shuffle_ShouldCallToggleShuffle()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
-
-        _activePlaylist.IsShuffled.Should().BeFalse();
+        _playbackMock.Setup(p => p.ToggleShuffle()).Returns(Result.Success());
+        _playbackMock.Setup(p => p.IsShuffled).Returns(true);
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("H");
 
-        _activePlaylist.IsShuffled.Should().BeTrue();
+        _playbackMock.Verify(p => p.ToggleShuffle(), Times.Once);
     }
 
     [Fact]
-    public async Task HandleInputAsync_Shuffle_TwiceShouldUnshuffle()
+    public async Task HandleInputAsync_Shuffle_EmptyQueue_ShouldShowError()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        _playbackMock.Setup(p => p.ToggleShuffle()).Returns(Result.Failure("No tracks in queue to shuffle."));
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("H");
-        await player.HandleInputAsync("H");
 
-        _activePlaylist.IsShuffled.Should().BeFalse();
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("No tracks in queue to shuffle");
     }
 
     // ========== HandleInputAsync — Unknown Command ==========
 
     [Fact]
-    public async Task HandleInputAsync_UnknownCommand_ShouldDoNothing()
+    public async Task HandleInputAsync_UnknownCommand_ShouldShowInvalidSelection()
     {
         var (player, output) = CreatePlayerWithOutput("");
 
-        var act = async () => await player.HandleInputAsync("Z");
+        await player.HandleInputAsync("Z");
 
-        await act.Should().NotThrowAsync();
-        _audioMock.VerifyNoOtherCalls();
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("Invalid selection");
     }
 
     // ========== Queue Display Tests ==========
@@ -598,26 +430,30 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task DisplayPlayerStateAsync_CurrentTrackHighlighted_ShouldShowArrow()
     {
-        var track1 = await CreateTrackAsync("First", "ArtistA");
-        var track2 = await CreateTrackAsync("Second", "ArtistB");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        _playbackMock.Setup(p => p.QueueCount).Returns(2);
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>())).ReturnsAsync(Result.Success(new List<QueueItem>
+        {
+            new() { Index = 0, Title = "First", Artist = "ArtistA", IsCurrent = true },
+            new() { Index = 1, Title = "Second", Artist = "ArtistB", IsCurrent = false }
+        }));
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.DisplayPlayerStateAsync();
 
         var text = output.ToString();
-        // Current track (index 0) should have "> " prefix
         text.Should().Contain("> 1) First");
-        // Other track should have "  " prefix
         text.Should().Contain("  2) Second");
     }
 
     [Fact]
     public async Task DisplayPlayerStateAsync_TrackWithDuration_ShouldShowDuration()
     {
-        var track = await CreateTrackAsync("Kerala", duration: TimeSpan.FromSeconds(195));
-        _activePlaylist.SetQueue(new[] { track.TrackId });
+        _playbackMock.Setup(p => p.QueueCount).Returns(1);
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>())).ReturnsAsync(Result.Success(new List<QueueItem>
+        {
+            new() { Index = 0, Title = "Kerala", Duration = TimeSpan.FromSeconds(195), IsCurrent = true }
+        }));
 
         var (player, output) = CreatePlayerWithOutput("");
 
@@ -629,7 +465,7 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task DisplayPlayerStateAsync_RepeatOne_ShouldShowInStatus()
     {
-        _activePlaylist.RepeatMode = RepeatMode.One;
+        _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.One);
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.DisplayPlayerStateAsync();
@@ -640,7 +476,7 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task DisplayPlayerStateAsync_RepeatAll_ShouldShowInStatus()
     {
-        _activePlaylist.RepeatMode = RepeatMode.All;
+        _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.All);
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.DisplayPlayerStateAsync();
@@ -651,10 +487,7 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task DisplayPlayerStateAsync_ShuffleOn_ShouldShowOn()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
-        _activePlaylist.ToggleShuffle();
+        _playbackMock.Setup(p => p.IsShuffled).Returns(true);
 
         var (player, output) = CreatePlayerWithOutput("");
 
@@ -668,47 +501,38 @@ public class PlayerUITests : IDisposable
     [Fact]
     public async Task HandleInputAsync_TrackNumber_ShouldJumpAndPlay()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        var track3 = await CreateTrackAsync("Track3");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId, track3.TrackId });
+        _playbackMock.Setup(p => p.QueueCount).Returns(3);
+        _playbackMock.Setup(p => p.JumpToAsync(2)).ReturnsAsync(Result.Success());
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("3");
 
-        _activePlaylist.CurrentIndex.Should().Be(2);
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.Is<Track>(t => t.TrackId == track3.TrackId),
-            It.IsAny<CancellationToken>()), Times.Once);
+        _playbackMock.Verify(p => p.JumpToAsync(2), Times.Once);
     }
 
     [Fact]
     public async Task HandleInputAsync_TrackNumber_Zero_ShouldNotJump()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track1.TrackId });
+        _playbackMock.Setup(p => p.QueueCount).Returns(1);
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("0");
 
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
+        _playbackMock.Verify(p => p.JumpToAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
     public async Task HandleInputAsync_TrackNumber_OutOfRange_ShouldNotJump()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track1.TrackId });
+        _playbackMock.Setup(p => p.QueueCount).Returns(1);
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("5");
 
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
+        _playbackMock.Verify(p => p.JumpToAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
@@ -718,90 +542,49 @@ public class PlayerUITests : IDisposable
 
         await player.HandleInputAsync("1");
 
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    // ========== PlayTrackByIdAsync — Null Track ==========
-
-    [Fact]
-    public async Task HandleInputAsync_Next_WithNonExistentTrack_ShouldShowNotFoundMessage()
-    {
-        // First track exists, second doesn't — MoveNext returns 9999
-        var track1 = await CreateTrackAsync("RealTrack");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, 9999 });
-
-        var (player, output) = CreatePlayerWithOutput("");
-
-        await player.HandleInputAsync("N");
-
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.IsAny<Track>(), It.IsAny<CancellationToken>()), Times.Never);
-
-        await player.DisplayPlayerStateAsync();
-        output.ToString().Should().Contain("Track 9999 not found in database.");
-    }
-
-    // ========== PlayTrackByIdAsync — Success Message ==========
-
-    [Fact]
-    public async Task HandleInputAsync_Next_SuccessfulPlay_ShouldShowNowPlayingMessage()
-    {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Kerala", "Bonobo");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
-
-        var (player, output) = CreatePlayerWithOutput("");
-
-        await player.HandleInputAsync("N");
-
-        await player.DisplayPlayerStateAsync();
-        output.ToString().Should().Contain("Now playing: Kerala");
+        _playbackMock.Verify(p => p.JumpToAsync(It.IsAny<int>()), Times.Never);
     }
 
     // ========== PlaybackCompleted — Auto-advance ==========
 
     [Fact]
-    public async Task RunAsync_PlaybackCompleted_ShouldAdvanceToNextTrack()
+    public async Task RunAsync_PlaybackCompleted_ShouldCallAutoAdvance()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        var track2 = await CreateTrackAsync("Track2");
-        _activePlaylist.SetQueue(new[] { track1.TrackId, track2.TrackId });
+        _playbackMock.Setup(p => p.AutoAdvanceAsync()).ReturnsAsync(Result.Success());
 
-        // Input: play track 1, then simulate completion (handled in loop), then exit
-        // We need to trigger PlaybackCompleted between loop iterations.
-        // Use a custom input reader that fires the event after the first read.
+        // Use a custom input reader that fires the track-ended callback after first read
         var inputSequence = new PlaybackCompletedInputReader(
             new[] { "1", "X" },
-            _mockPlayer,
+            _playbackMock,
             fireCompletedAfterRead: 0);
 
+        // Setup JumpToAsync for the "1" command
+        _playbackMock.Setup(p => p.QueueCount).Returns(2);
+        _playbackMock.Setup(p => p.JumpToAsync(0)).ReturnsAsync(Result.Success());
+
         var output = new StringWriter();
-        var player = new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork,
-            _playlistService, _configService, _scanService, inputSequence, output);
+        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, inputSequence, output);
 
         await player.RunAsync();
 
-        // Should have played track1 (from "1" input), then track2 (from auto-advance)
-        _audioMock.Verify(a => a.PlayTrackAsync(
-            It.Is<Track>(t => t.TrackId == track2.TrackId),
-            It.IsAny<CancellationToken>()), Times.Once);
+        _playbackMock.Verify(p => p.AutoAdvanceAsync(), Times.AtLeastOnce);
     }
 
     [Fact]
     public async Task RunAsync_PlaybackCompleted_AtEndOfQueue_ShouldShowEndMessage()
     {
-        var track1 = await CreateTrackAsync("Track1");
-        _activePlaylist.SetQueue(new[] { track1.TrackId });
+        _playbackMock.Setup(p => p.AutoAdvanceAsync()).ReturnsAsync(Result.Failure("End of queue."));
 
         var inputSequence = new PlaybackCompletedInputReader(
             new[] { "1", "X" },
-            _mockPlayer,
+            _playbackMock,
             fireCompletedAfterRead: 0);
 
+        _playbackMock.Setup(p => p.QueueCount).Returns(1);
+        _playbackMock.Setup(p => p.JumpToAsync(0)).ReturnsAsync(Result.Success());
+
         var output = new StringWriter();
-        var player = new PlayerUI(_activePlaylist, _audioMock.Object, _unitOfWork,
-            _playlistService, _configService, _scanService, inputSequence, output);
+        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, inputSequence, output);
 
         await player.RunAsync();
 
@@ -809,20 +592,25 @@ public class PlayerUITests : IDisposable
     }
 
     /// <summary>
-    /// Custom TextReader that fires PlaybackCompleted on the mock player after a specific ReadLine call.
+    /// Custom TextReader that triggers the SubscribeToTrackEnd callback after a specific ReadLine call.
     /// </summary>
     private class PlaybackCompletedInputReader : TextReader
     {
         private readonly string[] _lines;
-        private readonly MockAudioPlayer _player;
+        private readonly Mock<IPlaybackController> _playbackMock;
         private readonly int _fireAfterRead;
         private int _readCount;
+        private Action? _trackEndedCallback;
 
-        public PlaybackCompletedInputReader(string[] lines, MockAudioPlayer player, int fireCompletedAfterRead)
+        public PlaybackCompletedInputReader(string[] lines, Mock<IPlaybackController> playbackMock, int fireCompletedAfterRead)
         {
             _lines = lines;
-            _player = player;
+            _playbackMock = playbackMock;
             _fireAfterRead = fireCompletedAfterRead;
+
+            // Capture the callback when SubscribeToTrackEnd is called
+            _playbackMock.Setup(p => p.SubscribeToTrackEnd(It.IsAny<Action>()))
+                .Callback<Action>(callback => _trackEndedCallback = callback);
         }
 
         public override string? ReadLine()
@@ -836,7 +624,7 @@ public class PlayerUITests : IDisposable
 
             if (currentRead == _fireAfterRead)
             {
-                _player.SimulatePlaybackCompleted();
+                _trackEndedCallback?.Invoke();
             }
 
             return line;

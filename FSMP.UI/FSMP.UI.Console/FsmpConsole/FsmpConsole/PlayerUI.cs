@@ -1,9 +1,6 @@
 using FSMP.Core;
 using FSMP.Core.Interfaces;
-using FsmpDataAcsses;
-using FsmpDataAcsses.Services;
 using FSMP.Core.Models;
-using FsmpLibrary.Services;
 
 namespace FsmpConsole;
 
@@ -12,43 +9,34 @@ namespace FsmpConsole;
 /// </summary>
 public class PlayerUI
 {
-    private readonly ActivePlaylistService _activePlaylist;
-    private readonly IAudioService _audioService;
-    private readonly UnitOfWork _unitOfWork;
-    private readonly PlaylistService _playlistService;
-    private readonly ConfigurationService _configService;
-    private readonly LibraryScanService _scanService;
+    private readonly IPlaybackController _playback;
+    private readonly IPlaylistManager _playlists;
+    private readonly ILibraryManager _library;
+    private readonly ILibraryBrowser _browser;
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action? _onClear;
     private bool _exitRequested;
     private volatile bool _trackEnded;
     private string? _statusMessage;
-    private bool _playerEventSubscribed;
 
     public PlayerUI(
-        ActivePlaylistService activePlaylist,
-        IAudioService audioService,
-        UnitOfWork unitOfWork,
-        PlaylistService playlistService,
-        ConfigurationService configService,
-        LibraryScanService scanService,
+        IPlaybackController playback,
+        IPlaylistManager playlists,
+        ILibraryManager library,
+        ILibraryBrowser browser,
         TextReader input,
         TextWriter output,
         Action? onClear = null)
     {
-        _activePlaylist = activePlaylist ?? throw new ArgumentNullException(nameof(activePlaylist));
-        _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        _playlistService = playlistService ?? throw new ArgumentNullException(nameof(playlistService));
-        _configService = configService ?? throw new ArgumentNullException(nameof(configService));
-        _scanService = scanService ?? throw new ArgumentNullException(nameof(scanService));
+        _playback = playback ?? throw new ArgumentNullException(nameof(playback));
+        _playlists = playlists ?? throw new ArgumentNullException(nameof(playlists));
+        _library = library ?? throw new ArgumentNullException(nameof(library));
+        _browser = browser ?? throw new ArgumentNullException(nameof(browser));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _onClear = onClear;
     }
-
-    private bool IsPlaying => _audioService.Player.State == PlaybackState.Playing;
 
     /// <summary>
     /// Runs the player UI loop until the user chooses to go back.
@@ -60,7 +48,7 @@ public class PlayerUI
         // Initialize audio player with timeout to avoid blocking the UI if LibVLC hangs.
         var initTask = Task.Run(() =>
         {
-            try { EnsurePlayerEventSubscribed(); }
+            try { _playback.SubscribeToTrackEnd(() => _trackEnded = true); }
             catch { /* player init deferred to first play */ }
         });
         if (await Task.WhenAny(initTask, Task.Delay(TimeSpan.FromSeconds(5))) != initTask)
@@ -73,11 +61,9 @@ public class PlayerUI
             if (_trackEnded)
             {
                 _trackEnded = false;
-                var nextId = _activePlaylist.MoveNext();
-                if (nextId.HasValue)
-                    await PlayTrackByIdAsync(nextId.Value);
-                else
-                    _statusMessage = "End of queue.";
+                var advanceResult = await _playback.AutoAdvanceAsync();
+                if (!advanceResult.IsSuccess)
+                    _statusMessage = advanceResult.ErrorMessage;
             }
 
             _onClear?.Invoke();
@@ -99,18 +85,34 @@ public class PlayerUI
     /// </summary>
     public async Task DisplayPlayerStateAsync()
     {
-        var currentTrack = await GetCurrentTrackAsync();
-        var queueItems = await BuildQueueDisplayAsync();
+        var trackResult = await _playback.GetCurrentTrackAsync();
+        var currentTrack = trackResult.IsSuccess ? trackResult.Value : null;
+
+        var queueResult = await _playback.GetQueueItemsAsync();
+        var queueItems = new List<string>();
+        if (queueResult.IsSuccess && queueResult.Value != null)
+        {
+            foreach (var item in queueResult.Value)
+            {
+                var durationStr = item.Duration.HasValue
+                    ? $" [{item.Duration.Value.Minutes}:{item.Duration.Value.Seconds:D2}]"
+                    : "";
+                var prefix = item.IsCurrent ? "> " : "  ";
+                var artistSuffix = !string.IsNullOrEmpty(item.Artist) ? $" - {item.Artist}" : "";
+                queueItems.Add($"{prefix}{item.Index + 1}) {item.Title}{artistSuffix}{durationStr}");
+            }
+        }
+
         var message = _statusMessage;
         _statusMessage = null;
 
         Print.NewDisplay(
             _output,
             currentTrack,
-            IsPlaying,
+            _playback.IsPlaying,
             queueItems,
-            _activePlaylist.RepeatMode,
-            _activePlaylist.IsShuffled,
+            _playback.RepeatMode,
+            _playback.IsShuffled,
             message);
     }
 
@@ -122,25 +124,43 @@ public class PlayerUI
         switch (command)
         {
             case "N":
-                await NextTrackAsync();
+                var nextResult = await _playback.NextTrackAsync();
+                if (!nextResult.IsSuccess)
+                    _statusMessage = nextResult.ErrorMessage;
+                else
+                    _statusMessage = "Playing next track.";
                 break;
             case "P":
-                await PreviousTrackAsync();
+                var prevResult = await _playback.PreviousTrackAsync();
+                if (!prevResult.IsSuccess)
+                    _statusMessage = prevResult.ErrorMessage;
                 break;
             case "K":
-                await TogglePlayStopAsync();
+                var toggleResult = await _playback.TogglePlayStopAsync();
+                if (!toggleResult.IsSuccess)
+                    _statusMessage = toggleResult.ErrorMessage;
+                else
+                    _statusMessage = _playback.IsPlaying ? "Playing." : "Stopped.";
                 break;
             case "R":
-                await RestartTrackAsync();
+                var restartResult = await _playback.RestartTrackAsync();
+                if (!restartResult.IsSuccess)
+                    _statusMessage = restartResult.ErrorMessage;
                 break;
             case "S":
-                await StopAsync();
+                var stopResult = await _playback.StopAsync();
+                _statusMessage = stopResult.IsSuccess ? "Stopped." : stopResult.ErrorMessage;
                 break;
             case "M":
-                ToggleRepeatMode();
+                _playback.ToggleRepeatMode();
+                _statusMessage = $"Repeat: {_playback.RepeatMode}";
                 break;
             case "H":
-                ToggleShuffle();
+                var shuffleResult = _playback.ToggleShuffle();
+                if (!shuffleResult.IsSuccess)
+                    _statusMessage = shuffleResult.ErrorMessage;
+                else
+                    _statusMessage = _playback.IsShuffled ? "Shuffle: ON" : "Shuffle: OFF";
                 break;
             case "V":
                 await ViewFullQueueAsync();
@@ -163,10 +183,11 @@ public class PlayerUI
                 break;
             default:
                 if (int.TryParse(command, out var trackNum)
-                    && trackNum >= 1 && trackNum <= _activePlaylist.Count)
+                    && trackNum >= 1 && trackNum <= _playback.QueueCount)
                 {
-                    _activePlaylist.JumpTo(trackNum - 1);
-                    await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId!.Value);
+                    var jumpResult = await _playback.JumpToAsync(trackNum - 1);
+                    if (!jumpResult.IsSuccess)
+                        _statusMessage = jumpResult.ErrorMessage;
                 }
                 else
                 {
@@ -176,215 +197,52 @@ public class PlayerUI
         }
     }
 
-    private async Task NextTrackAsync()
-    {
-        var nextId = _activePlaylist.MoveNext();
-        if (nextId.HasValue)
-        {
-            await PlayTrackByIdAsync(nextId.Value);
-        }
-        else
-        {
-            await _audioService.StopAsync();
-            _statusMessage = "End of queue.";
-        }
-    }
-
-    private async Task PreviousTrackAsync()
-    {
-        var prevId = _activePlaylist.MovePrevious();
-        if (prevId.HasValue)
-        {
-            await PlayTrackByIdAsync(prevId.Value);
-        }
-        else
-        {
-            _statusMessage = "Beginning of queue.";
-        }
-    }
-
-    private async Task TogglePlayStopAsync()
-    {
-        if (IsPlaying)
-        {
-            await _audioService.StopAsync();
-            _statusMessage = "Stopped.";
-        }
-        else if (_activePlaylist.CurrentTrackId.HasValue)
-        {
-            await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
-            _statusMessage = "Playing.";
-        }
-    }
-
-    private async Task RestartTrackAsync()
-    {
-        if (_activePlaylist.CurrentTrackId.HasValue)
-        {
-            await _audioService.SeekAsync(TimeSpan.Zero);
-            await _audioService.ResumeAsync();
-        }
-    }
-
-    private async Task StopAsync()
-    {
-        await _audioService.StopAsync();
-        _statusMessage = "Stopped.";
-    }
-
-    private void ToggleRepeatMode()
-    {
-        _activePlaylist.RepeatMode = _activePlaylist.RepeatMode switch
-        {
-            RepeatMode.None => RepeatMode.One,
-            RepeatMode.One => RepeatMode.All,
-            RepeatMode.All => RepeatMode.None,
-            _ => RepeatMode.None
-        };
-        _statusMessage = $"Repeat: {_activePlaylist.RepeatMode}";
-    }
-
-    private void ToggleShuffle()
-    {
-        if (_activePlaylist.Count == 0)
-        {
-            _statusMessage = "No tracks in queue to shuffle.";
-            return;
-        }
-        _activePlaylist.ToggleShuffle();
-        _statusMessage = _activePlaylist.IsShuffled ? "Shuffle: ON" : "Shuffle: OFF";
-    }
-
-    private void EnsurePlayerEventSubscribed()
-    {
-        if (_playerEventSubscribed) return;
-        _playerEventSubscribed = true;
-        _audioService.Player.PlaybackCompleted += (s, e) =>
-        {
-            _trackEnded = true;
-        };
-    }
-
     private async Task AutoPlayIfQueuedAsync()
     {
-        if (!IsPlaying && _activePlaylist.CurrentTrackId.HasValue)
+        if (!_playback.IsPlaying && _playback.CurrentIndex >= 0 && _playback.QueueCount > 0)
         {
-            await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
+            await _playback.JumpToAsync(_playback.CurrentIndex);
         }
-    }
-
-    private async Task PlayTrackByIdAsync(int trackId)
-    {
-        var track = await _unitOfWork.Tracks.GetByIdAsync(trackId);
-        if (track == null)
-        {
-            _statusMessage = $"Track {trackId} not found in database.";
-            return;
-        }
-        try
-        {
-            await _audioService.PlayTrackAsync(track);
-            _statusMessage = $"Now playing: {track.DisplayTitle}";
-        }
-        catch (Exception ex)
-        {
-            _statusMessage = $"Playback error: {ex.Message}";
-        }
-    }
-
-    private async Task<Track?> GetCurrentTrackAsync()
-    {
-        var trackId = _activePlaylist.CurrentTrackId;
-        if (!trackId.HasValue) return null;
-        return await _unitOfWork.Tracks.GetByIdAsync(trackId.Value);
-    }
-
-    private async Task<List<string>> BuildQueueDisplayAsync(bool truncate = true)
-    {
-        var items = new List<string>();
-        var playOrder = _activePlaylist.PlayOrder;
-        var currentIndex = _activePlaylist.CurrentIndex;
-        const int maxVisible = 9;
-
-        var shouldTruncate = truncate && playOrder.Count > maxVisible + 1;
-
-        // Calculate the window of tracks to display
-        int startIndex = 0;
-        int endIndex = playOrder.Count;
-
-        if (shouldTruncate)
-        {
-            // Place current track in the middle 3 lines (positions 3-5 of 0-8)
-            // Target: currentIndex at display position 4 (middle)
-            startIndex = Math.Max(0, currentIndex - 4);
-            endIndex = startIndex + maxVisible;
-
-            // Clamp to end of list
-            if (endIndex > playOrder.Count)
-            {
-                endIndex = playOrder.Count;
-                startIndex = Math.Max(0, endIndex - maxVisible);
-            }
-        }
-
-        if (shouldTruncate && startIndex > 0)
-        {
-            items.Add($"  ... {startIndex} earlier");
-        }
-
-        for (int i = startIndex; i < endIndex; i++)
-        {
-            var track = await _unitOfWork.Tracks.GetByIdAsync(playOrder[i]);
-            var title = track?.DisplayTitle ?? "Unknown";
-            var artist = track?.DisplayArtist ?? "";
-            var duration = track?.Duration.HasValue == true
-                ? $" [{track.Duration.Value.Minutes}:{track.Duration.Value.Seconds:D2}]"
-                : "";
-
-            var prefix = i == currentIndex ? "> " : "  ";
-            var artistSuffix = !string.IsNullOrEmpty(artist) ? $" - {artist}" : "";
-            items.Add($"{prefix}{i + 1}) {title}{artistSuffix}{duration}");
-        }
-
-        if (shouldTruncate && endIndex < playOrder.Count)
-        {
-            var remaining = playOrder.Count - endIndex;
-            items.Add($"  ... {remaining} more — press [V] to view all");
-        }
-
-        return items;
     }
 
     private async Task ViewFullQueueAsync()
     {
-        var items = await BuildQueueDisplayAsync(truncate: false);
-        if (items.Count == 0)
+        var queueResult = await _playback.GetQueueItemsAsync(truncate: false);
+        if (!queueResult.IsSuccess || queueResult.Value == null || queueResult.Value.Count == 0)
         {
             _statusMessage = "Queue is empty.";
             return;
         }
 
         _output.WriteLine();
-        _output.WriteLine($"== Full Queue ({_activePlaylist.Count} tracks) ==");
+        _output.WriteLine($"== Full Queue ({_playback.QueueCount} tracks) ==");
         _output.WriteLine();
-        foreach (var item in items)
-            _output.WriteLine($"  {item}");
+        foreach (var item in queueResult.Value)
+        {
+            var durationStr = item.Duration.HasValue
+                ? $" [{item.Duration.Value.Minutes}:{item.Duration.Value.Seconds:D2}]"
+                : "";
+            var prefix = item.IsCurrent ? "> " : "  ";
+            var artistSuffix = !string.IsNullOrEmpty(item.Artist) ? $" - {item.Artist}" : "";
+            _output.WriteLine($"  {prefix}{item.Index + 1}) {item.Title}{artistSuffix}{durationStr}");
+        }
         _output.WriteLine();
         _output.WriteLine("  [#] Skip to track  [0] Back");
         _output.WriteLine();
         _output.Write("Select: ");
         var input = _input.ReadLine()?.Trim();
         if (int.TryParse(input, out var trackNum)
-            && trackNum >= 1 && trackNum <= _activePlaylist.Count)
+            && trackNum >= 1 && trackNum <= _playback.QueueCount)
         {
-            _activePlaylist.JumpTo(trackNum - 1);
-            await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId!.Value);
+            var jumpResult = await _playback.JumpToAsync(trackNum - 1);
+            if (!jumpResult.IsSuccess)
+                _statusMessage = jumpResult.ErrorMessage;
         }
     }
 
     private async Task BrowseAsync()
     {
-        var browseUI = new BrowseUI(_unitOfWork, _audioService, _activePlaylist, _input, _output, _onClear);
+        var browseUI = new BrowseUI(_browser, _playback, _input, _output, _onClear);
         await browseUI.RunAsync();
     }
 
@@ -392,8 +250,14 @@ public class PlayerUI
     {
         while (true)
         {
-            var playlists = (await _playlistService.GetAllPlaylistsAsync()).ToList();
+            var playlistsResult = await _playlists.GetAllPlaylistsAsync();
+            if (!playlistsResult.IsSuccess)
+            {
+                _output.WriteLine($"Error: {playlistsResult.ErrorMessage}");
+                return;
+            }
 
+            var playlists = playlistsResult.Value!;
             var items = playlists.Select(p =>
             {
                 var trackCount = p.PlaylistTracks?.Count ?? 0;
@@ -423,15 +287,11 @@ public class PlayerUI
                 {
                     _output.Write("Description (optional): ");
                     var desc = _input.ReadLine()?.Trim();
-                    try
-                    {
-                        var created = await _playlistService.CreatePlaylistAsync(name, string.IsNullOrEmpty(desc) ? null : desc);
-                        _output.WriteLine($"Created playlist: {created.Name}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _output.WriteLine($"Error creating playlist: {ex.Message}");
-                    }
+                    var createResult = await _playlists.CreatePlaylistAsync(name, string.IsNullOrEmpty(desc) ? null : desc);
+                    if (createResult.IsSuccess)
+                        _output.WriteLine($"Created playlist: {createResult.Value!.Name}");
+                    else
+                        _output.WriteLine($"Error creating playlist: {createResult.ErrorMessage}");
                 }
                 continue;
             }
@@ -451,13 +311,14 @@ public class PlayerUI
     {
         while (true)
         {
-            var playlist = await _playlistService.GetPlaylistWithTracksAsync(playlistId);
-            if (playlist == null)
+            var playlistResult = await _playlists.GetPlaylistWithTracksAsync(playlistId);
+            if (!playlistResult.IsSuccess || playlistResult.Value == null)
             {
                 _output.WriteLine("Playlist not found.");
                 return;
             }
 
+            var playlist = playlistResult.Value;
             var tracks = playlist.PlaylistTracks.OrderBy(pt => pt.Position).ToList();
 
             _output.WriteLine();
@@ -474,7 +335,8 @@ public class PlayerUI
             {
                 foreach (var pt in tracks)
                 {
-                    var track = await _unitOfWork.Tracks.GetByIdAsync(pt.TrackId);
+                    var trackResult = await _browser.GetTrackByIdAsync(pt.TrackId);
+                    var track = trackResult.IsSuccess ? trackResult.Value : null;
                     var title = track?.DisplayTitle ?? "Unknown";
                     var artist = track?.DisplayArtist ?? "";
                     var artistSuffix = !string.IsNullOrEmpty(artist) ? $" - {artist}" : "";
@@ -496,26 +358,18 @@ public class PlayerUI
             switch (input)
             {
                 case "l":
-                    if (tracks.Count > 0)
-                    {
-                        _activePlaylist.SetQueue(tracks.Select(pt => pt.TrackId).ToList());
+                    var loadResult = await _playlists.LoadPlaylistIntoQueueAsync(playlistId);
+                    if (loadResult.IsSuccess)
                         _output.WriteLine($"Loaded {tracks.Count} tracks into player queue.");
-                    }
                     else
-                    {
-                        _output.WriteLine("No tracks to load.");
-                    }
+                        _output.WriteLine(loadResult.ErrorMessage ?? "Error loading playlist.");
                     continue;
                 case "d":
-                    try
-                    {
-                        await _playlistService.DeletePlaylistAsync(playlistId);
+                    var deleteResult = await _playlists.DeletePlaylistAsync(playlistId);
+                    if (deleteResult.IsSuccess)
                         _output.WriteLine("Playlist deleted.");
-                    }
-                    catch (Exception ex)
-                    {
-                        _output.WriteLine($"Error deleting playlist: {ex.Message}");
-                    }
+                    else
+                        _output.WriteLine($"Error deleting playlist: {deleteResult.ErrorMessage}");
                     return; // playlist gone, back to list
                 default:
                     _output.WriteLine("Invalid selection.");
@@ -528,7 +382,13 @@ public class PlayerUI
     {
         while (true)
         {
-        var config = await _configService.LoadConfigurationAsync();
+        var configResult = await _library.LoadConfigurationAsync();
+        if (!configResult.IsSuccess)
+        {
+            _output.WriteLine($"Error: {configResult.ErrorMessage}");
+            return;
+        }
+        var config = configResult.Value!;
 
         _output.WriteLine();
         _output.WriteLine("== Library Paths ==");
@@ -561,15 +421,11 @@ public class PlayerUI
                 var newPath = _input.ReadLine()?.Trim();
                 if (!string.IsNullOrEmpty(newPath))
                 {
-                    if (!Directory.Exists(newPath))
-                    {
-                        _output.WriteLine($"Directory not found: {newPath}");
-                    }
-                    else
-                    {
-                        await _configService.AddLibraryPathAsync(newPath);
+                    var addResult = await _library.AddLibraryPathAsync(newPath);
+                    if (addResult.IsSuccess)
                         _output.WriteLine("Path added.");
-                    }
+                    else
+                        _output.WriteLine(addResult.ErrorMessage);
                 }
                 break;
             case "r":
@@ -578,27 +434,31 @@ public class PlayerUI
                 if (int.TryParse(removeInput, out var removeIndex)
                     && removeIndex >= 1 && removeIndex <= config.LibraryPaths.Count)
                 {
-                    await _configService.RemoveLibraryPathAsync(config.LibraryPaths[removeIndex - 1]);
-                    _output.WriteLine("Path removed.");
+                    var removeResult = await _library.RemoveLibraryPathAsync(config.LibraryPaths[removeIndex - 1]);
+                    if (removeResult.IsSuccess)
+                        _output.WriteLine("Path removed.");
+                    else
+                        _output.WriteLine(removeResult.ErrorMessage);
                 }
                 break;
             case "s":
-                if (config.LibraryPaths.Count == 0)
+                _output.WriteLine("Scanning libraries...");
+                var scanResult = await _library.ScanAllLibrariesAsync();
+                if (scanResult.IsSuccess)
                 {
-                    _output.WriteLine("No library paths configured.");
+                    var r = scanResult.Value!;
+                    _output.WriteLine($"Scan complete: {r.TracksAdded} added, {r.TracksUpdated} updated, {r.TracksRemoved} removed");
+                    if (r.Errors.Count > 0)
+                    {
+                        _output.WriteLine($"  {r.Errors.Count} error(s):");
+                        foreach (var error in r.Errors)
+                            _output.WriteLine($"    - {error}");
+                    }
+                    _output.WriteLine($"  Duration: {r.Duration.TotalSeconds:F1}s");
                 }
                 else
                 {
-                    _output.WriteLine("Scanning libraries...");
-                    var result = await _scanService.ScanAllLibrariesAsync(config.LibraryPaths);
-                    _output.WriteLine($"Scan complete: {result.TracksAdded} added, {result.TracksUpdated} updated, {result.TracksRemoved} removed");
-                    if (result.Errors.Count > 0)
-                    {
-                        _output.WriteLine($"  {result.Errors.Count} error(s):");
-                        foreach (var error in result.Errors)
-                            _output.WriteLine($"    - {error}");
-                    }
-                    _output.WriteLine($"  Duration: {result.Duration.TotalSeconds:F1}s");
+                    _output.WriteLine(scanResult.ErrorMessage);
                 }
                 break;
             default:

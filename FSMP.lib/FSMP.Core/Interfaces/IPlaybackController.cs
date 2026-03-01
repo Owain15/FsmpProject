@@ -23,6 +23,9 @@ public interface IPlaybackController
     Task<Result<Track?>> GetCurrentTrackAsync();
     Task<Result<List<QueueItem>>> GetQueueItemsAsync(bool truncate = true);
 
+    void SetQueue(IReadOnlyList<int> trackIds);
+    void AppendToQueue(List<int> trackIds);
+
     void SubscribeToTrackEnd(Action onTrackEnded);
     Task<Result> AutoAdvanceAsync();
 }

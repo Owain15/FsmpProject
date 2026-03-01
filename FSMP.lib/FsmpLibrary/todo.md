@@ -42,11 +42,18 @@ LibVLCSharp-based audio playback (replaced WMPLib COM interop), refactored with 
 - `IMetadataService.cs` / `MetadataService.cs` -- TagLibSharp metadata reading (title, artist, album, duration, album art, audio properties)
 - `TrackMetadata.cs` -- Metadata POCO
 - `AudioProperties.cs` -- Audio properties POCO (bit rate, sample rate, channels)
-- `ScanResult.cs` -- Library scan result POCO (tracks added/updated/removed, errors)
+- `ScanResult.cs` -- Library scan result POCO (moved to FSMP.Core.Models)
+
+### Orchestration Services (`Services/`)
+
+- `PlaybackController.cs` -- IPlaybackController implementation (play/pause/stop/next/prev/queue management)
+- `LibraryBrowser.cs` -- ILibraryBrowser implementation (artist/album/track hierarchy browsing)
+- `PlaylistManager.cs` -- IPlaylistManager implementation (playlist CRUD + load into queue)
+- `LibraryManager.cs` -- ILibraryManager implementation (config paths + scan libraries)
 
 ## Current Status
 
-**Status**: Complete (v1) | **Coverage**: 86.26% | **Tests**: see FSMP.Tests
+**Status**: Complete (v1 + orchestration refactor) | **Coverage**: 86.26% | **Tests**: see FSMP.Tests
 
 Coverage improved from 65.74% to 86.26% via adapter pattern refactor (IMediaPlayerAdapter) enabling unit testing of LibVlcAudioPlayer without LibVLC runtime.
 

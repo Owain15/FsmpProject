@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 93.99% | **Tests**: 821 passing | **Build**: Passing
+**Overall coverage**: 93.99% | **Tests**: 863 passing | **Build**: Passing
 
 ---
 
@@ -131,6 +131,23 @@ Replace the 8-option main menu with the Player screen as the primary UI. Navigat
 | 11 | [V] View full queue | **Complete** | PlayerUI.cs |
 | 12 | [#] Skip to track by number | **Complete** | PlayerUI.cs, Print.cs |
 | 13 | Skip-to-track tests (4 new tests) | **Complete** | PlayerUITests.cs |
+
+---
+
+## Orchestration Service Refactor
+
+**Status**: Complete | **Tests**: 863 passing
+
+Replaced the god-object PlayerUI (6+ raw service deps) with a clean orchestration layer:
+- `Result<T>` pattern for structured success/failure in FSMP.Core
+- 4 data access interfaces: `ITrackRepository`, `IArtistRepository`, `IAlbumRepository`, `IPlaylistService`, `ILibraryScanService`, `IConfigurationService`
+- 4 orchestration interfaces: `IPlaybackController`, `ILibraryBrowser`, `IPlaylistManager`, `ILibraryManager`
+- 4 implementations in FsmpLibrary wrapping calls in try/catch returning `Result<T>`
+- PlayerUI constructor: 4 orchestration deps (was 6 raw services + UnitOfWork)
+- BrowseUI constructor: 2 orchestration deps (was UnitOfWork + IAudioService + ActivePlaylistService)
+- No direct `UnitOfWork` usage in any UI file
+- All UI error handling uses `result.IsSuccess` / `result.ErrorMessage`
+- ScanResult moved to FSMP.Core.Models, QueueItem DTO added
 
 ---
 
