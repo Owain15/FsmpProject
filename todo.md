@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 93.99% | **Tests**: 864 passing | **Build**: Passing
+**Overall coverage**: 93.99% | **Tests**: 877 passing | **Build**: Passing
 
 ---
 
@@ -163,6 +163,24 @@ Audited all tests to ensure each tests one function with no unnecessary dependen
 - Fixed `TogglePlayStopAsync_StopsWhenPlaying` to use `SetState()` instead of calling `PlayAsync()`
 - Deleted redundant `AfterDispose_AllMethodsShouldThrowObjectDisposedException` (covered by individual tests)
 - Made `MockAudioPlayer.SetState()` public for direct state setup in tests
+
+---
+
+## Queue State Persistence
+
+**Status**: Complete | **Tests**: 13 new (877 total)
+
+Persist active queue (track order, position, shuffle, repeat mode) across sessions as JSON file alongside config.
+
+| # | Task | Status | Project |
+|---|------|--------|---------|
+| 1 | `QueueState` model | **Complete** | FSMP.Core |
+| 2 | `IQueueStateRepository` interface | **Complete** | FSMP.Core |
+| 3 | `GetState()` / `RestoreState()` on IActivePlaylistService | **Complete** | FSMP.Core |
+| 4 | `JsonQueueStateRepository` (atomic JSON file I/O) | **Complete** | FsmpDataAcsses |
+| 5 | AppStartup: restore on startup, save on shutdown | **Complete** | FsmpConsole |
+| 6 | State round-trip tests (8 tests) | **Complete** | FSMP.Tests |
+| 7 | Repository tests (5 tests) | **Complete** | FSMP.Tests |
 
 ---
 

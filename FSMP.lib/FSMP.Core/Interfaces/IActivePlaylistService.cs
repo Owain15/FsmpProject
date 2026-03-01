@@ -1,3 +1,5 @@
+using FSMP.Core.Models;
+
 namespace FSMP.Core.Interfaces;
 
 public interface IActivePlaylistService
@@ -17,4 +19,6 @@ public interface IActivePlaylistService
     int? MovePrevious();
     void JumpTo(int index);
     void ToggleShuffle();
+    QueueState GetState();
+    void RestoreState(QueueState state);
 }

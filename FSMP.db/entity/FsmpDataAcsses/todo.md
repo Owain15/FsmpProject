@@ -52,6 +52,15 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 ---
 
+## Queue State Persistence
+
+**Status**: Complete
+
+- [x] `JsonQueueStateRepository.cs` — implements `IQueueStateRepository`, persists QueueState as JSON to `%AppData%\FSMP\queue-state.json` with atomic writes (temp + rename)
+- [x] Tests: 5 tests in FSMP.Tests/Repositories/JsonQueueStateRepositoryTests.cs
+
+---
+
 ## Future Work
 
 ### Cross-Platform Migration (when Phase 1 begins)

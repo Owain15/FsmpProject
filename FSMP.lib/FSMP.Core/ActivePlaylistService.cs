@@ -1,4 +1,5 @@
 using FSMP.Core.Interfaces;
+using FSMP.Core.Models;
 
 namespace FSMP.Core;
 
@@ -128,6 +129,29 @@ public class ActivePlaylistService : IActivePlaylistService
                 $"Index {index} is out of range. Queue has {_playOrder.Count} items.");
 
         _currentIndex = index;
+    }
+
+    public QueueState GetState()
+    {
+        return new QueueState
+        {
+            OriginalOrder = new List<int>(_originalOrder),
+            PlayOrder = new List<int>(_playOrder),
+            CurrentIndex = _currentIndex,
+            RepeatMode = RepeatMode,
+            IsShuffled = _isShuffled
+        };
+    }
+
+    public void RestoreState(QueueState state)
+    {
+        _originalOrder = new List<int>(state.OriginalOrder);
+        _playOrder = new List<int>(state.PlayOrder);
+        _currentIndex = state.PlayOrder.Count > 0
+            ? Math.Clamp(state.CurrentIndex, 0, state.PlayOrder.Count - 1)
+            : -1;
+        RepeatMode = state.RepeatMode;
+        _isShuffled = state.IsShuffled;
     }
 
     public void ToggleShuffle()

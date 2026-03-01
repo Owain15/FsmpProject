@@ -25,6 +25,14 @@ Cross-platform business logic for playlist management, active playback queue, an
 - [x] Service interfaces: `IPlaylistService`, `ILibraryScanService`, `IConfigurationService`
 - [x] Orchestration interfaces: `IPlaybackController`, `ILibraryBrowser`, `IPlaylistManager`, `ILibraryManager`
 
+### Queue State Persistence
+
+- [x] Create `QueueState.cs` model (OriginalOrder, PlayOrder, CurrentIndex, RepeatMode, IsShuffled)
+- [x] Create `IQueueStateRepository.cs` interface (LoadAsync, SaveAsync)
+- [x] Add `GetState()` / `RestoreState(QueueState)` to `IActivePlaylistService`
+- [x] Implement GetState/RestoreState in `ActivePlaylistService`
+- [x] Tests: 8 round-trip state tests in FSMP.Tests/Core/ActivePlaylistServiceStateTests.cs
+
 ## Current Status
 
-**Status**: Complete | **Coverage**: 99.53% | **Tests**: 37+ passing
+**Status**: Complete | **Coverage**: 99.53% | **Tests**: 45+ passing

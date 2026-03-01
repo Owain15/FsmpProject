@@ -1,5 +1,6 @@
 using FSMP.Core;
 using FsmpDataAcsses;
+using FsmpDataAcsses.Repositories;
 using FsmpDataAcsses.Services;
 using FsmpLibrary.Audio;
 using FSMP.Core.Interfaces;
@@ -129,6 +130,13 @@ public class AppStartup
         var activePlaylist = new ActivePlaylistService();
         var playlistService = new PlaylistService(unitOfWork);
 
+        // 5b. Restore queue state from previous session
+        var queueStatePath = Path.Combine(Path.GetDirectoryName(configPath)!, "queue-state.json");
+        var queueStateRepo = new JsonQueueStateRepository(queueStatePath);
+        var savedState = await queueStateRepo.LoadAsync();
+        if (savedState != null)
+            activePlaylist.RestoreState(savedState);
+
         IPlaybackController playback = new PlaybackController(audioService, activePlaylist, unitOfWork.Tracks);
         ILibraryBrowser browser = new LibraryBrowser(unitOfWork.Artists, unitOfWork.Albums, unitOfWork.Tracks);
         IPlaylistManager playlists = new PlaylistManager(playlistService, activePlaylist);
@@ -138,5 +146,8 @@ public class AppStartup
         _onClear?.Invoke();
         var menu = new MenuSystem(playback, playlists, library, browser, _input, _output, _onClear);
         await menu.RunAsync();
+
+        // 7. Save queue state on shutdown
+        await queueStateRepo.SaveAsync(activePlaylist.GetState());
     }
 }

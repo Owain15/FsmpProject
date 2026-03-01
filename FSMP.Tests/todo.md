@@ -31,10 +31,11 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `PlaybackControllerTests.cs` (30 tests — split ToggleRepeatMode into 3, mocked IActivePlaylistService), `LibraryBrowserTests.cs` (12 tests)
 - `PlaylistManagerTests.cs` (11 tests — mocked IActivePlaylistService), `LibraryManagerTests.cs` (10 tests)
 
-**Repositories/** (7 files, ~70 tests):
+**Repositories/** (8 files, ~75 tests):
 - `RepositoryTests.cs`, `TrackRepositoryTests.cs`, `AlbumRepositoryTests.cs`
 - `ArtistRepositoryTests.cs`, `PlaybackHistoryRepositoryTests.cs`, `UnitOfWorkTests.cs`
 - `PlaylistRepositoryTests.cs` (14 tests)
+- `JsonQueueStateRepositoryTests.cs` (5 tests)
 
 **Database/** (3 files, ~48 tests):
 - `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs` (20 tests incl. Playlist/PlaylistTrack config), `MigrationTests.cs`
@@ -50,8 +51,9 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `LibVlcAudioPlayerTests.cs` (49 tests) -- Constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, dispose (removed redundant multi-method dispose test)
 - `LibVlcAudioPlayerFactoryTests.cs` (2 tests) -- Factory with adapter injection
 
-**Core/** (1 file, 37 tests):
+**Core/** (2 files, 45 tests):
 - `ActivePlaylistServiceTests.cs` -- RepeatMode, shuffle, queue navigation
+- `ActivePlaylistServiceStateTests.cs` -- GetState/RestoreState round-trips (8 tests)
 
 **Integration/** (1 file, 12 tests):
 - `EndToEndTests.cs` -- Full-stack E2E workflows with real SQLite
@@ -61,7 +63,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit | **Tests**: 864 passing | **Overall Coverage**: 93.99%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit + Queue state persistence | **Tests**: 877 passing | **Overall Coverage**: 93.99%
 
 | Project | Coverage |
 |---------|----------|

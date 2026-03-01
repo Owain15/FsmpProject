@@ -92,6 +92,14 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ---
 
+## Queue State Persistence
+
+**Status**: Complete
+
+- [x] `AppStartup.cs` — Restore queue state on startup (after creating ActivePlaylistService), save on shutdown (after menu loop exits)
+
+---
+
 ## Future Work
 
 ### Cross-Platform Migration (when Phase 8 begins)
