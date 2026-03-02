@@ -194,13 +194,14 @@ public class AudioServiceTests
     }
 
     [Fact]
-    public async Task ResumeAsync_ShouldCallPlayerPlay()
+    public async Task ResumeAsync_ShouldCallPlayerResume()
     {
         // Act
         await _service.ResumeAsync();
 
         // Assert
-        _mockPlayer.PlayCallCount.Should().Be(1);
+        _mockPlayer.ResumeCallCount.Should().Be(1);
+        _mockPlayer.PlayCallCount.Should().Be(0);
     }
 
     [Fact]

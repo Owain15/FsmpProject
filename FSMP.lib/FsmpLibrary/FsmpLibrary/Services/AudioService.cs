@@ -126,7 +126,7 @@ public class AudioService : IAudioService
     public Task PauseAsync() => Player.PauseAsync();
 
     /// <inheritdoc/>
-    public Task ResumeAsync() => Player.PlayAsync();
+    public Task ResumeAsync() => Player.ResumeAsync();
 
     /// <inheritdoc/>
     public Task StopAsync() => Player.StopAsync();

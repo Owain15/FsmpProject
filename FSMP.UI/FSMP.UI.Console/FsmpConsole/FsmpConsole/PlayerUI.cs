@@ -85,32 +85,41 @@ public class PlayerUI
     /// </summary>
     public async Task DisplayPlayerStateAsync()
     {
-        var trackResult = await _playback.GetCurrentTrackAsync();
-        var currentTrack = trackResult.IsSuccess ? trackResult.Value : null;
-
-        var queueResult = await _playback.GetQueueItemsAsync();
+        Track? currentTrack = null;
         var queueItems = new List<string>();
-        if (queueResult.IsSuccess && queueResult.Value != null)
-        {
-            foreach (var item in queueResult.Value)
-            {
-                var durationStr = item.Duration.HasValue
-                    ? $" [{item.Duration.Value.Minutes}:{item.Duration.Value.Seconds:D2}]"
-                    : "";
-                var prefix = item.IsCurrent ? "> " : "  ";
-                var artistSuffix = !string.IsNullOrEmpty(item.Artist) ? $" - {item.Artist}" : "";
-                queueItems.Add($"{prefix}{item.Index + 1}) {item.Title}{artistSuffix}{durationStr}");
-            }
-        }
-
         var message = _statusMessage;
         _statusMessage = null;
+
+        try
+        {
+            var trackResult = await _playback.GetCurrentTrackAsync();
+            currentTrack = trackResult.IsSuccess ? trackResult.Value : null;
+
+            var queueResult = await _playback.GetQueueItemsAsync();
+            if (queueResult.IsSuccess && queueResult.Value != null)
+            {
+                foreach (var item in queueResult.Value)
+                {
+                    var durationStr = item.Duration.HasValue
+                        ? $" [{item.Duration.Value.Minutes}:{item.Duration.Value.Seconds:D2}]"
+                        : "";
+                    var prefix = item.IsCurrent ? "> " : "  ";
+                    var artistSuffix = !string.IsNullOrEmpty(item.Artist) ? $" - {item.Artist}" : "";
+                    queueItems.Add($"{prefix}{item.Index + 1}) {item.Title}{artistSuffix}{durationStr}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            message ??= $"Display error: {ex.Message}";
+        }
 
         _onClear?.Invoke();
         Print.NewDisplay(
             _output,
             currentTrack,
             _playback.IsPlaying,
+            _playback.IsPaused,
             queueItems,
             _playback.RepeatMode,
             _playback.IsShuffled,
@@ -137,11 +146,12 @@ public class PlayerUI
                     _statusMessage = prevResult.ErrorMessage;
                 break;
             case "K":
-                var toggleResult = await _playback.TogglePlayStopAsync();
+                var wasPaused = _playback.IsPaused;
+                var toggleResult = await _playback.TogglePauseAsync();
                 if (!toggleResult.IsSuccess)
                     _statusMessage = toggleResult.ErrorMessage;
                 else
-                    _statusMessage = _playback.IsPlaying ? "Playing." : "Stopped.";
+                    _statusMessage = wasPaused ? "Resumed." : (_playback.IsPlaying ? "Playing." : "Paused.");
                 break;
             case "R":
                 var restartResult = await _playback.RestartTrackAsync();

@@ -79,7 +79,45 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
         return _mediaPlayer.Play();
     }
     public void Pause() => _mediaPlayer.Pause();
+    public void Resume() => _mediaPlayer.SetPause(false);
     public void Stop() => _mediaPlayer.Stop();
+
+    public async Task PlayAndWaitAsync(CancellationToken cancellationToken = default)
+    {
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        void OnPlaying(object? s, EventArgs e) => tcs.TrySetResult();
+        void OnError(object? s, EventArgs e) => tcs.TrySetException(
+            new InvalidOperationException("LibVLC encountered a playback error."));
+
+        _mediaPlayer.Playing += OnPlaying;
+        _mediaPlayer.EncounteredError += OnError;
+
+        try
+        {
+            // Only assign media when starting from scratch; skip for resume from pause
+            if (_mediaPlayer.Media != _currentMedia)
+                _mediaPlayer.Media = _currentMedia;
+
+            if (!_mediaPlayer.Play())
+                throw new InvalidOperationException("LibVLC failed to start playback.");
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(5));
+            cts.Token.Register(() => tcs.TrySetCanceled(cts.Token));
+
+            await tcs.Task.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            // Timeout — Playing event didn't fire within 5s, proceed anyway
+        }
+        finally
+        {
+            _mediaPlayer.Playing -= OnPlaying;
+            _mediaPlayer.EncounteredError -= OnError;
+        }
+    }
 
     public async Task StopAndWaitAsync(CancellationToken cancellationToken = default)
     {

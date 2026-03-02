@@ -239,14 +239,14 @@ public class PrintTests
     [Fact]
     public void NewDisplay_NullOutput_ShouldThrow()
     {
-        var act = () => Print.NewDisplay(null!, null, false, new List<string>(), RepeatMode.None, false);
+        var act = () => Print.NewDisplay(null!, null, false, false, new List<string>(), RepeatMode.None, false);
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
 
     [Fact]
     public void NewDisplay_NullQueueItems_ShouldThrow()
     {
-        var act = () => Print.NewDisplay(new StringWriter(), null, false, null!, RepeatMode.None, false);
+        var act = () => Print.NewDisplay(new StringWriter(), null, false, false, null!, RepeatMode.None, false);
         act.Should().Throw<ArgumentNullException>().WithParameterName("queueItems");
     }
 
@@ -261,7 +261,7 @@ public class PrintTests
             Album = new Album { Title = "Migration" },
         };
 
-        Print.NewDisplay(output, track, true, new List<string>(), RepeatMode.None, false);
+        Print.NewDisplay(output, track, true, false, new List<string>(), RepeatMode.None, false);
 
         var text = output.ToString();
         text.Should().Contain("Kerala");
@@ -274,7 +274,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, false);
 
         output.ToString().Should().Contain("(none)");
     }
@@ -284,7 +284,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, true, new List<string>(), RepeatMode.None, false);
+        Print.NewDisplay(output, null, true, false, new List<string>(), RepeatMode.None, false);
 
         output.ToString().Should().Contain("Playing");
     }
@@ -294,7 +294,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, false);
 
         output.ToString().Should().Contain("Stopped");
     }
@@ -304,7 +304,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.One, false);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.One, false);
 
         output.ToString().Should().Contain("Repeat: One");
     }
@@ -314,7 +314,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.All, false);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.All, false);
 
         output.ToString().Should().Contain("Repeat: All");
     }
@@ -324,7 +324,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, true);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, true);
 
         output.ToString().Should().Contain("Shuffle: On");
     }
@@ -334,7 +334,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, false);
 
         output.ToString().Should().Contain("Shuffle: Off");
     }
@@ -344,7 +344,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, false);
 
         output.ToString().Should().Contain("Queue: (empty)");
     }
@@ -355,7 +355,7 @@ public class PrintTests
         var output = new StringWriter();
         var queue = new List<string> { "> 1) Kerala - Bonobo [3:20]", "  2) Cirrus - Bonobo [4:15]" };
 
-        Print.NewDisplay(output, null, false, queue, RepeatMode.None, false);
+        Print.NewDisplay(output, null, false, false, queue, RepeatMode.None, false);
 
         var text = output.ToString();
         text.Should().Contain("Queue (2 tracks):");
@@ -368,7 +368,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false, "Path added.");
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, false, "Path added.");
 
         output.ToString().Should().Contain("Path added.");
     }
@@ -378,7 +378,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false, null);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, false, null);
 
         // Should still work normally
         output.ToString().Should().Contain("Queue: (empty)");
@@ -389,7 +389,7 @@ public class PrintTests
     {
         var output = new StringWriter();
 
-        Print.NewDisplay(output, null, false, new List<string>(), RepeatMode.None, false);
+        Print.NewDisplay(output, null, false, false, new List<string>(), RepeatMode.None, false);
 
         var text = output.ToString();
         text.Should().Contain("[N] Next");

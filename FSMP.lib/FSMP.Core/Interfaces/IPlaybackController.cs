@@ -5,6 +5,7 @@ namespace FSMP.Core.Interfaces;
 public interface IPlaybackController
 {
     bool IsPlaying { get; }
+    bool IsPaused { get; }
     RepeatMode RepeatMode { get; }
     bool IsShuffled { get; }
     int QueueCount { get; }
@@ -13,7 +14,7 @@ public interface IPlaybackController
     Task<Result> PlayTrackByIdAsync(int trackId);
     Task<Result> NextTrackAsync();
     Task<Result> PreviousTrackAsync();
-    Task<Result> TogglePlayStopAsync();
+    Task<Result> TogglePauseAsync();
     Task<Result> RestartTrackAsync();
     Task<Result> StopAsync();
     Result ToggleRepeatMode();

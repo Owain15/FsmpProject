@@ -22,6 +22,7 @@ public class PlaybackController : IPlaybackController
     }
 
     public bool IsPlaying => _audioService.Player.State == PlaybackState.Playing;
+    public bool IsPaused => _audioService.Player.State == PlaybackState.Paused;
     public RepeatMode RepeatMode => _activePlaylist.RepeatMode;
     public bool IsShuffled => _activePlaylist.IsShuffled;
     public int QueueCount => _activePlaylist.Count;
@@ -63,20 +64,24 @@ public class PlaybackController : IPlaybackController
         return Result.Failure("Beginning of queue.");
     }
 
-    public async Task<Result> TogglePlayStopAsync()
+    public async Task<Result> TogglePauseAsync()
     {
         try
         {
             if (IsPlaying)
             {
-                await _audioService.StopAsync();
+                await _audioService.PauseAsync();
+                return Result.Success();
+            }
+
+            if (IsPaused)
+            {
+                await _audioService.ResumeAsync();
                 return Result.Success();
             }
 
             if (_activePlaylist.CurrentTrackId.HasValue)
-            {
                 return await PlayTrackByIdAsync(_activePlaylist.CurrentTrackId.Value);
-            }
 
             return Result.Failure("No track selected.");
         }

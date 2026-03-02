@@ -10,6 +10,7 @@ public class MockMediaPlayerAdapter : IMediaPlayerAdapter
     // Call tracking
     public int PlayCallCount { get; private set; }
     public int PauseCallCount { get; private set; }
+    public int ResumeCallCount { get; private set; }
     public int StopCallCount { get; private set; }
     public int LoadCallCount { get; private set; }
     public int SetMediaCallCount { get; private set; }
@@ -49,9 +50,21 @@ public class MockMediaPlayerAdapter : IMediaPlayerAdapter
         PauseCallCount++;
     }
 
+    public void Resume()
+    {
+        ResumeCallCount++;
+    }
+
     public void Stop()
     {
         StopCallCount++;
+    }
+
+    public Task PlayAndWaitAsync(CancellationToken cancellationToken = default)
+    {
+        Play();
+        SimulatePlaying();
+        return Task.CompletedTask;
     }
 
     public Task StopAndWaitAsync(CancellationToken cancellationToken = default)

@@ -16,6 +16,7 @@ namespace FsmpConsole
 			TextWriter output,
 			Track? currentTrack,
 			bool isPlaying,
+			bool isPaused,
 			IList<string> queueItems,
 			RepeatMode repeatMode,
 			bool shuffleEnabled,
@@ -36,7 +37,7 @@ namespace FsmpConsole
 			var trackTitle = currentTrack?.DisplayTitle ?? "(none)";
 			var artist = currentTrack?.DisplayArtist ?? "";
 			var album = currentTrack?.DisplayAlbum ?? "";
-			var status = isPlaying ? "Playing" : "Stopped";
+			var status = isPlaying ? "Playing" : isPaused ? "Paused" : "Stopped";
 
 			output.WriteLine($"Current track : {trackTitle}");
 			output.WriteLine($"Artist        : {artist}");
@@ -57,7 +58,7 @@ namespace FsmpConsole
 
 			output.WriteLine();
 			output.WriteLine(separator);
-			var kLabel = isPlaying ? "Stop" : "Play";
+			var kLabel = isPlaying ? "Pause" : isPaused ? "Resume" : "Play";
 			output.WriteLine($"[N] Next  [P] Prev  [K] {kLabel}  [R] Restart");
 			output.WriteLine("[S] Stop  [M] Repeat  [H] Shuffle  [#] Skip to track");
 			output.WriteLine();

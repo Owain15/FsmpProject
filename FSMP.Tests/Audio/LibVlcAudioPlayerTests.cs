@@ -272,13 +272,53 @@ public class LibVlcAudioPlayerTests : IDisposable
     }
 
     [Fact]
-    public async Task PlayAsync_ShouldCallAdapterSetMediaAndPlay()
+    public async Task PlayAsync_ShouldCallAdapterPlayAndWait()
     {
         _mockAdapter.HasMedia = true;
 
         await _player.PlayAsync();
 
         _mockAdapter.PlayCallCount.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task PlayAsync_ShouldTransitionToPlayingState()
+    {
+        _mockAdapter.HasMedia = true;
+
+        await _player.PlayAsync();
+
+        _player.State.Should().Be(PlaybackState.Playing);
+    }
+
+    #endregion
+
+    #region ResumeAsync Tests
+
+    [Fact]
+    public async Task ResumeAsync_WhenDisposed_ShouldThrowObjectDisposedException()
+    {
+        _player.Dispose();
+
+        var act = () => _player.ResumeAsync();
+
+        await act.Should().ThrowAsync<ObjectDisposedException>();
+    }
+
+    [Fact]
+    public async Task ResumeAsync_ShouldCallAdapterResume()
+    {
+        await _player.ResumeAsync();
+
+        _mockAdapter.ResumeCallCount.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task ResumeAsync_ShouldNotCallPlayAndWait()
+    {
+        await _player.ResumeAsync();
+
+        _mockAdapter.PlayCallCount.Should().Be(0);
     }
 
     #endregion

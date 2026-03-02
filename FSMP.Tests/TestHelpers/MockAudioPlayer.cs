@@ -18,6 +18,7 @@ public class MockAudioPlayer : IAudioPlayer
     public string? LoadedFilePath { get; private set; }
     public int LoadCallCount { get; private set; }
     public int PlayCallCount { get; private set; }
+    public int ResumeCallCount { get; private set; }
     public int PauseCallCount { get; private set; }
     public int StopCallCount { get; private set; }
     public int SeekCallCount { get; private set; }
@@ -48,6 +49,13 @@ public class MockAudioPlayer : IAudioPlayer
             throw new InvalidOperationException("Test exception");
 
         PlayCallCount++;
+        SetState(PlaybackState.Playing);
+        return Task.CompletedTask;
+    }
+
+    public Task ResumeAsync()
+    {
+        ResumeCallCount++;
         SetState(PlaybackState.Playing);
         return Task.CompletedTask;
     }

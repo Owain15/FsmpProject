@@ -38,6 +38,12 @@ public interface IAudioPlayer : IDisposable
     Task PlayAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Resumes playback from the current position (unpauses without restarting).
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task ResumeAsync();
+
+    /// <summary>
     /// Pauses playback.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>

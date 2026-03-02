@@ -101,16 +101,21 @@ public class LibVlcAudioPlayer : IAudioPlayer
     }
 
     /// <inheritdoc/>
-    public Task PlayAsync(CancellationToken cancellationToken = default)
+    public async Task PlayAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
 
         if (!_adapter.HasMedia)
             throw new InvalidOperationException("No media loaded. Call LoadAsync first.");
 
-        if (!_adapter.Play())
-            throw new InvalidOperationException("LibVLC failed to start playback.");
+        await _adapter.PlayAndWaitAsync(cancellationToken);
+    }
 
+    /// <inheritdoc/>
+    public Task ResumeAsync()
+    {
+        ThrowIfDisposed();
+        _adapter.Resume();
         return Task.CompletedTask;
     }
 

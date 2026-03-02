@@ -27,6 +27,7 @@ public class PlayerUITests
         _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.None);
         _playbackMock.Setup(p => p.IsShuffled).Returns(false);
         _playbackMock.Setup(p => p.IsPlaying).Returns(false);
+        _playbackMock.Setup(p => p.IsPaused).Returns(false);
         _playbackMock.Setup(p => p.QueueCount).Returns(0);
     }
 
@@ -188,6 +189,51 @@ public class PlayerUITests
     }
 
     [Fact]
+    public async Task DisplayPlayerStateAsync_WhenPaused_ShouldShowPausedAndResume()
+    {
+        _playbackMock.Setup(p => p.IsPaused).Returns(true);
+        _playbackMock.Setup(p => p.IsPlaying).Returns(false);
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.DisplayPlayerStateAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Paused");
+        text.Should().Contain("[K] Resume");
+    }
+
+    [Fact]
+    public async Task DisplayPlayerStateAsync_WhenPlaying_ShouldShowPlayingAndPause()
+    {
+        _playbackMock.Setup(p => p.IsPlaying).Returns(true);
+        _playbackMock.Setup(p => p.IsPaused).Returns(false);
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.DisplayPlayerStateAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Playing");
+        text.Should().Contain("[K] Pause");
+    }
+
+    [Fact]
+    public async Task DisplayPlayerStateAsync_WhenStopped_ShouldShowStoppedAndPlay()
+    {
+        _playbackMock.Setup(p => p.IsPlaying).Returns(false);
+        _playbackMock.Setup(p => p.IsPaused).Returns(false);
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.DisplayPlayerStateAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Stopped");
+        text.Should().Contain("[K] Play");
+    }
+
+    [Fact]
     public async Task DisplayPlayerStateAsync_ShouldShowRepeatModeNone()
     {
         _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.None);
@@ -291,21 +337,21 @@ public class PlayerUITests
     // ========== HandleInputAsync — Play/Stop Toggle (K) ==========
 
     [Fact]
-    public async Task HandleInputAsync_K_ShouldCallTogglePlayStopAsync()
+    public async Task HandleInputAsync_K_ShouldCallTogglePauseAsync()
     {
-        _playbackMock.Setup(p => p.TogglePlayStopAsync()).ReturnsAsync(Result.Success());
+        _playbackMock.Setup(p => p.TogglePauseAsync()).ReturnsAsync(Result.Success());
 
         var (player, output) = CreatePlayerWithOutput("");
 
         await player.HandleInputAsync("K");
 
-        _playbackMock.Verify(p => p.TogglePlayStopAsync(), Times.Once);
+        _playbackMock.Verify(p => p.TogglePauseAsync(), Times.Once);
     }
 
     [Fact]
     public async Task HandleInputAsync_K_WhenNotPlaying_NoCurrentTrack_ShouldShowError()
     {
-        _playbackMock.Setup(p => p.TogglePlayStopAsync()).ReturnsAsync(Result.Failure("No track selected."));
+        _playbackMock.Setup(p => p.TogglePauseAsync()).ReturnsAsync(Result.Failure("No track selected."));
 
         var (player, output) = CreatePlayerWithOutput("");
 
@@ -313,6 +359,37 @@ public class PlayerUITests
 
         await player.DisplayPlayerStateAsync();
         output.ToString().Should().Contain("No track selected");
+    }
+
+    [Fact]
+    public async Task HandleInputAsync_K_WhenPlaying_ShouldShowPaused()
+    {
+        // Post-call state: was playing → toggled → now stopped/paused (IsPlaying = false)
+        _playbackMock.Setup(p => p.IsPlaying).Returns(false);
+        _playbackMock.Setup(p => p.TogglePauseAsync()).ReturnsAsync(Result.Success());
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("K");
+
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("Paused.");
+    }
+
+    [Fact]
+    public async Task HandleInputAsync_K_WhenPaused_ShouldShowResumed()
+    {
+        // Pre-call state: paused; post-call state: playing
+        _playbackMock.Setup(p => p.IsPaused).Returns(true);
+        _playbackMock.Setup(p => p.IsPlaying).Returns(true);
+        _playbackMock.Setup(p => p.TogglePauseAsync()).ReturnsAsync(Result.Success());
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.HandleInputAsync("K");
+
+        await player.DisplayPlayerStateAsync();
+        output.ToString().Should().Contain("Resumed.");
     }
 
     // ========== HandleInputAsync — Restart (R) ==========
@@ -423,6 +500,21 @@ public class PlayerUITests
 
         await player.DisplayPlayerStateAsync();
         output.ToString().Should().Contain("Invalid selection");
+    }
+
+    [Fact]
+    public async Task DisplayPlayerStateAsync_WhenDataFetchThrows_ShouldStillRender()
+    {
+        _playbackMock.Setup(p => p.GetCurrentTrackAsync()).ThrowsAsync(new InvalidOperationException("connection lost"));
+
+        var (player, output) = CreatePlayerWithOutput("");
+
+        await player.DisplayPlayerStateAsync();
+
+        var text = output.ToString();
+        text.Should().Contain("Queue: (empty)");
+        text.Should().Contain("[N] Next");
+        text.Should().Contain("Display error: connection lost");
     }
 
     // ========== Queue Display Tests ==========

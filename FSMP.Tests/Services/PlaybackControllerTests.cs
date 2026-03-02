@@ -133,36 +133,65 @@ public class PlaybackControllerTests
     }
 
     [Fact]
-    public async Task TogglePlayStopAsync_StopsWhenPlaying()
+    public async Task TogglePauseAsync_PausesWhenPlaying()
     {
         _mockPlayer.SetState(PlaybackState.Playing);
 
-        var result = await _controller.TogglePlayStopAsync();
+        var result = await _controller.TogglePauseAsync();
 
         result.IsSuccess.Should().BeTrue();
-        _audioServiceMock.Verify(a => a.StopAsync(), Times.Once);
+        _audioServiceMock.Verify(a => a.PauseAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task TogglePlayStopAsync_PlaysCurrentTrackWhenStopped()
+    public async Task TogglePauseAsync_ResumesWhenPaused()
     {
-        var track = new Track { TrackId = 1, Title = "T", FilePath = "t.mp3", FileHash = "a" };
-        _activePlaylistMock.Setup(p => p.CurrentTrackId).Returns(1);
-        _trackRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(track);
+        _mockPlayer.SetState(PlaybackState.Paused);
 
-        var result = await _controller.TogglePlayStopAsync();
+        var result = await _controller.TogglePauseAsync();
 
         result.IsSuccess.Should().BeTrue();
+        _audioServiceMock.Verify(a => a.ResumeAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task TogglePlayStopAsync_ReturnsFailure_WhenNoTrackSelected()
+    public void IsPaused_WhenPlayerPaused_ShouldReturnTrue()
     {
+        _mockPlayer.SetState(PlaybackState.Paused);
+        _controller.IsPaused.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsPaused_WhenPlayerStopped_ShouldReturnFalse()
+    {
+        _mockPlayer.SetState(PlaybackState.Stopped);
+        _controller.IsPaused.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task TogglePauseAsync_PlaysCurrentTrack_WhenStopped()
+    {
+        _mockPlayer.SetState(PlaybackState.Stopped);
+        var track = new Track { TrackId = 5, Title = "T5", FilePath = "t5.mp3", FileHash = "e" };
+        _activePlaylistMock.Setup(p => p.CurrentTrackId).Returns(5);
+        _trackRepoMock.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(track);
+
+        var result = await _controller.TogglePauseAsync();
+
+        result.IsSuccess.Should().BeTrue();
+        _audioServiceMock.Verify(a => a.PlayTrackAsync(track, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task TogglePauseAsync_ReturnsFailure_WhenStoppedAndNoTrack()
+    {
+        _mockPlayer.SetState(PlaybackState.Stopped);
         _activePlaylistMock.Setup(p => p.CurrentTrackId).Returns((int?)null);
 
-        var result = await _controller.TogglePlayStopAsync();
+        var result = await _controller.TogglePauseAsync();
 
         result.IsSuccess.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("No track selected");
     }
 
     [Fact]
