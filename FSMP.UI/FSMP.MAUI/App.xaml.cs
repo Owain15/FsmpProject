@@ -1,4 +1,5 @@
 using FsmpDataAcsses;
+using Microsoft.EntityFrameworkCore;
 
 namespace FSMP.MAUI;
 
@@ -12,7 +13,10 @@ public partial class App : Application
         using var scope = services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<FsmpDbContext>();
         context.Database.Migrate();
+    }
 
-        MainPage = new AppShell();
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window(new AppShell());
     }
 }
