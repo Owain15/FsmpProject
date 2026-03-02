@@ -17,4 +17,6 @@ public class MockAudioPlayerFactory : IAudioPlayerFactory
     public IAudioPlayer CreatePlayer() => _player;
 
     public Task<bool> InitializeAsync() => Task.FromResult(true);
+
+    public string? InitializationError => null;
 }

@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 94.3% | **Tests**: 904 passing | **Build**: Passing
+**Overall coverage**: 94.3% | **Tests**: 917 passing | **Build**: Passing
 
 ---
 
@@ -193,7 +193,7 @@ Persist active queue (track order, position, shuffle, repeat mode) across sessio
 | # | Phase | Status | Projects Affected |
 |---|-------|--------|-------------------|
 | 1 | Setup Projects | **Partial** | FSMP.Core ✓, FSMP.MAUI ✓, Platform.Windows ✓ (exists), Platform.Android pending |
-| 2 | Platform Abstraction | **Partial** | Interfaces in FSMP.Core ✓, duplicate cleanup ✓ |
+| 2 | Platform Abstraction | **Complete** | Interfaces in FSMP.Core ✓, LibVLC moved to Platform.Windows ✓, InitializationError on interface ✓ |
 | 3 | Migrate Business Logic | Not started | FSMP.Core, FsmpLibrary (refactor) |
 | 4 | Configure LibVLCSharp Android | Not started | Platform.Android |
 | 5 | Build MAUI UI | Not started | FSMP.MAUI |
@@ -205,6 +205,16 @@ Persist active queue (track order, position, shuffle, repeat mode) across sessio
 - [x] Deleted duplicate interfaces from FsmpLibrary/Interfaces/
 - [x] FsmpLibrary now uses FSMP.Core.Interfaces
 - [x] Build passes (MAUI requires SDK installation)
+
+**Batch 2 Complete** (Move LibVLC to Platform.Windows):
+- [x] Copied LibVlcAudioPlayer, LibVlcAudioPlayerFactory, LibVlcMediaPlayerAdapter to FSMP.Platform.Windows.Audio
+- [x] Switched all consumers (FsmpConsole, FSMP.MAUI, FSMP.Tests) to new namespace
+- [x] Deleted old Audio files from FsmpLibrary
+- [x] Removed LibVLCSharp/VideoLAN.LibVLC.Windows from FsmpLibrary.csproj
+- [x] Added InitializationError to IAudioPlayerFactory interface
+- [x] Removed concrete cast in AppStartup.cs
+- [x] FsmpLibrary is now platform-agnostic (no Windows-specific dependencies)
+- [x] 917 tests passing
 
 **Key Requirements:**
 - Support Windows 10/11 and Android 11+

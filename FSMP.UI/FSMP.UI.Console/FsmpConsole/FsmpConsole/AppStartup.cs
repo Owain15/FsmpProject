@@ -2,7 +2,7 @@ using FSMP.Core;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Repositories;
 using FsmpDataAcsses.Services;
-using FsmpLibrary.Audio;
+using FSMP.Platform.Windows.Audio;
 using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 using FsmpLibrary.Services;
@@ -114,7 +114,7 @@ public class AppStartup
         }
         else
         {
-            var errorMsg = (factory as LibVlcAudioPlayerFactory)?.InitializationError ?? "Unknown error";
+            var errorMsg = factory.InitializationError ?? "Unknown error";
             _output.WriteLine($" failed: {errorMsg}. Playback will not be available.");
         }
 

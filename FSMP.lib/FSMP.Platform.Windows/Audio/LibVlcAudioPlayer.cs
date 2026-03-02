@@ -2,7 +2,7 @@ using FSMP.Core.Audio;
 using FSMP.Core.Interfaces;
 using FSMP.Core.Interfaces.EventArgs;
 
-namespace FsmpLibrary.Audio;
+namespace FSMP.Platform.Windows.Audio;
 
 /// <summary>
 /// Audio player implementation using an IMediaPlayerAdapter for platform-specific playback.

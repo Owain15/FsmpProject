@@ -1,7 +1,7 @@
 using FSMP.Core.Audio;
 using FSMP.Core.Interfaces;
 
-namespace FsmpLibrary.Audio;
+namespace FSMP.Platform.Windows.Audio;
 
 /// <summary>
 /// Factory for creating LibVlcAudioPlayer instances.

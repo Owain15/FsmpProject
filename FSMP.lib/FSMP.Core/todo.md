@@ -35,4 +35,10 @@ Cross-platform business logic for playlist management, active playback queue, an
 
 ## Current Status
 
+### Cross-Platform Migration Phase 2
+
+- [x] Add `InitializationError` property to `IAudioPlayerFactory` interface
+
+## Current Status
+
 **Status**: Complete | **Coverage**: 99.53% | **Tests**: 45+ passing

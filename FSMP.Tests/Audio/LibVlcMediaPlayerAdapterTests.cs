@@ -1,5 +1,5 @@
 using FluentAssertions;
-using FsmpLibrary.Audio;
+using FSMP.Platform.Windows.Audio;
 using FSMP.Tests.TestHelpers;
 
 namespace FSMP.Tests.Audio;

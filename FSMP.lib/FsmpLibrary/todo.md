@@ -26,14 +26,11 @@ All entity models for the data layer, used by both FsmpLibrary and FsmpDataAcsse
 - `PlaybackState` -- Enum: Stopped, Playing, Paused, Loading, Error
 - `EventArgs/` -- PlaybackStateChanged, PlaybackCompleted, PlaybackError, PositionChanged
 
-### Audio Implementation (`Audio/`)
+### Audio Implementation
 
-LibVLCSharp-based audio playback (replaced WMPLib COM interop), refactored with adapter pattern:
-
-- `IMediaPlayerAdapter.cs` -- Thin adapter interface wrapping platform-specific media player operations
-- `LibVlcMediaPlayerAdapter.cs` -- IMediaPlayerAdapter implementation using LibVLCSharp (thin pass-through)
-- `LibVlcAudioPlayer.cs` -- IAudioPlayer implementation with business logic (state machine, validation, events), uses IMediaPlayerAdapter
-- `LibVlcAudioPlayerFactory.cs` -- IAudioPlayerFactory implementation with optional adapter factory injection
+**Moved to FSMP.Platform.Windows** - LibVLC audio implementations now live in `FSMP.Platform.Windows.Audio`:
+- `LibVlcMediaPlayerAdapter.cs`, `LibVlcAudioPlayer.cs`, `LibVlcAudioPlayerFactory.cs`
+- FsmpLibrary no longer has LibVLCSharp or VideoLAN.LibVLC.Windows dependencies
 
 ### Services (`Services/`)
 
@@ -84,9 +81,13 @@ Coverage improved from 65.74% to 86.26% via adapter pattern refactor (IMediaPlay
 - [x] Remove duplicate interfaces from `Interfaces/` (now in FSMP.Core)
 - [x] FsmpLibrary now references `FSMP.Core.Interfaces`
 
+**Batch 2 Complete** - LibVLC moved to Platform.Windows:
+- [x] Move LibVlcAudioPlayer, LibVlcAudioPlayerFactory, LibVlcMediaPlayerAdapter to FSMP.Platform.Windows
+- [x] Remove LibVLCSharp and VideoLAN.LibVLC.Windows from FsmpLibrary.csproj
+- [x] FsmpLibrary is now platform-agnostic
+
 **Future Batches**:
 - [ ] Move models from `FsmpLibrary/Models/` to `FSMP.Core/Models/`
-- [ ] Move LibVlcMediaPlayerAdapter to FSMP.Platform.Windows
 - [ ] Refactor AudioService to use platform-agnostic IAudioPlayer
 
 ---

@@ -15,4 +15,9 @@ public interface IAudioPlayerFactory
     /// Eagerly initializes the underlying audio engine. Returns true if successful.
     /// </summary>
     Task<bool> InitializeAsync();
+
+    /// <summary>
+    /// Returns the initialization error message, if initialization failed. Null if successful.
+    /// </summary>
+    string? InitializationError { get; }
 }

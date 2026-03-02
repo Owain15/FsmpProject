@@ -3,7 +3,7 @@ using FSMP.Core.Interfaces;
 using FSMP.MAUI.Pages;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
-using FsmpLibrary.Audio;
+using FSMP.Platform.Windows.Audio;
 using FsmpLibrary.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

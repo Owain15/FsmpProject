@@ -2,7 +2,7 @@ using FSMP.Core.Audio;
 using System.Runtime.InteropServices;
 using LibVLCSharp.Shared;
 
-namespace FsmpLibrary.Audio;
+namespace FSMP.Platform.Windows.Audio;
 
 /// <summary>
 /// Thin adapter wrapping LibVLCSharp types. Contains no business logic —
@@ -37,7 +37,7 @@ public class LibVlcMediaPlayerAdapter : IMediaPlayerAdapter
                 var libvlcPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "libvlc", archFolder));
                 var pluginsPath = Path.Combine(libvlcPath, "plugins");
                 Environment.SetEnvironmentVariable("VLC_PLUGIN_PATH", pluginsPath);
-                Core.Initialize(libvlcPath);
+                LibVLCSharp.Shared.Core.Initialize(libvlcPath);
                 _coreInitialized = true;
             }
         }
