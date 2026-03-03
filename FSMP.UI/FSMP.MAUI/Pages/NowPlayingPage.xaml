@@ -1,10 +1,65 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
              x:Class="FSMP.MAUI.Pages.NowPlayingPage"
+             x:DataType="vm:NowPlayingViewModel"
              Title="Now Playing">
-    <VerticalStackLayout Padding="16" Spacing="8">
-        <Label Text="Now Playing" FontSize="24" FontAttributes="Bold" />
-        <Label Text="Playback controls will appear here." TextColor="Gray" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <!-- Track Info -->
+            <Label Text="{Binding TrackTitle}" FontSize="28" FontAttributes="Bold" />
+            <Label Text="{Binding TrackArtist}" FontSize="18" TextColor="Gray" />
+            <Label Text="{Binding TrackAlbum}" FontSize="16" TextColor="DarkGray" />
+
+            <!-- Playback State -->
+            <Label Text="{Binding PlaybackState}" FontSize="14" TextColor="Gray" />
+
+            <!-- Progress -->
+            <ProgressBar Progress="{Binding Progress}" />
+            <HorizontalStackLayout Spacing="0">
+                <Label Text="{Binding PositionText}" FontSize="12" HorizontalOptions="Start" />
+                <Label Text=" / " FontSize="12" />
+                <Label Text="{Binding DurationText}" FontSize="12" />
+            </HorizontalStackLayout>
+
+            <!-- Transport Controls -->
+            <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                <Button Text="Prev" Command="{Binding PreviousCommand}" WidthRequest="80" />
+                <Button Text="Play/Pause" Command="{Binding PlayPauseCommand}" WidthRequest="100" />
+                <Button Text="Next" Command="{Binding NextCommand}" WidthRequest="80" />
+                <Button Text="Stop" Command="{Binding StopCommand}" WidthRequest="80" />
+            </HorizontalStackLayout>
+
+            <!-- Mode Controls -->
+            <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="120" />
+                <Button Text="{Binding IsShuffled, StringFormat='Shuffle: {0}'}"
+                        Command="{Binding ToggleShuffleCommand}" WidthRequest="120" />
+            </HorizontalStackLayout>
+
+            <!-- Volume -->
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="Volume" VerticalOptions="Center" />
+                <Slider Minimum="0" Maximum="1" Value="{Binding Volume}"
+                        HorizontalOptions="Fill" WidthRequest="200" />
+            </HorizontalStackLayout>
+
+            <!-- Queue -->
+            <Label Text="Queue" FontSize="20" FontAttributes="Bold" Margin="0,12,0,0" />
+            <CollectionView ItemsSource="{Binding QueueItems}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <HorizontalStackLayout Spacing="8" Padding="4">
+                            <Label Text="{Binding Index}" WidthRequest="30" FontAttributes="Bold" />
+                            <Label Text="{Binding Title}" />
+                            <Label Text="{Binding Artist}" TextColor="Gray" />
+                        </HorizontalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

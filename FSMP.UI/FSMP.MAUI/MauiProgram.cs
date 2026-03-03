@@ -1,10 +1,11 @@
 using FSMP.Core;
 using FSMP.Core.Interfaces;
+using FSMP.Core.Services;
 using FSMP.MAUI.Pages;
+using FSMP.MAUI.ViewModels;
+using FSMP.Platform.Windows.Audio;
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
-using FSMP.Platform.Windows.Audio;
-using FSMP.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -64,9 +65,29 @@ public static class MauiProgram
         services.AddSingleton<ActivePlaylistService>();
         services.AddSingleton<IActivePlaylistService>(sp => sp.GetRequiredService<ActivePlaylistService>());
 
+        // Interface mappings for services already registered as concrete types
+        services.AddScoped<IMetadataService>(sp => sp.GetRequiredService<MetadataService>());
+        services.AddScoped<ILibraryScanService>(sp => sp.GetRequiredService<LibraryScanService>());
+        services.AddScoped<IPlaylistService>(sp => sp.GetRequiredService<PlaylistService>());
+        services.AddSingleton<IConfigurationService>(sp => sp.GetRequiredService<ConfigurationService>());
+
+        // Repository interfaces (resolved from UnitOfWork)
+        services.AddScoped<ITrackRepository>(sp => sp.GetRequiredService<UnitOfWork>().Tracks);
+        services.AddScoped<IArtistRepository>(sp => sp.GetRequiredService<UnitOfWork>().Artists);
+        services.AddScoped<IAlbumRepository>(sp => sp.GetRequiredService<UnitOfWork>().Albums);
+
+        // Orchestration layer
+        services.AddScoped<IPlaybackController, PlaybackController>();
+        services.AddScoped<ILibraryBrowser, LibraryBrowser>();
+        services.AddScoped<ILibraryManager, LibraryManager>();
+        services.AddScoped<IPlaylistManager, PlaylistManager>();
+
         // Pages
         services.AddTransient<LibraryPage>();
         services.AddTransient<NowPlayingPage>();
         services.AddTransient<SettingsPage>();
+
+        // ViewModels
+        services.AddTransient<NowPlayingViewModel>();
     }
 }

@@ -1,23 +1,23 @@
 Summary
-  Generated on: 01/03/2026 - 20:15:59
-  Coverage date: 25/02/2026 - 11:21:08 - 01/03/2026 - 20:15:49
-  Parser: MultiReport (4x Cobertura)
+  Generated on: 03/03/2026 - 08:42:45
+  Coverage date: 03/03/2026 - 08:42:23
+  Parser: Cobertura
   Assemblies: 5
-  Classes: 68
-  Files: 69
+  Classes: 67
+  Files: 68
   Line coverage: 94.3%
-  Covered lines: 5785
-  Uncovered lines: 344
-  Coverable lines: 6129
-  Total lines: 8034
-  Branch coverage: 81.4% (1408 of 1728)
-  Covered branches: 1408
-  Total branches: 1728
-  Method coverage: 97.7% (612 of 626)
-  Full method coverage: 88.8% (556 of 626)
-  Covered methods: 612
-  Fully covered methods: 556
-  Total methods: 626
+  Covered lines: 5302
+  Uncovered lines: 320
+  Coverable lines: 5622
+  Total lines: 8086
+  Branch coverage: 83.1% (933 of 1122)
+  Covered branches: 933
+  Total branches: 1122
+  Method coverage: 96.4% (456 of 473)
+  Full method coverage: 87.9% (416 of 473)
+  Covered methods: 456
+  Fully covered methods: 416
+  Total methods: 473
 
 FSMO                                                             96.3%
   FSMO.AudioFileScanner                                           100%
@@ -29,14 +29,16 @@ FSMO                                                             96.3%
   FSMO.OrganizeResult                                             100%
   FSMO.PathBuilder                                                100%
 
-FSMP.Core                                                        99.6%
+FSMP.Core                                                        88.4%
   FSMP.Core.ActivePlaylistService                                 100%
   FSMP.Core.Interfaces.EventArgs.PlaybackCompletedEventArgs       100%
   FSMP.Core.Interfaces.EventArgs.PlaybackErrorEventArgs          66.6%
   FSMP.Core.Interfaces.EventArgs.PlaybackStateChangedEventArgs    100%
   FSMP.Core.Interfaces.EventArgs.PositionChangedEventArgs         100%
+  FSMP.Core.Interfaces.TrackChangedEventArgs                      100%
   FSMP.Core.Models.Album                                          100%
   FSMP.Core.Models.Artist                                         100%
+  FSMP.Core.Models.AudioProperties                                100%
   FSMP.Core.Models.Configuration                                  100%
   FSMP.Core.Models.FileExtension                                  100%
   FSMP.Core.Models.LibraryPath                                    100%
@@ -48,20 +50,33 @@ FSMP.Core                                                        99.6%
   FSMP.Core.Models.ScanResult                                     100%
   FSMP.Core.Models.Tags                                           100%
   FSMP.Core.Models.Track                                          100%
+  FSMP.Core.Models.TrackMetadata                                  100%
   FSMP.Core.Result                                                100%
   FSMP.Core.Result<T>                                             100%
+  FSMP.Core.Services.AudioService                                91.3%
+  FSMP.Core.Services.ConfigurationService                         100%
+  FSMP.Core.Services.LibraryBrowser                              75.3%
+  FSMP.Core.Services.LibraryManager                              93.1%
+  FSMP.Core.Services.MetadataService                             86.2%
+  FSMP.Core.Services.PlaybackController                          71.7%
+  FSMP.Core.Services.PlaylistManager                             88.6%
 
-FsmpConsole                                                      88.2%
-  FsmpConsole.AppStartup                                         98.9%
-  FsmpConsole.BrowseUI                                           91.7%
+FSMP.Platform.Windows                                            83.4%
+  FSMP.Platform.Windows.Audio.LibVlcAudioPlayer                   100%
+  FSMP.Platform.Windows.Audio.LibVlcAudioPlayerFactory           65.3%
+  FSMP.Platform.Windows.Audio.LibVlcMediaPlayerAdapter             70%
+
+FsmpConsole                                                      88.7%
+  FsmpConsole.AppStartup                                         91.9%
+  FsmpConsole.BrowseUI                                           81.8%
   FsmpConsole.MenuSystem                                          100%
   FsmpConsole.MetadataEditor                                     97.5%
-  FsmpConsole.PlayerUI                                           77.4%
+  FsmpConsole.PlayerUI                                             85%
   FsmpConsole.Print                                               100%
   FsmpConsole.StatisticsViewer                                    100%
   Program                                                           0%
 
-FsmpDataAcsses                                                   98.5%
+FsmpDataAcsses                                                   98.4%
   FsmpDataAcsses.DesignTimeDbContextFactory                         0%
   FsmpDataAcsses.FsmpDbContext                                    100%
   FsmpDataAcsses.Migrations.AddPlaylistTables                    98.9%
@@ -75,24 +90,8 @@ FsmpDataAcsses                                                   98.5%
   FsmpDataAcsses.Repositories.PlaylistRepository                  100%
   FsmpDataAcsses.Repositories.Repository<T>                       100%
   FsmpDataAcsses.Repositories.TrackRepository                     100%
-  FsmpDataAcsses.Services.LibraryScanService                      100%
+  FsmpDataAcsses.Services.LibraryScanService                     99.2%
   FsmpDataAcsses.Services.PlaybackTrackingService                 100%
   FsmpDataAcsses.Services.PlaylistService                         100%
   FsmpDataAcsses.Services.StatisticsService                       100%
   FsmpDataAcsses.UnitOfWork                                       100%
-
-FsmpLibrary                                                      86.6%
-  FsmpLibrary.Audio.LibVlcAudioPlayer                            99.1%
-  FsmpLibrary.Audio.LibVlcAudioPlayerFactory                     71.8%
-  FsmpLibrary.Audio.LibVlcMediaPlayerAdapter                     87.3%
-  FsmpLibrary.Services.AudioProperties                            100%
-  FsmpLibrary.Services.AudioService                              96.1%
-  FsmpLibrary.Services.ConfigurationService                       100%
-  FsmpLibrary.Services.LibraryBrowser                            75.3%
-  FsmpLibrary.Services.LibraryManager                            93.1%
-  FsmpLibrary.Services.MetadataService                           86.2%
-  FsmpLibrary.Services.PlaybackController                        71.1%
-  FsmpLibrary.Services.PlaylistManager                           88.6%
-  FsmpLibrary.Services.ScanResult                                 100%
-  FsmpLibrary.Services.TrackChangedEventArgs                      100%
-  FsmpLibrary.Services.TrackMetadata                              100%

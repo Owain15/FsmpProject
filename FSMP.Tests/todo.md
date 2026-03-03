@@ -40,10 +40,11 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 **Database/** (3 files, ~48 tests):
 - `FsmpDbContextTests.cs`, `EntityConfigurationTests.cs` (20 tests incl. Playlist/PlaylistTrack config), `MigrationTests.cs`
 
-**UI/** (7 files, ~241 tests):
+**UI/** (8 files, ~256 tests):
 - `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlayerUITests.cs` (75 tests — incl. 14 playlist + 13 directory UI-to-Core integration tests)
 - `MetadataEditorTests.cs`, `StatisticsViewerTests.cs`
 - `PrintTests.cs` (incl. 13 NewDisplay tests), `AppStartupTests.cs`
+- `NowPlayingViewModelTests.cs` (15 tests — ViewModel MVVM tests for MAUI NowPlaying page)
 
 > Removed: `PlaybackUITests.cs` and `LibraryManagerTests.cs` (dead code — classes superseded by PlayerUI)
 
@@ -63,14 +64,15 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit + Queue state persistence + Playlist/Directory UI tests + Cross-platform Phase 2 | **Tests**: 917 passing | **Overall Coverage**: 94.3%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit + Queue state persistence + Playlist/Directory UI tests + Cross-platform Phase 2 + MAUI NowPlaying ViewModel | **Tests**: 932 passing | **Overall Coverage**: 94.3%
 
 | Project | Coverage |
 |---------|----------|
-| FsmpConsole | 88.2% |
-| FsmpDataAcsses | 98.46% |
-| FSMP.Core | 94%+ |
-| FSMO | 96.39% |
+| FsmpConsole | 88.7% |
+| FsmpDataAcsses | 98.4% |
+| FSMP.Core | 88.4% |
+| FSMP.Platform.Windows | 83.4% |
+| FSMO | 96.3% |
 
 ---
 
@@ -125,5 +127,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature + Audio coverage + FSMO tests + Orchestration refactor tests (61 new tests)
+**Status**: Complete (v1) + Playlist feature + Audio coverage + FSMO tests + Orchestration refactor tests (61 new tests) + MAUI ViewModel tests (15 new)
 **Next Action**: Cross-platform migration tests when ready
