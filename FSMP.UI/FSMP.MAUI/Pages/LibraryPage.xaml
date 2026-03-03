@@ -1,10 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
              x:Class="FSMP.MAUI.Pages.LibraryPage"
+             x:DataType="vm:LibraryBrowseViewModel"
              Title="Library">
     <VerticalStackLayout Padding="16" Spacing="8">
-        <Label Text="Library" FontSize="24" FontAttributes="Bold" />
-        <Label Text="Browse your music library here." TextColor="Gray" />
+
+        <!-- Navigation -->
+        <HorizontalStackLayout Spacing="8">
+            <Button Text="Back" Command="{Binding GoBackCommand}"
+                    IsVisible="{Binding CanGoBack}" WidthRequest="80" />
+            <Label Text="{Binding PageTitle}" FontSize="24" FontAttributes="Bold"
+                   VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <!-- Items list -->
+        <CollectionView ItemsSource="{Binding Items}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:Object">
+                    <Grid Padding="8" ColumnDefinitions="*,Auto,Auto">
+                        <Label Grid.Column="0" FontSize="16" VerticalOptions="Center">
+                            <Label.Triggers>
+                                <!-- Show name/title depending on type -->
+                            </Label.Triggers>
+                        </Label>
+
+                        <!-- Tap to drill down -->
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=SelectItemCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+
+                        <!-- Play/Queue buttons (visible for tracks) -->
+                        <Button Grid.Column="1" Text="Play" WidthRequest="60" FontSize="12"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=PlayNowCommand}"
+                                CommandParameter="{Binding .}" />
+                        <Button Grid.Column="2" Text="+" WidthRequest="40" FontSize="12"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=AddToQueueCommand}"
+                                CommandParameter="{Binding .}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
     </VerticalStackLayout>
 </ContentPage>

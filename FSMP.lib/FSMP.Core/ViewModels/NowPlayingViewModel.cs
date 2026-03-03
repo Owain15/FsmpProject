@@ -45,6 +45,7 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         StopCommand = new AsyncRelayCommand(OnStop);
         ToggleRepeatCommand = new RelayCommand(OnToggleRepeat);
         ToggleShuffleCommand = new RelayCommand(OnToggleShuffle);
+        JumpToCommand = new AsyncRelayCommand<QueueItem>(OnJumpTo);
 
         SubscribeToEvents();
     }
@@ -136,6 +137,7 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     public ICommand StopCommand { get; }
     public ICommand ToggleRepeatCommand { get; }
     public ICommand ToggleShuffleCommand { get; }
+    public ICommand JumpToCommand { get; }
 
     public async Task LoadAsync()
     {
@@ -169,6 +171,8 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         _audioService.Player.StateChanged += OnStateChanged;
         _audioService.Player.PositionChanged += OnPositionChanged;
         _audioService.TrackChanged += OnTrackChanged;
+        _playbackController.SubscribeToTrackEnd(() =>
+            _dispatchToUIAsync(async () => await _playbackController.AutoAdvanceAsync()));
     }
 
     private void OnStateChanged(object? sender, PlaybackStateChangedEventArgs e)
@@ -215,6 +219,12 @@ public class NowPlayingViewModel : INotifyPropertyChanged
             foreach (var item in queueResult.Value!)
                 QueueItems.Add(item);
         }
+    }
+
+    private async Task OnJumpTo(QueueItem? item)
+    {
+        if (item is not null)
+            await _playbackController.JumpToAsync(item.Index);
     }
 
     private async Task OnPlayPause() => await _playbackController.TogglePauseAsync();
@@ -273,6 +283,15 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         public event EventHandler? CanExecuteChanged;
         public bool CanExecute(object? parameter) => true;
         public async void Execute(object? parameter) => await _execute();
+    }
+
+    private sealed class AsyncRelayCommand<T> : ICommand
+    {
+        private readonly Func<T?, Task> _execute;
+        public AsyncRelayCommand(Func<T?, Task> execute) => _execute = execute;
+        public event EventHandler? CanExecuteChanged;
+        public bool CanExecute(object? parameter) => true;
+        public async void Execute(object? parameter) => await _execute(parameter is T t ? t : default);
     }
 
     private sealed class RelayCommand : ICommand

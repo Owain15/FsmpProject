@@ -44,13 +44,16 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `MenuSystemTests.cs`, `BrowseUITests.cs`, `PlayerUITests.cs` (75 tests — incl. 14 playlist + 13 directory UI-to-Core integration tests)
 - `MetadataEditorTests.cs`, `StatisticsViewerTests.cs`
 - `PrintTests.cs` (incl. 13 NewDisplay tests), `AppStartupTests.cs`
-- `NowPlayingViewModelTests.cs` (15 tests — ViewModel MVVM tests for MAUI NowPlaying page)
+- `NowPlayingViewModelTests.cs` (17 tests — ViewModel MVVM tests for MAUI NowPlaying page, incl. auto-advance subscription + JumpToCommand)
 
 > Removed: `PlaybackUITests.cs` and `LibraryManagerTests.cs` (dead code — classes superseded by PlayerUI)
 
 **Audio/** (2 files, 51 tests):
 - `LibVlcAudioPlayerTests.cs` (49 tests) -- Constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, dispose (removed redundant multi-method dispose test)
 - `LibVlcAudioPlayerFactoryTests.cs` (2 tests) -- Factory with adapter injection
+
+**ViewModels/** (1 file, 7 tests):
+- `LibraryBrowseViewModelTests.cs` -- Library browse drill-down, play now, add to queue, go back
 
 **Core/** (2 files, 45 tests):
 - `ActivePlaylistServiceTests.cs` -- RepeatMode, shuffle, queue navigation
@@ -64,7 +67,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit + Queue state persistence + Playlist/Directory UI tests + Cross-platform Phase 2 + MAUI NowPlaying ViewModel | **Tests**: 932 passing | **Overall Coverage**: 94.3%
+**Status**: Complete (v1) + Playlist feature + Coverage improvement + FSMO tests + Player bug fixes + Orchestration refactor + Test isolation audit + Queue state persistence + Playlist/Directory UI tests + Cross-platform Phase 2 + MAUI NowPlaying ViewModel + Track Queuing (auto-advance, interactive queue, LibraryBrowseViewModel) | **Tests**: 941 passing | **Overall Coverage**: 94.3%
 
 | Project | Coverage |
 |---------|----------|
@@ -127,5 +130,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist feature + Audio coverage + FSMO tests + Orchestration refactor tests (61 new tests) + MAUI ViewModel tests (15 new)
+**Status**: Complete (v1) + Playlist feature + Audio coverage + FSMO tests + Orchestration refactor tests (61 new tests) + MAUI ViewModel tests (17) + LibraryBrowseViewModel tests (7 new)
 **Next Action**: Cross-platform migration tests when ready

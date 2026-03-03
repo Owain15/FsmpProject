@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
              x:Class="FSMP.MAUI.Pages.NowPlayingPage"
              x:DataType="vm:NowPlayingViewModel"
              Title="Now Playing">
@@ -48,14 +49,22 @@
 
             <!-- Queue -->
             <Label Text="Queue" FontSize="20" FontAttributes="Bold" Margin="0,12,0,0" />
-            <CollectionView ItemsSource="{Binding QueueItems}" SelectionMode="None">
+            <CollectionView ItemsSource="{Binding QueueItems}" SelectionMode="Single"
+                            x:Name="QueueCollectionView"
+                            SelectionChanged="OnQueueSelectionChanged">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="x:Object">
-                        <HorizontalStackLayout Spacing="8" Padding="4">
-                            <Label Text="{Binding Index}" WidthRequest="30" FontAttributes="Bold" />
-                            <Label Text="{Binding Title}" />
-                            <Label Text="{Binding Artist}" TextColor="Gray" />
-                        </HorizontalStackLayout>
+                    <DataTemplate x:DataType="models:QueueItem">
+                        <Grid Padding="4" ColumnDefinitions="30,*,Auto,60" ColumnSpacing="8">
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding IsCurrent}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#E0E0FF, Dark=#3A3A6A}" />
+                                </DataTrigger>
+                            </Grid.Triggers>
+                            <Label Grid.Column="0" Text="{Binding Index}" FontAttributes="Bold" />
+                            <Label Grid.Column="1" Text="{Binding Title}" />
+                            <Label Grid.Column="2" Text="{Binding Artist}" TextColor="Gray" />
+                            <Label Grid.Column="3" Text="{Binding Duration, StringFormat='{0:m\\:ss}'}" TextColor="Gray" FontSize="12" />
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

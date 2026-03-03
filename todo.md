@@ -11,7 +11,7 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
 
-**Overall coverage**: 94.3% | **Tests**: 932 passing | **Build**: Passing
+**Overall coverage**: 94.3% | **Tests**: 941 passing | **Build**: Passing
 
 ---
 
@@ -195,7 +195,7 @@ Persist active queue (track order, position, shuffle, repeat mode) across sessio
 | 2 | Platform Abstraction | **Complete** | Interfaces in FSMP.Core ✓, LibVLC moved to Platform.Windows ✓, InitializationError on interface ✓ |
 | 3 | Migrate Business Logic | **Complete** | FSMP.Core (services moved), FsmpLibrary removed |
 | 4 | Configure LibVLCSharp Android | Not started | Platform.Android |
-| 5 | Build MAUI UI | **In progress** | FSMP.MAUI |
+| 5 | Build MAUI UI | **In progress** | FSMP.MAUI (NowPlaying auto-advance + interactive queue, LibraryBrowseViewModel, LibraryPage wired) |
 | 6 | Android-Specific Features | Not started | FSMP.MAUI, Platform.Android |
 | 7 | Testing & Coverage | Not started | FSMP.Tests |
 | 8 | Documentation & Migration | Not started | All |

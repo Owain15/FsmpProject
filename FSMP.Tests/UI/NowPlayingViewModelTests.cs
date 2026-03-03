@@ -218,4 +218,21 @@ public class NowPlayingViewModelTests
         _vm.Position.Should().Be(TimeSpan.FromSeconds(45));
         _vm.Duration.Should().Be(TimeSpan.FromMinutes(4));
     }
+
+    [Fact]
+    public void Constructor_SubscribesToTrackEnd()
+    {
+        _playbackMock.Verify(p => p.SubscribeToTrackEnd(It.IsAny<Action>()), Times.Once);
+    }
+
+    [Fact]
+    public void JumpToCommand_CallsJumpToAsync()
+    {
+        var item = new QueueItem { Index = 2, Title = "Track 3", Artist = "Artist" };
+        _playbackMock.Setup(p => p.JumpToAsync(2)).ReturnsAsync(Result.Success());
+
+        _vm.JumpToCommand.Execute(item);
+
+        _playbackMock.Verify(p => p.JumpToAsync(2), Times.Once);
+    }
 }

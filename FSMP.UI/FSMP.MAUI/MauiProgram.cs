@@ -89,5 +89,6 @@ public static class MauiProgram
 
         // ViewModels
         services.AddTransient<NowPlayingViewModel>();
+        services.AddTransient<Core.ViewModels.LibraryBrowseViewModel>();
     }
 }
