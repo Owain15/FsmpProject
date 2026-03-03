@@ -7,11 +7,11 @@
 
     <TabBar>
         <ShellContent
-            Title="Library"
-            ContentTemplate="{DataTemplate pages:LibraryPage}" />
-        <ShellContent
             Title="Now Playing"
             ContentTemplate="{DataTemplate pages:NowPlayingPage}" />
+        <ShellContent
+            Title="Library"
+            ContentTemplate="{DataTemplate pages:LibraryPage}" />
         <ShellContent
             Title="Settings"
             ContentTemplate="{DataTemplate pages:SettingsPage}" />

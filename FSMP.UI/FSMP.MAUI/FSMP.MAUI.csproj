@@ -21,6 +21,7 @@
     <WindowsPackageType>None</WindowsPackageType>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+    <VlcWindowsX64Enabled>true</VlcWindowsX64Enabled>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,12 +35,37 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
     <ProjectReference Include="..\..\FSMP.lib\FSMP.Platform.Windows\FSMP.Platform.Windows.csproj" />
 <ProjectReference Include="..\..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
+  </ItemGroup>
+
+  <!-- Copy ARM64 LibVLC native libraries to output (NuGet package only ships x64/x86) -->
+  <ItemGroup Condition="'$(Platform)' == 'ARM64'">
+    <Content Include="..\..\dependencies\libvlc\libvlc.dll">
+      <Link>libvlc\win-arm64\libvlc.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\dependencies\libvlc\libvlccore.dll">
+      <Link>libvlc\win-arm64\libvlccore.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\dependencies\libvlc\plugins\**">
+      <Link>libvlc\win-arm64\plugins\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\dependencies\libvlc\hrtfs\**">
+      <Link>libvlc\win-arm64\hrtfs\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\dependencies\libvlc\lua\**">
+      <Link>libvlc\win-arm64\lua\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

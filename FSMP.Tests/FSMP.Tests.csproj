@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <Platforms>ARM64;x64</Platforms>
+    <VlcWindowsX64Enabled>true</VlcWindowsX64Enabled>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +37,30 @@
     <ProjectReference Include="..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
     <ProjectReference Include="..\FSMP.lib\FSMP.Platform.Windows\FSMP.Platform.Windows.csproj" />
     <ProjectReference Include="..\FSMP.lib\FSMO\FSMO\FSMO.csproj" />
+  </ItemGroup>
+
+  <!-- Copy ARM64 LibVLC native libraries to output (NuGet package only ships x64/x86) -->
+  <ItemGroup Condition="'$(Platform)' == 'ARM64'">
+    <Content Include="..\dependencies\libvlc\libvlc.dll">
+      <Link>libvlc\win-arm64\libvlc.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\dependencies\libvlc\libvlccore.dll">
+      <Link>libvlc\win-arm64\libvlccore.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\dependencies\libvlc\plugins\**">
+      <Link>libvlc\win-arm64\plugins\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\dependencies\libvlc\hrtfs\**">
+      <Link>libvlc\win-arm64\hrtfs\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\dependencies\libvlc\lua\**">
+      <Link>libvlc\win-arm64\lua\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
