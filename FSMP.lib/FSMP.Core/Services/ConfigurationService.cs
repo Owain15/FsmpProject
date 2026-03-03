@@ -2,7 +2,7 @@ using System.Text.Json;
 using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 
-namespace FsmpLibrary.Services;
+namespace FSMP.Core.Services;
 
 /// <summary>
 /// Manages application configuration stored as JSON.

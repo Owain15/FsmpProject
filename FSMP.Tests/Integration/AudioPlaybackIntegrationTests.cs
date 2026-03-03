@@ -2,7 +2,7 @@ using FluentAssertions;
 using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 using FSMP.Platform.Windows.Audio;
-using FsmpLibrary.Services;
+using FSMP.Core.Services;
 using FSMP.Tests.TestHelpers;
 
 namespace FSMP.Tests.Integration;

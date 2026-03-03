@@ -4,8 +4,7 @@
 
 | Project | Description | Status | Coverage | Todo |
 |---------|-------------|--------|----------|------|
-| FsmpLibrary | Core business logic & models | Complete (v1) | 95.43% | [todo](FSMP.lib/FsmpLibrary/todo.md) |
-| FSMP.Core | Platform-agnostic player logic | In progress | 99.53% | [todo](FSMP.lib/FSMP.Core/todo.md) |
+| FSMP.Core | Cross-platform business logic | In progress | 94%+ | [todo](FSMP.lib/FSMP.Core/todo.md) |
 | FsmpDataAcsses | EF Core data access layer | Complete (v1) | 98.46% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
 | FsmpConsole | Console UI application | Complete (v1) | 88.2% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
 | FSMO | File System Music Organizer | Complete (10/10) | 96.39% | [todo](FSMP.lib/FSMO/todo.md) |
@@ -194,7 +193,7 @@ Persist active queue (track order, position, shuffle, repeat mode) across sessio
 |---|-------|--------|-------------------|
 | 1 | Setup Projects | **Partial** | FSMP.Core ✓, FSMP.MAUI ✓, Platform.Windows ✓ (exists), Platform.Android pending |
 | 2 | Platform Abstraction | **Complete** | Interfaces in FSMP.Core ✓, LibVLC moved to Platform.Windows ✓, InitializationError on interface ✓ |
-| 3 | Migrate Business Logic | Not started | FSMP.Core, FsmpLibrary (refactor) |
+| 3 | Migrate Business Logic | **Complete** | FSMP.Core (services moved), FsmpLibrary removed |
 | 4 | Configure LibVLCSharp Android | Not started | Platform.Android |
 | 5 | Build MAUI UI | Not started | FSMP.MAUI |
 | 6 | Android-Specific Features | Not started | FSMP.MAUI, Platform.Android |
@@ -214,6 +213,17 @@ Persist active queue (track order, position, shuffle, repeat mode) across sessio
 - [x] Added InitializationError to IAudioPlayerFactory interface
 - [x] Removed concrete cast in AppStartup.cs
 - [x] FsmpLibrary is now platform-agnostic (no Windows-specific dependencies)
+- [x] 917 tests passing
+
+**Batch 3 Complete** (Move Services to FSMP.Core & Remove FsmpLibrary):
+- [x] Moved IAudioService, IMetadataService interfaces to FSMP.Core.Interfaces
+- [x] Moved TrackMetadata, AudioProperties models to FSMP.Core.Models
+- [x] Moved all 7 service implementations to FSMP.Core.Services (AudioService, ConfigurationService, MetadataService, PlaybackController, LibraryBrowser, LibraryManager, PlaylistManager)
+- [x] Added TagLibSharp and System.Text.Json to FSMP.Core.csproj
+- [x] Switched all 14 consumer files from `FsmpLibrary.Services` to `FSMP.Core.Services`
+- [x] Removed FsmpLibrary project references from all csproj files (FsmpConsole, FSMP.MAUI, FSMP.Tests, FsmpDataAcsses)
+- [x] Removed FsmpLibrary from FsmpConsole.slnx
+- [x] Deleted FsmpLibrary directory entirely
 - [x] 917 tests passing
 
 **Key Requirements:**

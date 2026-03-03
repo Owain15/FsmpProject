@@ -1,7 +1,7 @@
 using System.Text.Json;
 using FluentAssertions;
 using FSMP.Core.Models;
-using FsmpLibrary.Services;
+using FSMP.Core.Services;
 
 namespace FSMP.Tests.Services;
 

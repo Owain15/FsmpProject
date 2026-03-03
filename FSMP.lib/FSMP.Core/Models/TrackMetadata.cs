@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Services;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Plain data object holding metadata extracted from an audio file.

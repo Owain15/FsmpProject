@@ -69,8 +69,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 |---------|----------|
 | FsmpConsole | 88.2% |
 | FsmpDataAcsses | 98.46% |
-| FsmpLibrary | 95.43% |
-| FSMP.Core | 99.53% |
+| FSMP.Core | 94%+ |
 | FSMO | 96.39% |
 
 ---

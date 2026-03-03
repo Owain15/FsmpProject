@@ -1,7 +1,7 @@
 using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 
-namespace FsmpLibrary.Services;
+namespace FSMP.Core.Services;
 
 /// <summary>
 /// Audio service implementation using IAudioPlayer for playback.

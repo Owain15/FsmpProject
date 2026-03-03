@@ -1,5 +1,5 @@
 using FluentAssertions;
-using FsmpLibrary.Services;
+using FSMP.Core.Services;
 
 namespace FSMP.Tests.Services;
 

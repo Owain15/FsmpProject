@@ -1,8 +1,7 @@
-using FSMP.Core;
 using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 
-namespace FsmpLibrary.Services;
+namespace FSMP.Core.Services;
 
 public class PlaylistManager : IPlaylistManager
 {

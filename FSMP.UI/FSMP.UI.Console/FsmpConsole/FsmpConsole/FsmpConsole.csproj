@@ -22,8 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
-    <ProjectReference Include="..\..\..\..\FSMP.lib\FsmpLibrary\FsmpLibrary\FsmpLibrary.csproj" />
-    <ProjectReference Include="..\..\..\..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
+<ProjectReference Include="..\..\..\..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
     <ProjectReference Include="..\..\..\..\FSMP.lib\FSMP.Platform.Windows\FSMP.Platform.Windows.csproj" />
   </ItemGroup>
 

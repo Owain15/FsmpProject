@@ -1,7 +1,6 @@
-using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
 
-namespace FsmpLibrary.Services;
+namespace FSMP.Core.Interfaces;
 
 /// <summary>
 /// High-level audio service for playback operations with track metadata integration.
@@ -65,7 +64,7 @@ public interface IAudioService : IDisposable
 /// <summary>
 /// Event arguments for when the current track changes.
 /// </summary>
-public class TrackChangedEventArgs : EventArgs
+public class TrackChangedEventArgs : System.EventArgs
 {
     /// <summary>Gets the previous track, if any.</summary>
     public Track? PreviousTrack { get; init; }

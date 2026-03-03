@@ -1,4 +1,4 @@
-namespace FsmpLibrary.Services;
+namespace FSMP.Core.Models;
 
 /// <summary>
 /// Technical audio properties extracted from a file (bit rate, sample rate, etc.).

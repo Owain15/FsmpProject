@@ -5,7 +5,7 @@ using FsmpDataAcsses.Services;
 using FSMP.Platform.Windows.Audio;
 using FSMP.Core.Interfaces;
 using FSMP.Core.Models;
-using FsmpLibrary.Services;
+using FSMP.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

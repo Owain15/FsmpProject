@@ -1,4 +1,7 @@
-namespace FsmpLibrary.Services;
+using FSMP.Core.Interfaces;
+using FSMP.Core.Models;
+
+namespace FSMP.Core.Services;
 
 /// <summary>
 /// Reads metadata from audio files (WAV, WMA, MP3) using TagLibSharp.
