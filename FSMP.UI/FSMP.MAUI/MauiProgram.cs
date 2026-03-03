@@ -86,9 +86,12 @@ public static class MauiProgram
         services.AddTransient<LibraryPage>();
         services.AddTransient<NowPlayingPage>();
         services.AddTransient<SettingsPage>();
+        services.AddTransient<PlaylistsPage>();
 
         // ViewModels
         services.AddTransient<NowPlayingViewModel>();
         services.AddTransient<Core.ViewModels.LibraryBrowseViewModel>();
+        services.AddTransient<Core.ViewModels.SettingsViewModel>();
+        services.AddTransient<Core.ViewModels.PlaylistsViewModel>();
     }
 }

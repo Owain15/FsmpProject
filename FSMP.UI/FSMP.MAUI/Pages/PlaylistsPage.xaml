@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
+             x:Class="FSMP.MAUI.Pages.PlaylistsPage"
+             x:DataType="vm:PlaylistsViewModel"
+             Title="Playlists">
+    <VerticalStackLayout Padding="16" Spacing="12">
+
+        <Label Text="Playlists" FontSize="24" FontAttributes="Bold" />
+
+        <!-- Create new playlist -->
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Entry x:Name="PlaylistNameEntry" Placeholder="New playlist name" FontSize="14" />
+            <Button Grid.Column="1" Text="Create"
+                    Command="{Binding CreatePlaylistCommand}"
+                    CommandParameter="{Binding Source={x:Reference PlaylistNameEntry}, Path=Text}" />
+        </Grid>
+
+        <!-- Status -->
+        <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="Gray" />
+
+        <!-- Playlist list -->
+        <CollectionView ItemsSource="{Binding Playlists}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Playlist">
+                    <Grid Padding="8" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <VerticalStackLayout VerticalOptions="Center">
+                            <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                            <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" Text="Load" FontSize="12"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}, Path=LoadIntoQueueCommand}"
+                                CommandParameter="{Binding .}" />
+                        <Button Grid.Column="2" Text="Delete" FontSize="12" TextColor="Red"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}, Path=DeletePlaylistCommand}"
+                                CommandParameter="{Binding .}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="No playlists yet. Create one above!" TextColor="Gray" Padding="8" />
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </VerticalStackLayout>
+</ContentPage>

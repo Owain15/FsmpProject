@@ -41,4 +41,11 @@ Cross-platform business logic for playlist management, active playback queue, an
 
 ## Current Status
 
+### MAUI ViewModels
+
+- [x] `NowPlayingViewModel.cs` — Playback controls, queue display, auto-advance
+- [x] `LibraryBrowseViewModel.cs` — Artist/Album/Track drill-down with play/queue
+- [x] `SettingsViewModel.cs` — Config management, library paths, scan, save
+- [x] `PlaylistsViewModel.cs` — Playlist CRUD, load into queue
+
 **Status**: Complete | **Coverage**: 99.53% | **Tests**: 45+ passing

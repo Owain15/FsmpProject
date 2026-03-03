@@ -1,10 +1,63 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
              x:Class="FSMP.MAUI.Pages.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
              Title="Settings">
-    <VerticalStackLayout Padding="16" Spacing="8">
-        <Label Text="Settings" FontSize="24" FontAttributes="Bold" />
-        <Label Text="Library paths and configuration will appear here." TextColor="Gray" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="Settings" FontSize="24" FontAttributes="Bold" />
+
+            <!-- Library Paths -->
+            <Label Text="Library Paths" FontSize="18" FontAttributes="Bold" />
+
+            <CollectionView ItemsSource="{Binding LibraryPaths}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Grid Padding="4" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding .}" FontSize="14" VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="Remove" FontSize="12"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=RemovePathCommand}"
+                                    CommandParameter="{Binding .}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <Label Text="No library paths configured." TextColor="Gray" />
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry x:Name="NewPathEntry" Placeholder="Enter folder path" FontSize="14" />
+                <Button Grid.Column="1" Text="Add"
+                        Command="{Binding AddPathCommand}"
+                        CommandParameter="{Binding Source={x:Reference NewPathEntry}, Path=Text}" />
+            </Grid>
+
+            <!-- Scan -->
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <Button Text="Scan Libraries" Command="{Binding ScanCommand}"
+                        />
+                <Label Grid.Column="1" Text="{Binding StatusMessage}" FontSize="14"
+                       VerticalOptions="Center" TextColor="Gray" />
+            </Grid>
+
+            <!-- Auto-scan toggle -->
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Auto-scan on startup" FontSize="16" VerticalOptions="Center" />
+                <Switch Grid.Column="1" IsToggled="{Binding AutoScanOnStartup}" />
+            </Grid>
+
+            <!-- Volume slider -->
+            <Label Text="{Binding DefaultVolume, StringFormat='Default Volume: {0}%'}" FontSize="16" />
+            <Slider Minimum="0" Maximum="100" Value="{Binding DefaultVolume}" />
+
+            <!-- Save -->
+            <Button Text="Save Settings" Command="{Binding SaveCommand}"
+                    HorizontalOptions="Start" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

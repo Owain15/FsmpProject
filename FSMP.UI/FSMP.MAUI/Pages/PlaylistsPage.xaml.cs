@@ -2,11 +2,11 @@ using FSMP.Core.ViewModels;
 
 namespace FSMP.MAUI.Pages;
 
-public partial class SettingsPage : ContentPage
+public partial class PlaylistsPage : ContentPage
 {
-    private readonly SettingsViewModel _viewModel;
+    private readonly PlaylistsViewModel _viewModel;
 
-    public SettingsPage(SettingsViewModel viewModel)
+    public PlaylistsPage(PlaylistsViewModel viewModel)
     {
         InitializeComponent();
         _viewModel = viewModel;

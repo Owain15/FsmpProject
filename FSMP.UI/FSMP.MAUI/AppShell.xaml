@@ -13,6 +13,9 @@
             Title="Library"
             ContentTemplate="{DataTemplate pages:LibraryPage}" />
         <ShellContent
+            Title="Playlists"
+            ContentTemplate="{DataTemplate pages:PlaylistsPage}" />
+        <ShellContent
             Title="Settings"
             ContentTemplate="{DataTemplate pages:SettingsPage}" />
     </TabBar>
