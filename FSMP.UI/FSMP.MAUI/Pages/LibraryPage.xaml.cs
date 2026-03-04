@@ -1,21 +1,32 @@
 using FSMP.Core.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FSMP.MAUI.Pages;
 
 public partial class LibraryPage : ContentPage
 {
     private readonly LibraryBrowseViewModel _viewModel;
+    private readonly IServiceScope _scope;
 
-    public LibraryPage(LibraryBrowseViewModel viewModel)
+    public LibraryPage()
     {
+        _scope = App.Services.CreateScope();
+        _viewModel = _scope.ServiceProvider.GetRequiredService<LibraryBrowseViewModel>();
         InitializeComponent();
-        _viewModel = viewModel;
         BindingContext = _viewModel;
+        Unloaded += (_, _) => _scope.Dispose();
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadAsync();
+        try
+        {
+            await _viewModel.LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            App.Log($"LibraryPage.OnAppearing error: {ex}");
+        }
     }
 }
