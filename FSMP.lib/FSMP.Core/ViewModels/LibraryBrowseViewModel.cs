@@ -18,16 +18,18 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
 {
     private readonly ILibraryBrowser _libraryBrowser;
     private readonly IPlaybackController _playbackController;
+    private readonly Action<Action> _dispatchToUI;
 
     private BrowseLevel _browseLevel = BrowseLevel.Artists;
     private string _pageTitle = "Artists";
     private int? _currentArtistId;
     private int? _currentAlbumId;
 
-    public LibraryBrowseViewModel(ILibraryBrowser libraryBrowser, IPlaybackController playbackController)
+    public LibraryBrowseViewModel(ILibraryBrowser libraryBrowser, IPlaybackController playbackController, Action<Action> dispatchToUI)
     {
         _libraryBrowser = libraryBrowser ?? throw new ArgumentNullException(nameof(libraryBrowser));
         _playbackController = playbackController ?? throw new ArgumentNullException(nameof(playbackController));
+        _dispatchToUI = dispatchToUI ?? throw new ArgumentNullException(nameof(dispatchToUI));
 
         Items = new ObservableCollection<object>();
         SelectItemCommand = new AsyncRelayCommand<object>(OnSelectItem);
@@ -65,13 +67,16 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
         _currentAlbumId = null;
 
         var result = await _libraryBrowser.GetAllArtistsAsync();
-        Items.Clear();
-        if (result.IsSuccess)
+        _dispatchToUI(() =>
         {
-            foreach (var artist in result.Value!)
-                Items.Add(artist);
-        }
-        OnPropertyChanged(nameof(CanGoBack));
+            Items.Clear();
+            if (result.IsSuccess)
+            {
+                foreach (var artist in result.Value!)
+                    Items.Add(artist);
+            }
+            OnPropertyChanged(nameof(CanGoBack));
+        });
     }
 
     private async Task OnSelectItem(object? item)
@@ -97,13 +102,16 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
         PageTitle = artist.Name;
 
         var result = await _libraryBrowser.GetAlbumsByArtistAsync(artist.ArtistId);
-        Items.Clear();
-        if (result.IsSuccess)
+        _dispatchToUI(() =>
         {
-            foreach (var album in result.Value!)
-                Items.Add(album);
-        }
-        OnPropertyChanged(nameof(CanGoBack));
+            Items.Clear();
+            if (result.IsSuccess)
+            {
+                foreach (var album in result.Value!)
+                    Items.Add(album);
+            }
+            OnPropertyChanged(nameof(CanGoBack));
+        });
     }
 
     private async Task LoadTracksForAlbum(Album album)
@@ -113,13 +121,16 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
         PageTitle = album.Title;
 
         var result = await _libraryBrowser.GetAlbumWithTracksAsync(album.AlbumId);
-        Items.Clear();
-        if (result.IsSuccess && result.Value is not null)
+        _dispatchToUI(() =>
         {
-            foreach (var track in result.Value.Tracks)
-                Items.Add(track);
-        }
-        OnPropertyChanged(nameof(CanGoBack));
+            Items.Clear();
+            if (result.IsSuccess && result.Value is not null)
+            {
+                foreach (var track in result.Value.Tracks)
+                    Items.Add(track);
+            }
+            OnPropertyChanged(nameof(CanGoBack));
+        });
     }
 
     private async Task OnPlayNow(Track? track)

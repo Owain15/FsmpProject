@@ -10,12 +10,14 @@ namespace FSMP.Core.ViewModels;
 public class PlaylistsViewModel : INotifyPropertyChanged
 {
     private readonly IPlaylistManager _playlistManager;
+    private readonly Action<Action> _dispatchToUI;
 
     private string _statusMessage = string.Empty;
 
-    public PlaylistsViewModel(IPlaylistManager playlistManager)
+    public PlaylistsViewModel(IPlaylistManager playlistManager, Action<Action> dispatchToUI)
     {
         _playlistManager = playlistManager ?? throw new ArgumentNullException(nameof(playlistManager));
+        _dispatchToUI = dispatchToUI ?? throw new ArgumentNullException(nameof(dispatchToUI));
 
         Playlists = new ObservableCollection<Playlist>();
         CreatePlaylistCommand = new AsyncRelayCommand<string>(OnCreatePlaylist);
@@ -38,12 +40,15 @@ public class PlaylistsViewModel : INotifyPropertyChanged
     public async Task LoadAsync()
     {
         var result = await _playlistManager.GetAllPlaylistsAsync();
-        Playlists.Clear();
-        if (result.IsSuccess && result.Value is not null)
+        _dispatchToUI(() =>
         {
-            foreach (var playlist in result.Value)
-                Playlists.Add(playlist);
-        }
+            Playlists.Clear();
+            if (result.IsSuccess && result.Value is not null)
+            {
+                foreach (var playlist in result.Value)
+                    Playlists.Add(playlist);
+            }
+        });
     }
 
     private async Task OnCreatePlaylist(string? name)

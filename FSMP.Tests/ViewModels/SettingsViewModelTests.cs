@@ -17,7 +17,7 @@ public class SettingsViewModelTests
     {
         _libraryManagerMock = new Mock<ILibraryManager>();
         _configServiceMock = new Mock<IConfigurationService>();
-        _vm = new SettingsViewModel(_libraryManagerMock.Object, _configServiceMock.Object);
+        _vm = new SettingsViewModel(_libraryManagerMock.Object, _configServiceMock.Object, action => action());
     }
 
     [Fact]
@@ -154,14 +154,14 @@ public class SettingsViewModelTests
     [Fact]
     public void Constructor_ThrowsOnNullLibraryManager()
     {
-        var act = () => new SettingsViewModel(null!, _configServiceMock.Object);
+        var act = () => new SettingsViewModel(null!, _configServiceMock.Object, action => action());
         act.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void Constructor_ThrowsOnNullConfigService()
     {
-        var act = () => new SettingsViewModel(_libraryManagerMock.Object, null!);
+        var act = () => new SettingsViewModel(_libraryManagerMock.Object, null!, action => action());
         act.Should().Throw<ArgumentNullException>();
     }
 

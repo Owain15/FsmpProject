@@ -15,7 +15,7 @@ public class PlaylistsViewModelTests
     public PlaylistsViewModelTests()
     {
         _playlistManagerMock = new Mock<IPlaylistManager>();
-        _vm = new PlaylistsViewModel(_playlistManagerMock.Object);
+        _vm = new PlaylistsViewModel(_playlistManagerMock.Object, action => action());
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class PlaylistsViewModelTests
     [Fact]
     public void Constructor_ThrowsOnNull()
     {
-        var act = () => new PlaylistsViewModel(null!);
+        var act = () => new PlaylistsViewModel(null!, action => action());
         act.Should().Throw<ArgumentNullException>();
     }
 

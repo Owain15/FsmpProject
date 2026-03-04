@@ -17,7 +17,7 @@ public class LibraryBrowseViewModelTests
     {
         _browserMock = new Mock<ILibraryBrowser>();
         _playbackMock = new Mock<IPlaybackController>();
-        _vm = new LibraryBrowseViewModel(_browserMock.Object, _playbackMock.Object);
+        _vm = new LibraryBrowseViewModel(_browserMock.Object, _playbackMock.Object, action => action());
     }
 
     [Fact]

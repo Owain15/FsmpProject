@@ -69,7 +69,7 @@
 
         <!-- Items list -->
         <CollectionView ItemsSource="{Binding Items}" SelectionMode="None"
-                        ItemTemplateSelector="{StaticResource ItemSelector}" />
+                        ItemTemplate="{StaticResource ItemSelector}" />
 
     </VerticalStackLayout>
 </ContentPage>

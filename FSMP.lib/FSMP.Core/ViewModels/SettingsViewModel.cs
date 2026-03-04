@@ -11,6 +11,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 {
     private readonly ILibraryManager _libraryManager;
     private readonly IConfigurationService _configService;
+    private readonly Action<Action> _dispatchToUI;
 
     private bool _autoScanOnStartup;
     private int _defaultVolume = 75;
@@ -18,10 +19,11 @@ public class SettingsViewModel : INotifyPropertyChanged
     private string _statusMessage = string.Empty;
     private Configuration? _config;
 
-    public SettingsViewModel(ILibraryManager libraryManager, IConfigurationService configService)
+    public SettingsViewModel(ILibraryManager libraryManager, IConfigurationService configService, Action<Action> dispatchToUI)
     {
         _libraryManager = libraryManager ?? throw new ArgumentNullException(nameof(libraryManager));
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
+        _dispatchToUI = dispatchToUI ?? throw new ArgumentNullException(nameof(dispatchToUI));
 
         LibraryPaths = new ObservableCollection<string>();
         AddPathCommand = new AsyncRelayCommand<string>(OnAddPath);
@@ -67,11 +69,14 @@ public class SettingsViewModel : INotifyPropertyChanged
         if (result.IsSuccess && result.Value is not null)
         {
             _config = result.Value;
-            LibraryPaths.Clear();
-            foreach (var path in _config.LibraryPaths)
-                LibraryPaths.Add(path);
-            AutoScanOnStartup = _config.AutoScanOnStartup;
-            DefaultVolume = _config.DefaultVolume;
+            _dispatchToUI(() =>
+            {
+                LibraryPaths.Clear();
+                foreach (var path in _config.LibraryPaths)
+                    LibraryPaths.Add(path);
+                AutoScanOnStartup = _config.AutoScanOnStartup;
+                DefaultVolume = _config.DefaultVolume;
+            });
         }
     }
 

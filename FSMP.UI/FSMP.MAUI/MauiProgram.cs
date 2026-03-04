@@ -90,8 +90,19 @@ public static class MauiProgram
 
         // ViewModels
         services.AddTransient<NowPlayingViewModel>();
-        services.AddTransient<Core.ViewModels.LibraryBrowseViewModel>();
-        services.AddTransient<Core.ViewModels.SettingsViewModel>();
-        services.AddTransient<Core.ViewModels.PlaylistsViewModel>();
+        services.AddTransient<Core.ViewModels.LibraryBrowseViewModel>(sp =>
+            new Core.ViewModels.LibraryBrowseViewModel(
+                sp.GetRequiredService<ILibraryBrowser>(),
+                sp.GetRequiredService<IPlaybackController>(),
+                MainThread.BeginInvokeOnMainThread));
+        services.AddTransient<Core.ViewModels.SettingsViewModel>(sp =>
+            new Core.ViewModels.SettingsViewModel(
+                sp.GetRequiredService<ILibraryManager>(),
+                sp.GetRequiredService<IConfigurationService>(),
+                MainThread.BeginInvokeOnMainThread));
+        services.AddTransient<Core.ViewModels.PlaylistsViewModel>(sp =>
+            new Core.ViewModels.PlaylistsViewModel(
+                sp.GetRequiredService<IPlaylistManager>(),
+                MainThread.BeginInvokeOnMainThread));
     }
 }
