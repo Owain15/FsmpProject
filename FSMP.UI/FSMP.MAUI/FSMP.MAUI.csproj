@@ -8,7 +8,9 @@
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Platforms>ARM64</Platforms>
+    <Platforms>ARM64;x64</Platforms>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
 
     <ApplicationTitle>FSMP Music Player</ApplicationTitle>
     <ApplicationId>com.fsmp.musicplayer</ApplicationId>

@@ -26,11 +26,11 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Enable MAUI build in solution (currently `Build=false` in slnx) | Pending |
-| 2 | Build MAUI project, fix compilation errors | Pending |
-| 3 | Fix runtime issues (LibVLC ARM64, DB paths, EF migrations) | Pending |
+| 1 | Enable MAUI build in solution (currently `Build=false` in slnx) | Done |
+| 2 | Build MAUI project, fix compilation errors | Done |
+| 3 | Fix runtime issues (LibVLC ARM64, DB paths, EF migrations) | Ready to test |
 | 4 | Verify end-to-end: add directory → scan → browse → queue → play | Pending |
-| 5 | Update build.cmd with MAUI build support | Pending |
+| 5 | Update build.cmd with MAUI build support | Done (solution build includes MAUI) |
 | 6 | Add ViewModel tests to maintain 80%+ coverage | Pending |
 
 ---

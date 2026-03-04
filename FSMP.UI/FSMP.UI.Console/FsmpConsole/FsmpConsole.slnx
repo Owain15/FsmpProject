@@ -16,9 +16,8 @@
     <Platform Solution="*|x64" Project="x64" />
   </Project>
   <Project Path="../../FSMP.MAUI/FSMP.MAUI.csproj">
-    <Platform Project="ARM64" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
     <Build Solution="*|x64" Project="false" />
-    <Build Solution="*|ARM64" Project="false" />
   </Project>
   <Project Path="FsmpConsole/FsmpConsole.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />
