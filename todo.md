@@ -9,15 +9,61 @@
 | FsmpConsole | Console UI application | Complete (v1) | 88.7% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
 | FSMO | File System Music Organizer | Complete (10/10) | 96.3% | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
-| FSMP.MAUI | Cross-platform MAUI UI | In progress | -- | [todo](FSMP.UI/FSMP.MAUI/todo.md) |
+| FSMP.MAUI | MAUI UI (Windows) | In progress | -- | -- |
 
 **Overall coverage**: 94.3% | **Tests**: 960 passing | **Build**: Passing
 
 ---
 
+## Active Work
+
+### MAUI Windows — Build, Run & Verify
+
+**Status**: In progress
+**Goal**: Get the MAUI app building and running on Windows to verify audio + UI functionality
+
+The MAUI app has all UI pages and ViewModels wired up but has never been built or run. The flow is: Settings (add directory → scan) → Library (browse → queue) → Now Playing (playback).
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Enable MAUI build in solution (currently `Build=false` in slnx) | Pending |
+| 2 | Build MAUI project, fix compilation errors | Pending |
+| 3 | Fix runtime issues (LibVLC ARM64, DB paths, EF migrations) | Pending |
+| 4 | Verify end-to-end: add directory → scan → browse → queue → play | Pending |
+| 5 | Update build.cmd with MAUI build support | Pending |
+| 6 | Add ViewModel tests to maintain 80%+ coverage | Pending |
+
+---
+
+## Deferred Work
+
+### Android Support
+
+**Status**: Deferred — waiting until MAUI works on Windows
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| Platform.Android project setup | Create project, configure LibVLCSharp Android | Not started |
+| ExoPlayer FFmpeg for WMA | Real-time WMA decoding on Android | Not started |
+| Android-specific features | Permissions, background playback, lock screen | Not started |
+| Android testing | Device/emulator verification | Not started |
+
+---
+
 ## Completed Milestones
 
-### v1.0 -- Console Music Player (26 slices)
+### Cross-Platform Architecture Migration
+
+**Status**: Complete (Batches 1-3)
+
+Restructured the codebase for cross-platform support:
+- Created FSMP.Core with cross-platform interfaces, models, services, and ViewModels
+- Created FSMP.Platform.Windows with LibVLC audio player implementation
+- Created FSMP.MAUI with 4-tab UI (Now Playing, Library, Playlists, Settings)
+- Removed FsmpLibrary (replaced by FSMP.Core + FSMP.Platform.Windows)
+- 960 tests passing, 94.3% coverage
+
+### v1.0 — Console Music Player (26 slices)
 
 - [x] Testing infrastructure (xUnit, Moq, FluentAssertions, Coverlet)
 - [x] Entity models (Track, Album, Artist, Genre, FileExtension, PlaybackHistory, LibraryPath, Configuration)
@@ -26,217 +72,58 @@
 - [x] Services (Configuration, Metadata, Library Scan, Playback Tracking, Statistics)
 - [x] Console UI (Menu, Browse, Playback, Metadata Editor, Library Manager, Statistics Viewer)
 - [x] Program.cs integration with AppStartup
-- [x] End-to-end testing and error handling (513 tests, 92.49% coverage)
+- [x] End-to-end testing and error handling
 
 Full slice-by-slice history: [todo-v1-archive.md](todo-v1-archive.md)
 
----
-
-## Active Work
-
 ### Playlist + Music Player Feature
 
-**Status**: Complete | **Batches**: 17/17 complete
-**Plan**: [.claude/plans/smooth-wishing-cerf.md](.claude/plans/smooth-wishing-cerf.md)
-
-| # | Component | Status | Project |
-|---|-----------|--------|---------|
-| 1 | FSMP.Core project setup (csproj, slnx, refs) | **Complete** | FSMP.Core |
-| 2 | RepeatMode enum + ActivePlaylistService | **Complete** | FSMP.Core |
-| 3 | ActivePlaylistService tests | **Complete** | FSMP.Tests |
-| 4 | Playlist + PlaylistTrack models | **Complete** | FsmpLibrary |
-| 5 | Playlist model tests | **Complete** | FSMP.Tests |
-| 6 | FsmpDbContext (DbSets + config) | **Complete** | FsmpDataAcsses |
-| 7 | EF Core migration (AddPlaylists) | **Complete** | FsmpDataAcsses |
-| 8 | Entity configuration tests | **Complete** | FSMP.Tests |
-| 9 | PlaylistRepository + UnitOfWork | **Complete** | FsmpDataAcsses |
-| 10 | PlaylistRepository tests | **Complete** | FSMP.Tests |
-| 11 | PlaylistService | **Complete** | FsmpDataAcsses |
-| 12 | PlaylistService tests | **Complete** | FSMP.Tests |
-| 13 | PlayerUI + Print.NewDisplay() update | **Complete** | FsmpConsole |
-| 14 | MenuSystem + AppStartup + BrowseUI updates | **Complete** | FsmpConsole |
-| 15 | PlayerUI tests + Print.NewDisplay tests | **Complete** | FSMP.Tests |
-| 16 | MenuSystem/BrowseUI test updates | **Complete** | FSMP.Tests |
-| 17 | Update all todo.md files | **Complete** | — |
-
-**Key Features**:
 - Saved playlists (DB-persisted with ordered tracks)
 - Active playlist (in-memory queue of track IDs)
-- Music player view with current track display
-- Playback controls: play/pause, next, prev, restart, stop
-- Repeat modes: None, One, All
-- Shuffle on/off
+- Music player view with playback controls (play/pause, next, prev, stop)
+- Repeat modes (None, One, All) and shuffle
 
----
+### FSMO — File System Music Organizer
+
+Scan source directories for audio files and reorganize into Artist/Album/Track structure. Copy/move with duplicate handling. See [FSMO todo](FSMP.lib/FSMO/todo.md).
+
+### Console UI Restructure
+
+Player screen as primary UI with hotkey navigation (B=Browse, L=Playlists, D=Directories, X=Exit).
+
+### Orchestration Service Refactor
+
+Replaced god-object PlayerUI with clean orchestration layer: IPlaybackController, ILibraryBrowser, IPlaylistManager, ILibraryManager with Result<T> pattern.
+
+### Queue State Persistence
+
+Persist active queue (track order, position, shuffle, repeat) across sessions as JSON.
+
+### Player Bug Fixes & Enhancements
+
+13 fixes including auto-play, pause key, resume after stop, sliding queue window, skip-to-track.
+
+### Test Isolation Audit
+
+Extracted IActivePlaylistService, mocked dependencies, split/fixed tests.
 
 ### FsmpLibrary Coverage Improvement
 
-**Status**: Complete | **Batches**: 11/11 complete
-**Plan**: [.claude/plans/nifty-launching-sunset.md](.claude/plans/nifty-launching-sunset.md)
-
-Refactored `LibVlcAudioPlayer` to extract `IMediaPlayerAdapter` interface, enabling unit testing of the audio player business logic without requiring LibVLC runtime. Added 52 new tests covering constructor, properties, LoadAsync, PlayAsync, PauseAsync, StopAsync, SeekAsync, event handlers, state machine, and disposal.
-
-**Result**: FsmpLibrary coverage **65.74% -> 86.26%** (target was 80%+)
+LibVlcAudioPlayer refactored with IMediaPlayerAdapter. Coverage 65.74% → 86.26%.
 
 ---
 
-### FSMO -- File System Music Organizer
+## Build & Test Quick Reference
 
-**Status**: Complete (10/10 slices)
-
-Scan source directories for audio files and reorganize them into `Artist/Album/Track` structure. Supports copy and move operations with duplicate handling.
-
-See [FSMO todo](FSMP.lib/FSMO/todo.md) for detailed task breakdown.
-
----
-
-## Console UI Restructure: Player as Main Screen
-
-**Status**: Complete | **Plan**: [.claude/plans/lexical-growing-acorn.md](.claude/plans/lexical-growing-acorn.md)
-
-Replace the 8-option main menu with the Player screen as the primary UI. Navigation to Browse, Playlists, and Directories via hotkeys from the player.
-
-| # | Task | Status | Project |
-|---|------|--------|---------|
-| 1 | Expand PlayerUI with B/L/D/X hotkeys and sub-screen launchers | **Complete** | FsmpConsole |
-| 2 | Update Print.NewDisplay to show navigation hotkeys | **Complete** | FsmpConsole |
-| 3 | Simplify/remove MenuSystem (PlayerUI is now the entry point) | **Complete** | FsmpConsole |
-| 4 | Update AppStartup wiring for expanded PlayerUI | **Complete** | FsmpConsole |
-| 5 | Update PlayerUI tests for new hotkeys and sub-screens | **Complete** | FSMP.Tests |
-| 6 | Update MenuSystem tests / remove if MenuSystem removed | **Complete** | FSMP.Tests |
-| 7 | Update Print.NewDisplay tests | **Complete** | FSMP.Tests |
-| 8 | Verify build, all tests pass, 80%+ coverage maintained | **Complete** | All |
-
-**Removed from main flow**: Statistics, Settings, Scan Libraries (scan accessible via Directories)
+```batch
+build.cmd                    # Build console solution (MSBuild for COM interop)
+test.cmd                     # Run all tests
+test-with-coverage.cmd       # Run tests with coverage report
+```
 
 ---
 
-## Player Menu Bug Fixes & Enhancements
-
-**Status**: Complete
-
-| # | Fix | Status | File |
-|---|-----|--------|------|
-| 1 | RestartTrackAsync resumes playback after seek | **Complete** | PlayerUI.cs |
-| 2 | Directory path validation before adding | **Complete** | PlayerUI.cs |
-| 3 | Show scan error details instead of just count | **Complete** | PlayerUI.cs |
-| 4 | Directories menu loops (like Playlists) | **Complete** | PlayerUI.cs |
-| 5 | Error handling on playlist create/delete | **Complete** | PlayerUI.cs |
-| 6 | Shuffle/Repeat status messages | **Complete** | PlayerUI.cs |
-| 7 | Auto-play on queue load (Browse/Playlists) | **Complete** | PlayerUI.cs |
-| 8 | Pause key changed from Space to [K] (Space unreachable after Trim) | **Complete** | PlayerUI.cs, Print.cs |
-| 9 | Resume after Stop re-loads track (LibVLC requirement) | **Complete** | PlayerUI.cs |
-| 10 | Queue display: sliding window with current track centered | **Complete** | PlayerUI.cs |
-| 11 | [V] View full queue | **Complete** | PlayerUI.cs |
-| 12 | [#] Skip to track by number | **Complete** | PlayerUI.cs, Print.cs |
-| 13 | Skip-to-track tests (4 new tests) | **Complete** | PlayerUITests.cs |
-
----
-
-## Orchestration Service Refactor
-
-**Status**: Complete | **Tests**: 864 passing
-
-Replaced the god-object PlayerUI (6+ raw service deps) with a clean orchestration layer:
-- `Result<T>` pattern for structured success/failure in FSMP.Core
-- 4 data access interfaces: `ITrackRepository`, `IArtistRepository`, `IAlbumRepository`, `IPlaylistService`, `ILibraryScanService`, `IConfigurationService`
-- 4 orchestration interfaces: `IPlaybackController`, `ILibraryBrowser`, `IPlaylistManager`, `ILibraryManager`
-- 4 implementations in FsmpLibrary wrapping calls in try/catch returning `Result<T>`
-- PlayerUI constructor: 4 orchestration deps (was 6 raw services + UnitOfWork)
-- BrowseUI constructor: 2 orchestration deps (was UnitOfWork + IAudioService + ActivePlaylistService)
-- No direct `UnitOfWork` usage in any UI file
-- All UI error handling uses `result.IsSuccess` / `result.ErrorMessage`
-- ScanResult moved to FSMP.Core.Models, QueueItem DTO added
-
----
-
-## Test Isolation Audit
-
-**Status**: Complete | **Tests**: 864 passing (net +1)
-
-Audited all tests to ensure each tests one function with no unnecessary dependencies:
-- Extracted `IActivePlaylistService` interface from `ActivePlaylistService` (FSMP.Core)
-- Updated `PlaybackController` and `PlaylistManager` to depend on `IActivePlaylistService`
-- Mocked `IActivePlaylistService` in `PlaybackControllerTests` and `PlaylistManagerTests`
-- Split `ToggleRepeatMode_CyclesThroughModes` into 3 independent tests
-- Fixed `TogglePlayStopAsync_StopsWhenPlaying` to use `SetState()` instead of calling `PlayAsync()`
-- Deleted redundant `AfterDispose_AllMethodsShouldThrowObjectDisposedException` (covered by individual tests)
-- Made `MockAudioPlayer.SetState()` public for direct state setup in tests
-
----
-
-## Queue State Persistence
-
-**Status**: Complete | **Tests**: 13 new (877 total)
-
-Persist active queue (track order, position, shuffle, repeat mode) across sessions as JSON file alongside config.
-
-| # | Task | Status | Project |
-|---|------|--------|---------|
-| 1 | `QueueState` model | **Complete** | FSMP.Core |
-| 2 | `IQueueStateRepository` interface | **Complete** | FSMP.Core |
-| 3 | `GetState()` / `RestoreState()` on IActivePlaylistService | **Complete** | FSMP.Core |
-| 4 | `JsonQueueStateRepository` (atomic JSON file I/O) | **Complete** | FsmpDataAcsses |
-| 5 | AppStartup: restore on startup, save on shutdown | **Complete** | FsmpConsole |
-| 6 | State round-trip tests (8 tests) | **Complete** | FSMP.Tests |
-| 7 | Repository tests (5 tests) | **Complete** | FSMP.Tests |
-
----
-
-## Cross-Platform Migration (Windows + Android)
-
-**Status**: In progress | **Batch 1 Complete**
-**Plan Document**: [.claude/plans/soft-percolating-codd.md](.claude/plans/soft-percolating-codd.md)
-**Decision**: Use LibVLCSharp on both Windows and Android
-
-| # | Phase | Status | Projects Affected |
-|---|-------|--------|-------------------|
-| 1 | Setup Projects | **Partial** | FSMP.Core ✓, FSMP.MAUI ✓, Platform.Windows ✓ (exists), Platform.Android pending |
-| 2 | Platform Abstraction | **Complete** | Interfaces in FSMP.Core ✓, LibVLC moved to Platform.Windows ✓, InitializationError on interface ✓ |
-| 3 | Migrate Business Logic | **Complete** | FSMP.Core (services moved), FsmpLibrary removed |
-| 4 | Configure LibVLCSharp Android | Not started | Platform.Android |
-| 5 | Build MAUI UI | **In progress** | FSMP.MAUI (NowPlaying, Library with DataTemplateSelector, Settings with ViewModel, Playlists page) |
-| 6 | Android-Specific Features | Not started | FSMP.MAUI, Platform.Android |
-| 7 | Testing & Coverage | Not started | FSMP.Tests |
-| 8 | Documentation & Migration | Not started | All |
-
-**Batch 1 Complete** (Interface Cleanup):
-- [x] Deleted duplicate interfaces from FsmpLibrary/Interfaces/
-- [x] FsmpLibrary now uses FSMP.Core.Interfaces
-- [x] Build passes (MAUI requires SDK installation)
-
-**Batch 2 Complete** (Move LibVLC to Platform.Windows):
-- [x] Copied LibVlcAudioPlayer, LibVlcAudioPlayerFactory, LibVlcMediaPlayerAdapter to FSMP.Platform.Windows.Audio
-- [x] Switched all consumers (FsmpConsole, FSMP.MAUI, FSMP.Tests) to new namespace
-- [x] Deleted old Audio files from FsmpLibrary
-- [x] Removed LibVLCSharp/VideoLAN.LibVLC.Windows from FsmpLibrary.csproj
-- [x] Added InitializationError to IAudioPlayerFactory interface
-- [x] Removed concrete cast in AppStartup.cs
-- [x] FsmpLibrary is now platform-agnostic (no Windows-specific dependencies)
-- [x] 917 tests passing
-
-**Batch 3 Complete** (Move Services to FSMP.Core & Remove FsmpLibrary):
-- [x] Moved IAudioService, IMetadataService interfaces to FSMP.Core.Interfaces
-- [x] Moved TrackMetadata, AudioProperties models to FSMP.Core.Models
-- [x] Moved all 7 service implementations to FSMP.Core.Services (AudioService, ConfigurationService, MetadataService, PlaybackController, LibraryBrowser, LibraryManager, PlaylistManager)
-- [x] Added TagLibSharp and System.Text.Json to FSMP.Core.csproj
-- [x] Switched all 14 consumer files from `FsmpLibrary.Services` to `FSMP.Core.Services`
-- [x] Removed FsmpLibrary project references from all csproj files (FsmpConsole, FSMP.MAUI, FSMP.Tests, FsmpDataAcsses)
-- [x] Removed FsmpLibrary from FsmpConsole.slnx
-- [x] Deleted FsmpLibrary directory entirely
-- [x] 917 tests passing
-
-**Key Requirements:**
-- Support Windows 10/11 and Android 11+
-- WMA playback WITHOUT altering originals (ExoPlayer FFmpeg on Android)
-- Update console app to use new architecture (not deprecate)
-- Maintain 80%+ test coverage throughout
-
-When implementation begins, per-project todo.md files will be created for each new project.
-
----
-
-## Remaining Manual Verification
+## Manual Verification Checklist
 
 - [ ] Fresh install creates config.json and fsmp.db
 - [ ] Add multiple library paths via UI
@@ -246,16 +133,4 @@ When implementation begins, per-project todo.md files will be created for each n
 - [ ] WMA playback works
 - [ ] MP3 playback works
 - [ ] Metadata editing saves to database
-- [ ] Statistics display correctly
 - [ ] Application restart preserves all data
-- [ ] Custom metadata overrides display correctly
-
----
-
-## Build & Test Quick Reference
-
-```batch
-build.cmd                    # Build solution (MSBuild for COM interop)
-test.cmd                     # Run all tests
-test-with-coverage.cmd       # Run tests with coverage report
-```
