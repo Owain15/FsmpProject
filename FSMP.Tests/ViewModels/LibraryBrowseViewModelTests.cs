@@ -135,6 +135,81 @@ public class LibraryBrowseViewModelTests
     }
 
     [Fact]
+    public async Task PlayAll_AtArtistsLevel_QueuesAllTracks()
+    {
+        var trackIds = new List<int> { 1, 2, 3 };
+        _browserMock.Setup(b => b.GetAllArtistsAsync())
+            .ReturnsAsync(Result.Success(new List<Artist>()));
+        _browserMock.Setup(b => b.GetAllTrackIdsAsync())
+            .ReturnsAsync(Result.Success(trackIds));
+        _playbackMock.Setup(p => p.JumpToAsync(0))
+            .ReturnsAsync(Result.Success());
+
+        await _vm.LoadAsync();
+        _vm.PlayAllCommand.Execute(null);
+        await Task.Delay(50);
+
+        _playbackMock.Verify(p => p.SetQueue(It.Is<IReadOnlyList<int>>(ids =>
+            ids.Count == 3 && ids[0] == 1 && ids[1] == 2 && ids[2] == 3)), Times.Once);
+        _playbackMock.Verify(p => p.JumpToAsync(0), Times.Once);
+    }
+
+    [Fact]
+    public async Task PlayAll_AtAlbumsLevel_QueuesArtistTracks()
+    {
+        var artist = new Artist { ArtistId = 1, Name = "Test Artist" };
+        var trackIds = new List<int> { 10, 11 };
+        _browserMock.Setup(b => b.GetAlbumsByArtistAsync(1))
+            .ReturnsAsync(Result.Success(new List<Album>()));
+        _browserMock.Setup(b => b.GetAllTrackIdsByArtistAsync(1))
+            .ReturnsAsync(Result.Success(trackIds));
+        _playbackMock.Setup(p => p.JumpToAsync(0))
+            .ReturnsAsync(Result.Success());
+
+        _vm.SelectItemCommand.Execute(artist);
+        await Task.Delay(50);
+        _vm.BrowseLevel.Should().Be(BrowseLevel.Albums);
+
+        _vm.PlayAllCommand.Execute(null);
+        await Task.Delay(50);
+
+        _playbackMock.Verify(p => p.SetQueue(It.Is<IReadOnlyList<int>>(ids =>
+            ids.Count == 2 && ids[0] == 10 && ids[1] == 11)), Times.Once);
+        _playbackMock.Verify(p => p.JumpToAsync(0), Times.Once);
+    }
+
+    [Fact]
+    public async Task PlayAll_AtTracksLevel_QueuesCurrentTracks()
+    {
+        var album = new Album { AlbumId = 10, Title = "Test Album" };
+        var albumWithTracks = new Album
+        {
+            AlbumId = 10,
+            Title = "Test Album",
+            Tracks = new List<Track>
+            {
+                new() { TrackId = 100, Title = "Track 1" },
+                new() { TrackId = 101, Title = "Track 2" }
+            }
+        };
+        _browserMock.Setup(b => b.GetAlbumWithTracksAsync(10))
+            .ReturnsAsync(Result.Success<Album?>(albumWithTracks));
+        _playbackMock.Setup(p => p.JumpToAsync(0))
+            .ReturnsAsync(Result.Success());
+
+        _vm.SelectItemCommand.Execute(album);
+        await Task.Delay(50);
+        _vm.BrowseLevel.Should().Be(BrowseLevel.Tracks);
+
+        _vm.PlayAllCommand.Execute(null);
+        await Task.Delay(50);
+
+        _playbackMock.Verify(p => p.SetQueue(It.Is<IReadOnlyList<int>>(ids =>
+            ids.Count == 2 && ids[0] == 100 && ids[1] == 101)), Times.Once);
+        _playbackMock.Verify(p => p.JumpToAsync(0), Times.Once);
+    }
+
+    [Fact]
     public async Task GoBack_FromAlbums_ReturnsToArtists()
     {
         // Navigate to albums first

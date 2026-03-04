@@ -59,12 +59,14 @@
 
     <VerticalStackLayout Padding="16" Spacing="8">
 
-        <!-- Navigation -->
+        <!-- Title -->
+        <Label Text="{Binding PageTitle}" FontSize="24" FontAttributes="Bold" />
+
+        <!-- Actions -->
         <HorizontalStackLayout Spacing="8">
+            <Button Text="Play All" Command="{Binding PlayAllCommand}" WidthRequest="100" />
             <Button Text="Back" Command="{Binding GoBackCommand}"
                     IsVisible="{Binding CanGoBack}" WidthRequest="80" />
-            <Label Text="{Binding PageTitle}" FontSize="24" FontAttributes="Bold"
-                   VerticalOptions="Center" />
         </HorizontalStackLayout>
 
         <!-- Items list -->

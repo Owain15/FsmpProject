@@ -36,6 +36,7 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
         GoBackCommand = new AsyncRelayCommand(OnGoBack);
         PlayNowCommand = new AsyncRelayCommand<Track>(OnPlayNow);
         AddToQueueCommand = new RelayCommand<Track>(OnAddToQueue);
+        PlayAllCommand = new AsyncRelayCommand(OnPlayAll);
     }
 
     public ObservableCollection<object> Items { get; }
@@ -58,6 +59,7 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
     public ICommand GoBackCommand { get; }
     public ICommand PlayNowCommand { get; }
     public ICommand AddToQueueCommand { get; }
+    public ICommand PlayAllCommand { get; }
 
     public async Task LoadAsync()
     {
@@ -161,6 +163,36 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
     {
         if (track is not null)
             _playbackController.AppendToQueue(new List<int> { track.TrackId });
+    }
+
+    private async Task OnPlayAll()
+    {
+        Result<List<int>> result;
+        switch (BrowseLevel)
+        {
+            case BrowseLevel.Artists:
+                result = await _libraryBrowser.GetAllTrackIdsAsync();
+                break;
+            case BrowseLevel.Albums when _currentArtistId.HasValue:
+                result = await _libraryBrowser.GetAllTrackIdsByArtistAsync(_currentArtistId.Value);
+                break;
+            case BrowseLevel.Tracks:
+                var trackIds = Items.OfType<Track>().Select(t => t.TrackId).ToList();
+                if (trackIds.Count > 0)
+                {
+                    _playbackController.SetQueue(trackIds);
+                    await _playbackController.JumpToAsync(0);
+                }
+                return;
+            default:
+                return;
+        }
+
+        if (result.IsSuccess && result.Value is { Count: > 0 })
+        {
+            _playbackController.SetQueue(result.Value);
+            await _playbackController.JumpToAsync(0);
+        }
     }
 
     private async Task OnGoBack()
