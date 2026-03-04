@@ -255,6 +255,13 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         };
     }
 
+    public void UnsubscribeFromEvents()
+    {
+        _audioService.Player.StateChanged -= OnStateChanged;
+        _audioService.Player.PositionChanged -= OnPositionChanged;
+        _audioService.TrackChanged -= OnTrackChanged;
+    }
+
     private static string FormatTime(TimeSpan time) =>
         time.Hours > 0
             ? time.ToString(@"h\:mm\:ss")

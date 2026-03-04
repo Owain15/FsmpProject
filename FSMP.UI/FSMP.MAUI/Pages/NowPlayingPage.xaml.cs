@@ -6,16 +6,22 @@ namespace FSMP.MAUI.Pages;
 
 public partial class NowPlayingPage : ContentPage
 {
-    private readonly NowPlayingViewModel _viewModel;
-    private readonly IServiceScope _scope;
+    private NowPlayingViewModel _viewModel = null!;
+    private IServiceScope? _scope;
 
     public NowPlayingPage()
     {
+        InitializeComponent();
+        CreateScopeAndViewModel();
+    }
+
+    private void CreateScopeAndViewModel()
+    {
+        _viewModel?.UnsubscribeFromEvents();
+        _scope?.Dispose();
         _scope = App.Services.CreateScope();
         _viewModel = _scope.ServiceProvider.GetRequiredService<NowPlayingViewModel>();
-        InitializeComponent();
         BindingContext = _viewModel;
-        Unloaded += (_, _) => _scope.Dispose();
     }
 
     protected override async void OnAppearing()
@@ -23,6 +29,7 @@ public partial class NowPlayingPage : ContentPage
         base.OnAppearing();
         try
         {
+            CreateScopeAndViewModel();
             await _viewModel.LoadAsync();
         }
         catch (Exception ex)

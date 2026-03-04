@@ -13,6 +13,14 @@ public class TrackRepository : Repository<Track>, ITrackRepository
     {
     }
 
+    public new async Task<Track?> GetByIdAsync(int id)
+    {
+        return await DbSet
+            .Include(t => t.Artist)
+            .Include(t => t.Album)
+            .FirstOrDefaultAsync(t => t.TrackId == id);
+    }
+
     public async Task<Track?> GetByFilePathAsync(string filePath)
     {
         return await DbSet.FirstOrDefaultAsync(t => t.FilePath == filePath);
