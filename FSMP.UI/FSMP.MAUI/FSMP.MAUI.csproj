@@ -10,8 +10,6 @@
     <Nullable>enable</Nullable>
     <Platforms>ARM64</Platforms>
 
-    <MauiXamlInflator>SourceGen</MauiXamlInflator>
-
     <ApplicationTitle>FSMP Music Player</ApplicationTitle>
     <ApplicationId>com.fsmp.musicplayer</ApplicationId>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
