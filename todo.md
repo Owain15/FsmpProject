@@ -9,9 +9,9 @@
 | FsmpConsole | Console UI application | Complete (v1) | 88.7% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
 | FSMO | File System Music Organizer | Complete (10/10) | 96.3% | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
-| FSMP.MAUI | MAUI UI (Windows) | In progress | -- | -- |
+| FSMP.MAUI | MAUI UI (Windows) | Complete (v1) | -- | -- |
 
-**Overall coverage**: 94.3% | **Tests**: 960 passing | **Build**: Passing
+**Overall coverage**: 94.3% | **Tests**: 993 passing | **Build**: Passing
 
 ---
 
@@ -19,7 +19,7 @@
 
 ### MAUI Windows — Build, Run & Verify
 
-**Status**: In progress
+**Status**: Complete
 **Goal**: Get the MAUI app building and running on Windows to verify audio + UI functionality
 
 The MAUI app has all UI pages and ViewModels wired up but has never been built or run. The flow is: Settings (add directory → scan) → Library (browse → queue) → Now Playing (playback).
@@ -32,9 +32,9 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 | 4 | Fix MAUI deadlock on session restore (Task.Run wrapper) | Done |
 | 5 | Add session save/restore to MAUI (queue state persistence) | Done |
 | 6 | Register IQueueStateRepository in MAUI DI | Done |
-| 7 | Verify end-to-end: add directory → scan → browse → queue → play | Pending |
+| 7 | Verify end-to-end: add directory → scan → browse → queue → play | Done |
 | 8 | Update build.cmd with MAUI build support | Done (solution build includes MAUI) |
-| 9 | Add ViewModel tests to maintain 80%+ coverage | Pending |
+| 9 | Add ViewModel tests to maintain 80%+ coverage | Done |
 
 ---
 
