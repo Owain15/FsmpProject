@@ -55,6 +55,10 @@ public static class MauiProgram
         // Library services
         services.AddScoped<MetadataService>();
 
+        // Queue state persistence (shares queue-state.json with console app)
+        var queueStatePath = Path.Combine(appData, "FSMP", "queue-state.json");
+        services.AddSingleton<IQueueStateRepository>(_ => new FsmpDataAcsses.Repositories.JsonQueueStateRepository(queueStatePath));
+
         // Config service (uses same %AppData%\FSMP\config.json as console app)
         var configPath = Path.Combine(appData, "FSMP", "config.json");
         services.AddSingleton(_ => new ConfigurationService(configPath));

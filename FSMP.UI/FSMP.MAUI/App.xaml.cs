@@ -1,3 +1,5 @@
+using FSMP.Core;
+using FSMP.Core.Interfaces;
 using FsmpDataAcsses;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +26,23 @@ public partial class App : Application
             var context = scope.ServiceProvider.GetRequiredService<FsmpDbContext>();
             context.Database.Migrate();
             Log("Database migration done");
+
+            // Restore previous session queue
+            try
+            {
+                var queueStateRepo = services.GetRequiredService<IQueueStateRepository>();
+                var savedState = Task.Run(() => queueStateRepo.LoadAsync()).GetAwaiter().GetResult();
+                if (savedState != null)
+                {
+                    var activePlaylist = services.GetRequiredService<ActivePlaylistService>();
+                    activePlaylist.RestoreState(savedState);
+                    Log($"Session restored: {savedState.PlayOrder.Count} tracks, index {savedState.CurrentIndex}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to restore session (non-fatal): {ex.Message}");
+            }
         }
         catch (Exception ex)
         {
@@ -35,7 +54,22 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         Log("CreateWindow called");
-        return new Window(new AppShell());
+        var window = new Window(new AppShell());
+        window.Destroying += (_, _) =>
+        {
+            try
+            {
+                var activePlaylist = Services.GetRequiredService<ActivePlaylistService>();
+                var repo = Services.GetRequiredService<IQueueStateRepository>();
+                Task.Run(() => repo.SaveAsync(activePlaylist.GetState())).GetAwaiter().GetResult();
+                Log("Session saved");
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to save session: {ex.Message}");
+            }
+        };
+        return window;
     }
 
     internal static void Log(string message)

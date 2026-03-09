@@ -28,10 +28,13 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 |---|------|--------|
 | 1 | Enable MAUI build in solution (currently `Build=false` in slnx) | Done |
 | 2 | Build MAUI project, fix compilation errors | Done |
-| 3 | Fix runtime issues (LibVLC ARM64, DB paths, EF migrations) | Ready to test |
-| 4 | Verify end-to-end: add directory → scan → browse → queue → play | Pending |
-| 5 | Update build.cmd with MAUI build support | Done (solution build includes MAUI) |
-| 6 | Add ViewModel tests to maintain 80%+ coverage | Pending |
+| 3 | Fix runtime issues (LibVLC ARM64, DB paths, EF migrations) | Done |
+| 4 | Fix MAUI deadlock on session restore (Task.Run wrapper) | Done |
+| 5 | Add session save/restore to MAUI (queue state persistence) | Done |
+| 6 | Register IQueueStateRepository in MAUI DI | Done |
+| 7 | Verify end-to-end: add directory → scan → browse → queue → play | Pending |
+| 8 | Update build.cmd with MAUI build support | Done (solution build includes MAUI) |
+| 9 | Add ViewModel tests to maintain 80%+ coverage | Pending |
 
 ---
 
@@ -97,7 +100,7 @@ Replaced god-object PlayerUI with clean orchestration layer: IPlaybackController
 
 ### Queue State Persistence
 
-Persist active queue (track order, position, shuffle, repeat) across sessions as JSON.
+Persist active queue (track order, position, shuffle, repeat) across sessions as JSON. Implemented in both Console and MAUI apps.
 
 ### Player Bug Fixes & Enhancements
 

@@ -49,3 +49,9 @@ Cross-platform business logic for playlist management, active playback queue, an
 - [x] `PlaylistsViewModel.cs` — Playlist CRUD, load into queue
 
 **Status**: Complete | **Coverage**: 99.53% | **Tests**: 45+ passing
+
+### MAUI Session Restore Integration
+
+- [x] `ActivePlaylistService.GetState()` / `RestoreState()` used by MAUI App.xaml.cs for session persistence
+- [x] `IQueueStateRepository` registered in MAUI DI (MauiProgram.cs)
+- [x] Deadlock fix: async calls wrapped in `Task.Run()` to avoid MAUI SynchronizationContext capture
