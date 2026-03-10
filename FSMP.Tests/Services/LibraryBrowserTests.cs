@@ -11,6 +11,7 @@ public class LibraryBrowserTests
     private readonly Mock<IArtistRepository> _artistRepoMock;
     private readonly Mock<IAlbumRepository> _albumRepoMock;
     private readonly Mock<ITrackRepository> _trackRepoMock;
+    private readonly Mock<ITagRepository> _tagRepoMock;
     private readonly LibraryBrowser _browser;
 
     public LibraryBrowserTests()
@@ -18,7 +19,8 @@ public class LibraryBrowserTests
         _artistRepoMock = new Mock<IArtistRepository>();
         _albumRepoMock = new Mock<IAlbumRepository>();
         _trackRepoMock = new Mock<ITrackRepository>();
-        _browser = new LibraryBrowser(_artistRepoMock.Object, _albumRepoMock.Object, _trackRepoMock.Object);
+        _tagRepoMock = new Mock<ITagRepository>();
+        _browser = new LibraryBrowser(_artistRepoMock.Object, _albumRepoMock.Object, _trackRepoMock.Object, _tagRepoMock.Object);
     }
 
     [Fact]
@@ -169,5 +171,53 @@ public class LibraryBrowserTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().BeEquivalentTo(new[] { 1, 2 });
+    }
+
+    [Fact]
+    public async Task GetAllTagsAsync_ReturnsTags()
+    {
+        var tags = new List<Tags> { new() { TagId = 1, Name = "Rock" } };
+        _tagRepoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(tags);
+
+        var result = await _browser.GetAllTagsAsync();
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task GetArtistsByTagAsync_ReturnsFilteredArtists()
+    {
+        var artists = new List<Artist> { new() { ArtistId = 1, Name = "Rock Band" } };
+        _artistRepoMock.Setup(r => r.GetByTagAsync(1)).ReturnsAsync(artists);
+
+        var result = await _browser.GetArtistsByTagAsync(1);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task GetAlbumsByTagAsync_ReturnsFilteredAlbums()
+    {
+        var albums = new List<Album> { new() { AlbumId = 1, Title = "Rock Album" } };
+        _albumRepoMock.Setup(r => r.GetByTagAsync(1)).ReturnsAsync(albums);
+
+        var result = await _browser.GetAlbumsByTagAsync(1);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task GetTracksByTagAsync_ReturnsFilteredTracks()
+    {
+        var tracks = new List<Track> { new() { TrackId = 1, Title = "T", FilePath = "f", FileHash = "h" } };
+        _trackRepoMock.Setup(r => r.GetByTagAsync(1)).ReturnsAsync(tracks);
+
+        var result = await _browser.GetTracksByTagAsync(1);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(1);
     }
 }

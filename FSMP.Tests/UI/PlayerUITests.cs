@@ -13,6 +13,7 @@ public class PlayerUITests
     private readonly Mock<IPlaylistManager> _playlistsMock;
     private readonly Mock<ILibraryManager> _libraryMock;
     private readonly Mock<ILibraryBrowser> _browserMock;
+    private readonly Mock<ITagService> _tagServiceMock;
 
     public PlayerUITests()
     {
@@ -20,6 +21,7 @@ public class PlayerUITests
         _playlistsMock = new Mock<IPlaylistManager>();
         _libraryMock = new Mock<ILibraryManager>();
         _browserMock = new Mock<ILibraryBrowser>();
+        _tagServiceMock = new Mock<ITagService>();
 
         // Default setups
         _playbackMock.Setup(p => p.GetCurrentTrackAsync()).ReturnsAsync(Result.Success<Track?>(null));
@@ -35,7 +37,7 @@ public class PlayerUITests
     {
         var input = new StringReader(inputLines);
         var output = new StringWriter();
-        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, input, output);
+        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, _tagServiceMock.Object, input, output);
         return (player, output);
     }
 
@@ -44,42 +46,49 @@ public class PlayerUITests
     [Fact]
     public void Constructor_WithNullPlayback_ShouldThrow()
     {
-        var act = () => new PlayerUI(null!, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        var act = () => new PlayerUI(null!, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, _tagServiceMock.Object, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("playback");
     }
 
     [Fact]
     public void Constructor_WithNullPlaylists_ShouldThrow()
     {
-        var act = () => new PlayerUI(_playbackMock.Object, null!, _libraryMock.Object, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        var act = () => new PlayerUI(_playbackMock.Object, null!, _libraryMock.Object, _browserMock.Object, _tagServiceMock.Object, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("playlists");
     }
 
     [Fact]
     public void Constructor_WithNullLibrary_ShouldThrow()
     {
-        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, null!, _browserMock.Object, TextReader.Null, TextWriter.Null);
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, null!, _browserMock.Object, _tagServiceMock.Object, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("library");
     }
 
     [Fact]
     public void Constructor_WithNullBrowser_ShouldThrow()
     {
-        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, null!, TextReader.Null, TextWriter.Null);
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, null!, _tagServiceMock.Object, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("browser");
+    }
+
+    [Fact]
+    public void Constructor_WithNullTagService_ShouldThrow()
+    {
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, null!, TextReader.Null, TextWriter.Null);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("tagService");
     }
 
     [Fact]
     public void Constructor_WithNullInput_ShouldThrow()
     {
-        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, null!, TextWriter.Null);
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, _tagServiceMock.Object, null!, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("input");
     }
 
     [Fact]
     public void Constructor_WithNullOutput_ShouldThrow()
     {
-        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, TextReader.Null, null!);
+        var act = () => new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, _tagServiceMock.Object, TextReader.Null, null!);
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
 
@@ -655,7 +664,7 @@ public class PlayerUITests
         _playbackMock.Setup(p => p.JumpToAsync(0)).ReturnsAsync(Result.Success());
 
         var output = new StringWriter();
-        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, inputSequence, output);
+        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, _tagServiceMock.Object, inputSequence, output);
 
         await player.RunAsync();
 
@@ -676,7 +685,7 @@ public class PlayerUITests
         _playbackMock.Setup(p => p.JumpToAsync(0)).ReturnsAsync(Result.Success());
 
         var output = new StringWriter();
-        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, inputSequence, output);
+        var player = new PlayerUI(_playbackMock.Object, _playlistsMock.Object, _libraryMock.Object, _browserMock.Object, _tagServiceMock.Object, inputSequence, output);
 
         await player.RunAsync();
 

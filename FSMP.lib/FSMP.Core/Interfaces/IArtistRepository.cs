@@ -7,4 +7,5 @@ public interface IArtistRepository
     Task<IEnumerable<Artist>> GetAllAsync();
     Task<Artist?> GetByIdAsync(int id);
     Task<Artist?> GetWithTracksAsync(int id);
+    Task<IEnumerable<Artist>> GetByTagAsync(int tagId);
 }

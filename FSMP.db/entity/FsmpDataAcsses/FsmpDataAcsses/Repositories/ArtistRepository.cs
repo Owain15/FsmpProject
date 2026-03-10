@@ -33,4 +33,12 @@ public class ArtistRepository : Repository<Artist>, IArtistRepository
             .Where(a => a.Name.Contains(searchTerm))
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Artist>> GetByTagAsync(int tagId)
+    {
+        return await DbSet
+            .Include(a => a.Tags)
+            .Where(a => a.Tags.Any(tag => tag.TagId == tagId))
+            .ToListAsync();
+    }
 }

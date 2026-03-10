@@ -11,6 +11,7 @@ public class MenuSystem
     private readonly IPlaylistManager _playlists;
     private readonly ILibraryManager _library;
     private readonly ILibraryBrowser _browser;
+    private readonly ITagService _tagService;
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action? _onClear;
@@ -20,6 +21,7 @@ public class MenuSystem
         IPlaylistManager playlists,
         ILibraryManager library,
         ILibraryBrowser browser,
+        ITagService tagService,
         TextReader input,
         TextWriter output,
         Action? onClear = null)
@@ -28,6 +30,7 @@ public class MenuSystem
         _playlists = playlists ?? throw new ArgumentNullException(nameof(playlists));
         _library = library ?? throw new ArgumentNullException(nameof(library));
         _browser = browser ?? throw new ArgumentNullException(nameof(browser));
+        _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _onClear = onClear;
@@ -39,7 +42,7 @@ public class MenuSystem
     public async Task RunAsync()
     {
         var playerUI = new PlayerUI(
-            _playback, _playlists, _library, _browser,
+            _playback, _playlists, _library, _browser, _tagService,
             _input, _output, _onClear);
         await playerUI.RunAsync();
     }

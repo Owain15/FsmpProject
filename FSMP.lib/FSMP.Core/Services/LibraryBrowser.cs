@@ -8,15 +8,18 @@ public class LibraryBrowser : ILibraryBrowser
     private readonly IArtistRepository _artistRepository;
     private readonly IAlbumRepository _albumRepository;
     private readonly ITrackRepository _trackRepository;
+    private readonly ITagRepository? _tagRepository;
 
     public LibraryBrowser(
         IArtistRepository artistRepository,
         IAlbumRepository albumRepository,
-        ITrackRepository trackRepository)
+        ITrackRepository trackRepository,
+        ITagRepository? tagRepository = null)
     {
         _artistRepository = artistRepository ?? throw new ArgumentNullException(nameof(artistRepository));
         _albumRepository = albumRepository ?? throw new ArgumentNullException(nameof(albumRepository));
         _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));
+        _tagRepository = tagRepository;
     }
 
     public async Task<Result<List<Artist>>> GetAllArtistsAsync()
@@ -115,6 +118,60 @@ public class LibraryBrowser : ILibraryBrowser
         catch (Exception ex)
         {
             return Result.Failure<List<int>>($"Error loading tracks: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<List<Tags>>> GetAllTagsAsync()
+    {
+        try
+        {
+            if (_tagRepository == null)
+                return Result.Failure<List<Tags>>("Tag repository not available.");
+            var tags = (await _tagRepository.GetAllAsync()).ToList();
+            return Result.Success(tags);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<List<Tags>>($"Error loading tags: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<List<Artist>>> GetArtistsByTagAsync(int tagId)
+    {
+        try
+        {
+            var artists = (await _artistRepository.GetByTagAsync(tagId)).ToList();
+            return Result.Success(artists);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<List<Artist>>($"Error loading artists by tag: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<List<Album>>> GetAlbumsByTagAsync(int tagId)
+    {
+        try
+        {
+            var albums = (await _albumRepository.GetByTagAsync(tagId)).ToList();
+            return Result.Success(albums);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<List<Album>>($"Error loading albums by tag: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<List<Track>>> GetTracksByTagAsync(int tagId)
+    {
+        try
+        {
+            var tracks = (await _trackRepository.GetByTagAsync(tagId)).ToList();
+            return Result.Success(tracks);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<List<Track>>($"Error loading tracks by tag: {ex.Message}");
         }
     }
 }

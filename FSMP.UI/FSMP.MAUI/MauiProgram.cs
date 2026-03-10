@@ -79,10 +79,23 @@ public static class MauiProgram
         services.AddScoped<ITrackRepository>(sp => sp.GetRequiredService<UnitOfWork>().Tracks);
         services.AddScoped<IArtistRepository>(sp => sp.GetRequiredService<UnitOfWork>().Artists);
         services.AddScoped<IAlbumRepository>(sp => sp.GetRequiredService<UnitOfWork>().Albums);
+        services.AddScoped<ITagRepository>(sp => sp.GetRequiredService<UnitOfWork>().Tags);
+
+        // Tag service
+        services.AddScoped<ITagService>(sp => new TagService(
+            sp.GetRequiredService<ITagRepository>(),
+            sp.GetRequiredService<ITrackRepository>(),
+            sp.GetRequiredService<IAlbumRepository>(),
+            sp.GetRequiredService<IArtistRepository>(),
+            sp.GetRequiredService<UnitOfWork>().SaveAsync));
 
         // Orchestration layer
         services.AddScoped<IPlaybackController, PlaybackController>();
-        services.AddScoped<ILibraryBrowser, LibraryBrowser>();
+        services.AddScoped<ILibraryBrowser>(sp => new LibraryBrowser(
+            sp.GetRequiredService<IArtistRepository>(),
+            sp.GetRequiredService<IAlbumRepository>(),
+            sp.GetRequiredService<ITrackRepository>(),
+            sp.GetRequiredService<ITagRepository>()));
         services.AddScoped<ILibraryManager, LibraryManager>();
         services.AddScoped<IPlaylistManager, PlaylistManager>();
 

@@ -62,7 +62,7 @@ namespace FsmpConsole
 			output.WriteLine($"[N] Next  [P] Prev  [K] {kLabel}  [R] Restart");
 			output.WriteLine("[S] Stop  [M] Repeat  [H] Shuffle  [#] Skip to track");
 			output.WriteLine();
-			output.WriteLine("[B] Browse  [L] Playlists  [D] Directories  [X] Exit");
+			output.WriteLine("[B] Browse  [L] Playlists  [D] Directories  [T] Tags  [X] Exit");
 			output.Write("Input: ");
 		}
 

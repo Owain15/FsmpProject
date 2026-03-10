@@ -67,7 +67,29 @@
             <Button Text="Play All" Command="{Binding PlayAllCommand}" WidthRequest="100" />
             <Button Text="Back" Command="{Binding GoBackCommand}"
                     IsVisible="{Binding CanGoBack}" WidthRequest="80" />
+            <Button Text="Clear Filter" Command="{Binding ClearTagFilterCommand}"
+                    IsVisible="{Binding HasTagFilter}" WidthRequest="110" />
         </HorizontalStackLayout>
+
+        <!-- Tag filter chips -->
+        <CollectionView ItemsSource="{Binding AvailableTags}" SelectionMode="None"
+                        HeightRequest="40">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="6" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Tags">
+                    <Border StrokeShape="RoundRectangle 12" Padding="8,4" BackgroundColor="#E0E0E0">
+                        <Label Text="{Binding Name}" FontSize="12" VerticalOptions="Center" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=FilterByTagCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
         <!-- Items list -->
         <CollectionView ItemsSource="{Binding Items}" SelectionMode="None"

@@ -160,4 +160,29 @@ public class TrackRepositoryTests : IDisposable
 
         result.Should().BeNull();
     }
+
+    [Fact]
+    public async Task GetByTagAsync_ShouldReturnTaggedTracks()
+    {
+        await SeedTracksAsync();
+        var rockTag = await _context.Set<Tags>().FirstAsync(t => t.Name == "Rock");
+        var track = await _context.Tracks.FirstAsync(t => t.Title == "Song A");
+        track.Tags.Add(rockTag);
+        await _context.SaveChangesAsync();
+
+        var result = (await _repository.GetByTagAsync(rockTag.TagId)).ToList();
+
+        result.Should().HaveCount(1);
+        result[0].Title.Should().Be("Song A");
+    }
+
+    [Fact]
+    public async Task GetByTagAsync_ShouldReturnEmpty_WhenNoMatches()
+    {
+        await SeedTracksAsync();
+
+        var result = (await _repository.GetByTagAsync(999)).ToList();
+
+        result.Should().BeEmpty();
+    }
 }

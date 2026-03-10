@@ -6,4 +6,5 @@ public interface IAlbumRepository
 {
     Task<IEnumerable<Album>> GetByArtistAsync(int artistId);
     Task<Album?> GetWithTracksAsync(int albumId);
+    Task<IEnumerable<Album>> GetByTagAsync(int tagId);
 }

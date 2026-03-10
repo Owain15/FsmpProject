@@ -12,16 +12,19 @@ public class BrowseUI
 {
     private readonly ILibraryBrowser _browser;
     private readonly IPlaybackController _playback;
+    private readonly ITagService? _tagService;
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action? _onClear;
     private string? _statusMessage;
     private bool _returnToMain;
+    private Tags? _activeTagFilter;
 
-    public BrowseUI(ILibraryBrowser browser, IPlaybackController playback, TextReader input, TextWriter output, Action? onClear = null)
+    public BrowseUI(ILibraryBrowser browser, IPlaybackController playback, ITagService? tagService, TextReader input, TextWriter output, Action? onClear = null)
     {
         _browser = browser ?? throw new ArgumentNullException(nameof(browser));
         _playback = playback ?? throw new ArgumentNullException(nameof(playback));
+        _tagService = tagService;
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _onClear = onClear;
@@ -44,7 +47,12 @@ public class BrowseUI
     {
         while (true)
         {
-            var artistsResult = await _browser.GetAllArtistsAsync();
+            Result<List<Artist>> artistsResult;
+            if (_activeTagFilter != null)
+                artistsResult = await _browser.GetArtistsByTagAsync(_activeTagFilter.TagId);
+            else
+                artistsResult = await _browser.GetAllArtistsAsync();
+
             if (!artistsResult.IsSuccess)
             {
                 _output.WriteLine($"\nError: {artistsResult.ErrorMessage}");
@@ -54,7 +62,10 @@ public class BrowseUI
 
             if (artists.Count == 0)
             {
-                _output.WriteLine("\nNo artists in library. Scan a library first.");
+                if (_activeTagFilter != null)
+                    _output.WriteLine($"\nNo artists with tag '{_activeTagFilter.Name}'.");
+                else
+                    _output.WriteLine("\nNo artists in library. Scan a library first.");
                 return;
             }
 
@@ -64,12 +75,20 @@ public class BrowseUI
                 _output.WriteLine(_statusMessage);
                 _statusMessage = null;
             }
-            Print.WriteSelectionMenu(_output, "Artists",
+            var title = _activeTagFilter != null ? $"Artists [Tag: {_activeTagFilter.Name}]" : "Artists";
+            Print.WriteSelectionMenu(_output, title,
                 artists.Select(a => a.Name).ToList(),
                 prompt: null, backLabel: null);
 
             WriteDivider();
             WriteQueueOptions("all artists");
+            if (_tagService != null)
+            {
+                if (_activeTagFilter != null)
+                    _output.WriteLine("  C) Clear tag filter");
+                else
+                    _output.WriteLine("  F) Filter by tag");
+            }
             _output.WriteLine("  0) Back");
             WritePrompt();
 
@@ -109,6 +128,19 @@ public class BrowseUI
                 return;
             }
 
+            if (input.Equals("f", StringComparison.OrdinalIgnoreCase) && _tagService != null && _activeTagFilter == null)
+            {
+                await SelectTagFilterAsync();
+                continue;
+            }
+
+            if (input.Equals("c", StringComparison.OrdinalIgnoreCase) && _activeTagFilter != null)
+            {
+                _activeTagFilter = null;
+                _statusMessage = "Tag filter cleared.";
+                continue;
+            }
+
             if (int.TryParse(input, out var index) && index >= 1 && index <= artists.Count)
             {
                 await DisplayAlbumsByArtistAsync(artists[index - 1].ArtistId);
@@ -118,6 +150,35 @@ public class BrowseUI
             {
                 _output.WriteLine("Invalid selection.");
             }
+        }
+    }
+
+    private async Task SelectTagFilterAsync()
+    {
+        if (_tagService == null) return;
+
+        var tagsResult = await _tagService.GetAllTagsAsync();
+        if (!tagsResult.IsSuccess || tagsResult.Value!.Count == 0)
+        {
+            _output.WriteLine("  No tags available.");
+            return;
+        }
+
+        _output.WriteLine();
+        _output.WriteLine("== Select Tag ==");
+        _output.WriteLine();
+        var tags = tagsResult.Value;
+        for (int i = 0; i < tags.Count; i++)
+            _output.WriteLine($"  {i + 1}) {tags[i].Name}");
+        _output.WriteLine("  0) Cancel");
+        _output.WriteLine();
+        _output.Write("Select: ");
+
+        var input = _input.ReadLine()?.Trim();
+        if (int.TryParse(input, out var idx) && idx >= 1 && idx <= tags.Count)
+        {
+            _activeTagFilter = tags[idx - 1];
+            _statusMessage = $"Filtering by tag: {_activeTagFilter.Name}";
         }
     }
 

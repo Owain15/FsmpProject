@@ -27,7 +27,7 @@ public class BrowseUITests
     {
         var input = new StringReader(inputLines);
         var output = new StringWriter();
-        var browse = new BrowseUI(_browserMock.Object, _playbackMock.Object, input, output);
+        var browse = new BrowseUI(_browserMock.Object, _playbackMock.Object, null, input, output);
         return (browse, output);
     }
 
@@ -36,28 +36,28 @@ public class BrowseUITests
     [Fact]
     public void Constructor_WithNullBrowser_ShouldThrow()
     {
-        var act = () => new BrowseUI(null!, _playbackMock.Object, TextReader.Null, TextWriter.Null);
+        var act = () => new BrowseUI(null!, _playbackMock.Object, null, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("browser");
     }
 
     [Fact]
     public void Constructor_WithNullPlayback_ShouldThrow()
     {
-        var act = () => new BrowseUI(_browserMock.Object, null!, TextReader.Null, TextWriter.Null);
+        var act = () => new BrowseUI(_browserMock.Object, null!, null, TextReader.Null, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("playback");
     }
 
     [Fact]
     public void Constructor_WithNullInput_ShouldThrow()
     {
-        var act = () => new BrowseUI(_browserMock.Object, _playbackMock.Object, null!, TextWriter.Null);
+        var act = () => new BrowseUI(_browserMock.Object, _playbackMock.Object, null, null!, TextWriter.Null);
         act.Should().Throw<ArgumentNullException>().WithParameterName("input");
     }
 
     [Fact]
     public void Constructor_WithNullOutput_ShouldThrow()
     {
-        var act = () => new BrowseUI(_browserMock.Object, _playbackMock.Object, TextReader.Null, null!);
+        var act = () => new BrowseUI(_browserMock.Object, _playbackMock.Object, null, TextReader.Null, null!);
         act.Should().Throw<ArgumentNullException>().WithParameterName("output");
     }
 

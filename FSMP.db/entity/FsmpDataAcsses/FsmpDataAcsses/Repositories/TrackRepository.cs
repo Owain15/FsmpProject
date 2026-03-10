@@ -52,4 +52,12 @@ public class TrackRepository : Repository<Track>, ITrackRepository
     {
         return await DbSet.FirstOrDefaultAsync(t => t.FileHash == fileHash);
     }
+
+    public async Task<IEnumerable<Track>> GetByTagAsync(int tagId)
+    {
+        return await DbSet
+            .Include(t => t.Tags)
+            .Where(t => t.Tags.Any(tag => tag.TagId == tagId))
+            .ToListAsync();
+    }
 }

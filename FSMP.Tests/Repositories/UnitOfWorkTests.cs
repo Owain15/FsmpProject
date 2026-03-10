@@ -66,7 +66,7 @@ public class UnitOfWorkTests : IDisposable
     public void Tags_ShouldBeInitialized()
     {
         _unitOfWork.Tags.Should().NotBeNull();
-        _unitOfWork.Tags.Should().BeOfType<Repository<Tags>>();
+        _unitOfWork.Tags.Should().BeOfType<TagRepository>();
     }
 
     [Fact]

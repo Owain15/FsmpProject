@@ -116,4 +116,29 @@ public class ArtistRepositoryTests : IDisposable
 
         result.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task GetByTagAsync_ShouldReturnTaggedArtists()
+    {
+        await SeedDataAsync();
+        var rockTag = await _context.Set<Tags>().FirstAsync(t => t.Name == "Rock");
+        var artist = await _context.Artists.FirstAsync(a => a.Name == "The Rock Band");
+        artist.Tags.Add(rockTag);
+        await _context.SaveChangesAsync();
+
+        var result = (await _repository.GetByTagAsync(rockTag.TagId)).ToList();
+
+        result.Should().HaveCount(1);
+        result[0].Name.Should().Be("The Rock Band");
+    }
+
+    [Fact]
+    public async Task GetByTagAsync_ShouldReturnEmpty_WhenNoMatches()
+    {
+        await SeedDataAsync();
+
+        var result = (await _repository.GetByTagAsync(999)).ToList();
+
+        result.Should().BeEmpty();
+    }
 }

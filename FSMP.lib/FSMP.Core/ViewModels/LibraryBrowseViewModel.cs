@@ -24,6 +24,7 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
     private string _pageTitle = "Artists";
     private int? _currentArtistId;
     private int? _currentAlbumId;
+    private Tags? _selectedTagFilter;
 
     public LibraryBrowseViewModel(ILibraryBrowser libraryBrowser, IPlaybackController playbackController, Action<Action> dispatchToUI)
     {
@@ -32,14 +33,29 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
         _dispatchToUI = dispatchToUI ?? throw new ArgumentNullException(nameof(dispatchToUI));
 
         Items = new ObservableCollection<object>();
+        AvailableTags = new ObservableCollection<Tags>();
         SelectItemCommand = new AsyncRelayCommand<object>(OnSelectItem);
         GoBackCommand = new AsyncRelayCommand(OnGoBack);
         PlayNowCommand = new AsyncRelayCommand<Track>(OnPlayNow);
         AddToQueueCommand = new RelayCommand<Track>(OnAddToQueue);
         PlayAllCommand = new AsyncRelayCommand(OnPlayAll);
+        FilterByTagCommand = new AsyncRelayCommand<Tags>(OnFilterByTag);
+        ClearTagFilterCommand = new AsyncRelayCommand(OnClearTagFilter);
     }
 
     public ObservableCollection<object> Items { get; }
+    public ObservableCollection<Tags> AvailableTags { get; }
+
+    public Tags? SelectedTagFilter
+    {
+        get => _selectedTagFilter;
+        private set => SetProperty(ref _selectedTagFilter, value);
+    }
+
+    public bool HasTagFilter => _selectedTagFilter != null;
+
+    public ICommand FilterByTagCommand { get; }
+    public ICommand ClearTagFilterCommand { get; }
 
     public BrowseLevel BrowseLevel
     {
@@ -64,13 +80,33 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
     public async Task LoadAsync()
     {
         BrowseLevel = BrowseLevel.Artists;
-        PageTitle = "Artists";
         _currentArtistId = null;
         _currentAlbumId = null;
 
-        var result = await _libraryBrowser.GetAllArtistsAsync();
+        // Load available tags
+        var tagsResult = await _libraryBrowser.GetAllTagsAsync();
+
+        Result<List<Artist>> result;
+        if (_selectedTagFilter != null)
+        {
+            PageTitle = $"Artists [{_selectedTagFilter.Name}]";
+            result = await _libraryBrowser.GetArtistsByTagAsync(_selectedTagFilter.TagId);
+        }
+        else
+        {
+            PageTitle = "Artists";
+            result = await _libraryBrowser.GetAllArtistsAsync();
+        }
+
         _dispatchToUI(() =>
         {
+            AvailableTags.Clear();
+            if (tagsResult.IsSuccess)
+            {
+                foreach (var tag in tagsResult.Value!)
+                    AvailableTags.Add(tag);
+            }
+
             Items.Clear();
             if (result.IsSuccess)
             {
@@ -78,7 +114,21 @@ public class LibraryBrowseViewModel : INotifyPropertyChanged
                     Items.Add(artist);
             }
             OnPropertyChanged(nameof(CanGoBack));
+            OnPropertyChanged(nameof(HasTagFilter));
         });
+    }
+
+    private async Task OnFilterByTag(Tags? tag)
+    {
+        if (tag == null) return;
+        SelectedTagFilter = tag;
+        await LoadAsync();
+    }
+
+    private async Task OnClearTagFilter()
+    {
+        SelectedTagFilter = null;
+        await LoadAsync();
     }
 
     private async Task OnSelectItem(object? item)

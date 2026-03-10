@@ -141,13 +141,14 @@ public class AppStartup
         _output.WriteLine(" done.");
 
         IPlaybackController playback = new PlaybackController(audioService, activePlaylist, unitOfWork.Tracks);
-        ILibraryBrowser browser = new LibraryBrowser(unitOfWork.Artists, unitOfWork.Albums, unitOfWork.Tracks);
+        ILibraryBrowser browser = new LibraryBrowser(unitOfWork.Artists, unitOfWork.Albums, unitOfWork.Tracks, unitOfWork.Tags);
         IPlaylistManager playlists = new PlaylistManager(playlistService, activePlaylist);
         ILibraryManager library = new LibraryManager(configService, scanService);
+        ITagService tagService = new TagService(unitOfWork.Tags, unitOfWork.Tracks, unitOfWork.Albums, unitOfWork.Artists, unitOfWork.SaveAsync);
 
         // 6. Launch menu (startup messages stay visible until PlayerUI renders)
         _output.WriteLine("Starting player...");
-        var menu = new MenuSystem(playback, playlists, library, browser, _input, _output, _onClear);
+        var menu = new MenuSystem(playback, playlists, library, browser, tagService, _input, _output, _onClear);
         await menu.RunAsync();
 
         // 7. Save queue state on shutdown

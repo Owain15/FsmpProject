@@ -11,11 +11,29 @@
 | FSMP.Tests | Test suite | Complete (v1) | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete (v1) | -- | -- |
 
-**Overall coverage**: 94.3% | **Tests**: 993 passing | **Build**: Passing
+**Overall coverage**: ~94% | **Tests**: 1042 passing | **Build**: Passing
 
 ---
 
 ## Active Work
+
+### Tag Management & Filtering
+
+**Status**: Complete
+**Goal**: Full tag CRUD + library filtering in Console and MAUI apps
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | ITagRepository + TagRepository | Done |
+| 2 | GetByTagAsync on Track/Album/Artist repos | Done |
+| 3 | Repository tests (TagRepository + GetByTagAsync) | Done |
+| 4 | ITagService + TagService | Done |
+| 5 | TagService tests | Done |
+| 6 | ILibraryBrowser tag-filtering methods | Done |
+| 7 | Console UI — T hotkey (tag management) + F hotkey (filter by tag in Browse) | Done |
+| 8 | MAUI — Tag filter chip bar in Library page | Done |
+
+---
 
 ### MAUI Windows — Build, Run & Verify
 

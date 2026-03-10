@@ -13,6 +13,7 @@ public class PlayerUI
     private readonly IPlaylistManager _playlists;
     private readonly ILibraryManager _library;
     private readonly ILibraryBrowser _browser;
+    private readonly ITagService _tagService;
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action? _onClear;
@@ -25,6 +26,7 @@ public class PlayerUI
         IPlaylistManager playlists,
         ILibraryManager library,
         ILibraryBrowser browser,
+        ITagService tagService,
         TextReader input,
         TextWriter output,
         Action? onClear = null)
@@ -33,6 +35,7 @@ public class PlayerUI
         _playlists = playlists ?? throw new ArgumentNullException(nameof(playlists));
         _library = library ?? throw new ArgumentNullException(nameof(library));
         _browser = browser ?? throw new ArgumentNullException(nameof(browser));
+        _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
         _input = input ?? throw new ArgumentNullException(nameof(input));
         _output = output ?? throw new ArgumentNullException(nameof(output));
         _onClear = onClear;
@@ -187,6 +190,9 @@ public class PlayerUI
             case "D":
                 await ManageDirectoriesAsync();
                 break;
+            case "T":
+                await ManageTagsAsync();
+                break;
             case "X":
                 _exitRequested = true;
                 _output.WriteLine();
@@ -253,8 +259,158 @@ public class PlayerUI
 
     private async Task BrowseAsync()
     {
-        var browseUI = new BrowseUI(_browser, _playback, _input, _output, _onClear);
+        var browseUI = new BrowseUI(_browser, _playback, _tagService, _input, _output, _onClear);
         await browseUI.RunAsync();
+    }
+
+    private async Task ManageTagsAsync()
+    {
+        while (true)
+        {
+            _output.WriteLine();
+            _output.WriteLine("== Tags ==");
+            _output.WriteLine();
+            _output.WriteLine("  1) View all tags");
+            _output.WriteLine("  2) Create new tag");
+            _output.WriteLine("  3) Delete tag");
+            _output.WriteLine("  4) Assign tag to track");
+            _output.WriteLine("  5) Remove tag from track");
+            _output.WriteLine("  0) Back");
+            _output.WriteLine();
+            _output.Write("Select: ");
+
+            var input = _input.ReadLine()?.Trim();
+            if (input == "0" || string.IsNullOrEmpty(input))
+                return;
+
+            switch (input)
+            {
+                case "1":
+                    await ViewAllTagsAsync();
+                    break;
+                case "2":
+                    await CreateTagAsync();
+                    break;
+                case "3":
+                    await DeleteTagAsync();
+                    break;
+                case "4":
+                    await AssignTagToTrackAsync();
+                    break;
+                case "5":
+                    await RemoveTagFromTrackAsync();
+                    break;
+                default:
+                    _output.WriteLine("Invalid selection.");
+                    break;
+            }
+        }
+    }
+
+    private async Task ViewAllTagsAsync()
+    {
+        var result = await _tagService.GetAllTagsAsync();
+        if (!result.IsSuccess)
+        {
+            _output.WriteLine($"Error: {result.ErrorMessage}");
+            return;
+        }
+
+        var tags = result.Value!;
+        _output.WriteLine();
+        if (tags.Count == 0)
+        {
+            _output.WriteLine("  No tags found.");
+            return;
+        }
+
+        foreach (var tag in tags)
+            _output.WriteLine($"  {tag.TagId}) {tag.Name}");
+    }
+
+    private async Task CreateTagAsync()
+    {
+        _output.Write("Tag name: ");
+        var name = _input.ReadLine()?.Trim();
+        if (string.IsNullOrEmpty(name))
+            return;
+
+        var result = await _tagService.CreateTagAsync(name);
+        _output.WriteLine(result.IsSuccess
+            ? $"Created tag: {result.Value!.Name}"
+            : $"Error: {result.ErrorMessage}");
+    }
+
+    private async Task DeleteTagAsync()
+    {
+        await ViewAllTagsAsync();
+        _output.Write("Tag ID to delete: ");
+        var input = _input.ReadLine()?.Trim();
+        if (!int.TryParse(input, out var tagId))
+            return;
+
+        var result = await _tagService.DeleteTagAsync(tagId);
+        _output.WriteLine(result.IsSuccess ? "Tag deleted." : $"Error: {result.ErrorMessage}");
+    }
+
+    private async Task AssignTagToTrackAsync()
+    {
+        // Show current track if playing
+        var trackResult = await _playback.GetCurrentTrackAsync();
+        if (!trackResult.IsSuccess || trackResult.Value == null)
+        {
+            _output.WriteLine("No track currently loaded. Play a track first.");
+            return;
+        }
+
+        var track = trackResult.Value;
+        _output.WriteLine($"\nCurrent track: {track.DisplayTitle} - {track.DisplayArtist}");
+
+        // Show current tags
+        var currentTags = await _tagService.GetTagsForTrackAsync(track.TrackId);
+        if (currentTags.IsSuccess && currentTags.Value!.Count > 0)
+            _output.WriteLine($"  Current tags: {string.Join(", ", currentTags.Value.Select(t => t.Name))}");
+
+        // Show available tags
+        await ViewAllTagsAsync();
+        _output.Write("Tag ID to assign: ");
+        var input = _input.ReadLine()?.Trim();
+        if (!int.TryParse(input, out var tagId))
+            return;
+
+        var result = await _tagService.AddTagToTrackAsync(track.TrackId, tagId);
+        _output.WriteLine(result.IsSuccess ? "Tag assigned." : $"Error: {result.ErrorMessage}");
+    }
+
+    private async Task RemoveTagFromTrackAsync()
+    {
+        var trackResult = await _playback.GetCurrentTrackAsync();
+        if (!trackResult.IsSuccess || trackResult.Value == null)
+        {
+            _output.WriteLine("No track currently loaded. Play a track first.");
+            return;
+        }
+
+        var track = trackResult.Value;
+        _output.WriteLine($"\nCurrent track: {track.DisplayTitle} - {track.DisplayArtist}");
+
+        var currentTags = await _tagService.GetTagsForTrackAsync(track.TrackId);
+        if (!currentTags.IsSuccess || currentTags.Value!.Count == 0)
+        {
+            _output.WriteLine("  No tags assigned to this track.");
+            return;
+        }
+
+        foreach (var tag in currentTags.Value)
+            _output.WriteLine($"  {tag.TagId}) {tag.Name}");
+
+        _output.Write("Tag ID to remove: ");
+        var input = _input.ReadLine()?.Trim();
+        if (!int.TryParse(input, out var tagId))
+            return;
+
+        var result = await _tagService.RemoveTagFromTrackAsync(track.TrackId, tagId);
+        _output.WriteLine(result.IsSuccess ? "Tag removed." : $"Error: {result.ErrorMessage}");
     }
 
     private async Task ManagePlaylistsAsync()

@@ -17,6 +17,7 @@ public class LibraryBrowseViewModelTests
     {
         _browserMock = new Mock<ILibraryBrowser>();
         _playbackMock = new Mock<IPlaybackController>();
+        _browserMock.Setup(b => b.GetAllTagsAsync()).ReturnsAsync(Result.Success(new List<Tags>()));
         _vm = new LibraryBrowseViewModel(_browserMock.Object, _playbackMock.Object, action => action());
     }
 

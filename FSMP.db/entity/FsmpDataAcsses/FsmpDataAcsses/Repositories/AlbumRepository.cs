@@ -29,4 +29,12 @@ public class AlbumRepository : Repository<Album>, IAlbumRepository
             .Include(a => a.Tracks)
             .FirstOrDefaultAsync(a => a.AlbumId == albumId);
     }
+
+    public async Task<IEnumerable<Album>> GetByTagAsync(int tagId)
+    {
+        return await DbSet
+            .Include(a => a.Tags)
+            .Where(a => a.Tags.Any(tag => tag.TagId == tagId))
+            .ToListAsync();
+    }
 }

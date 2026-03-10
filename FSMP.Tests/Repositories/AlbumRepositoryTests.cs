@@ -117,4 +117,29 @@ public class AlbumRepositoryTests : IDisposable
 
         result.Should().BeNull();
     }
+
+    [Fact]
+    public async Task GetByTagAsync_ShouldReturnTaggedAlbums()
+    {
+        await SeedDataAsync();
+        var rockTag = await _context.Set<Tags>().FirstAsync(t => t.Name == "Rock");
+        var album = await _context.Albums.FirstAsync(a => a.Title == "Album A");
+        album.Tags.Add(rockTag);
+        await _context.SaveChangesAsync();
+
+        var result = (await _repository.GetByTagAsync(rockTag.TagId)).ToList();
+
+        result.Should().HaveCount(1);
+        result[0].Title.Should().Be("Album A");
+    }
+
+    [Fact]
+    public async Task GetByTagAsync_ShouldReturnEmpty_WhenNoMatches()
+    {
+        await SeedDataAsync();
+
+        var result = (await _repository.GetByTagAsync(999)).ToList();
+
+        result.Should().BeEmpty();
+    }
 }
