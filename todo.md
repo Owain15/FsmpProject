@@ -17,6 +17,20 @@
 
 ## Active Work
 
+### UI Philosophy — Startup Feedback & Loading States
+
+**Status**: In progress
+**Goal**: Apply UI philosophy (Fast, Uncoupled, Informative, Graceful) to Console and MAUI apps
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Add UI Philosophy section to CLAUDE.md | Done |
+| 2 | Console startup feedback (scan progress, config, session, audio) | Done |
+| 3 | MAUI deferred init with status broadcast | Not started |
+| 4 | MAUI loading overlay on all 4 pages | Not started |
+
+---
+
 ### Tag Management & Filtering
 
 **Status**: Complete

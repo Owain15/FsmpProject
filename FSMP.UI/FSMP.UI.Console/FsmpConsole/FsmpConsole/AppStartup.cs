@@ -70,8 +70,12 @@ public class AppStartup
         _output.WriteLine("Getting Config...");
         var configPath = GetConfigPath();
         var configService = new ConfigurationService(configPath);
+        var configExisted = File.Exists(configPath);
         var config = await configService.LoadConfigurationAsync();
-        _output.WriteLine($"Config loaded from: {configPath}");
+        if (!configExisted)
+            _output.WriteLine($"Created default config at: {configPath} — add library paths to get started");
+        else
+            _output.WriteLine($"Config loaded from: {configPath}");
 
         // 2. Initialize database
         _output.WriteLine($"Getting Data Source...");
@@ -115,15 +119,22 @@ public class AppStartup
         else
         {
             var errorMsg = factory.InitializationError ?? "Unknown error";
-            _output.WriteLine($" failed: {errorMsg}. Playback will not be available.");
+            _output.WriteLine($"\n  WARNING: Audio playback unavailable — {errorMsg}");
+            _output.WriteLine("  You can still browse and manage your library, but playback will not work.");
         }
 
         // 4. Auto-scan if enabled
         if (config.AutoScanOnStartup && config.LibraryPaths.Count > 0)
         {
-            _output.WriteLine("Auto-scanning libraries...");
+            _output.WriteLine($"Auto-scanning {config.LibraryPaths.Count} library path(s)...");
             var result = await scanService.ScanAllLibrariesAsync(config.LibraryPaths);
-            _output.WriteLine($"Scan complete: {result.TracksAdded} added, {result.TracksUpdated} updated, {result.TracksRemoved} removed");
+            _output.WriteLine($"Scan complete: {result.TracksAdded} added, {result.TracksUpdated} updated, {result.TracksRemoved} removed ({result.Duration.TotalSeconds:F1}s)");
+            if (result.Errors.Count > 0)
+                _output.WriteLine($"  {result.Errors.Count} error(s) during scan — check library paths");
+        }
+        else if (config.LibraryPaths.Count == 0)
+        {
+            _output.WriteLine("No library paths configured — add paths in Settings to get started.");
         }
 
         // 5. Create orchestration services
@@ -134,11 +145,24 @@ public class AppStartup
         // 5b. Restore queue state from previous session
         var queueStatePath = Path.Combine(Path.GetDirectoryName(configPath)!, "queue-state.json");
         var queueStateRepo = new JsonQueueStateRepository(queueStatePath);
-        var savedState = await queueStateRepo.LoadAsync();
-        if (savedState != null)
-            activePlaylist.RestoreState(savedState);
-
-        _output.WriteLine(" done.");
+        try
+        {
+            var savedState = await queueStateRepo.LoadAsync();
+            if (savedState != null)
+            {
+                activePlaylist.RestoreState(savedState);
+                _output.WriteLine($" restored {savedState.PlayOrder.Count} tracks.");
+            }
+            else
+            {
+                _output.WriteLine(" no previous session found.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _output.WriteLine($" failed: {ex.Message}");
+            _output.WriteLine("  Starting with empty queue.");
+        }
 
         IPlaybackController playback = new PlaybackController(audioService, activePlaylist, unitOfWork.Tracks);
         ILibraryBrowser browser = new LibraryBrowser(unitOfWork.Artists, unitOfWork.Albums, unitOfWork.Tracks, unitOfWork.Tags);

@@ -145,7 +145,8 @@ public class AppStartupTests : IDisposable
 
         var text = output.ToString();
         text.Should().Contain("FSMP - File System Music Player");
-        text.Should().Contain("Config loaded from:");
+        (text.Contains("Config loaded from:") || text.Contains("Created default config at:"))
+            .Should().BeTrue("should show config status message");
     }
 
     [Fact]

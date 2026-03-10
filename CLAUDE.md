@@ -273,6 +273,21 @@ Metadata is handled non-destructively:
 - Original files are never modified
 - Display shows custom metadata if available, otherwise file metadata
 
+## UI Philosophy
+
+All UI code (Console and MAUI) must follow these four principles:
+
+- **Fast**: Window/prompt appears instantly. Zero blocking I/O before the user sees UI.
+- **Uncoupled**: Each UI component is independent of backend init state. If a service isn't ready, the component shows a loading state — not a blank screen or crash.
+- **Informative**: Every long operation shows what's happening: "Migrating database...", "Scanning 1,234/10,000 files...", "Restoring session...". No mystery waits.
+- **Graceful errors**: Failures are contained. A broken audio engine doesn't prevent browsing. A corrupt queue file doesn't crash the app. Errors are reported clearly with context, never swallowed.
+
+**Concrete rules:**
+- Every blocking I/O must show a status message before it starts
+- Long operations (>2s) must show progress updates
+- Errors must be reported, never swallowed — recoverable errors don't block the app
+- Critical errors show actionable messages (what happened, what the user can do)
+
 ## Project Status
 
 - **Stage**: Active development - implementing data storage and metadata features
