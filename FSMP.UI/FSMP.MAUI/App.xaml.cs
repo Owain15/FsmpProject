@@ -12,6 +12,11 @@ public partial class App : Application
 
     public static IServiceProvider Services { get; private set; } = null!;
 
+    public static bool IsInitialized { get; private set; }
+    public static string InitStatusMessage { get; private set; } = "Starting...";
+    public static event Action? InitializationStatusChanged;
+    public static event Action? InitializationComplete;
+
     public App(IServiceProvider services)
     {
         try
@@ -20,29 +25,6 @@ public partial class App : Application
             Log("App constructor starting");
             InitializeComponent();
             Log("InitializeComponent done");
-
-            // Apply EF migrations on startup
-            using var scope = services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<FsmpDbContext>();
-            context.Database.Migrate();
-            Log("Database migration done");
-
-            // Restore previous session queue
-            try
-            {
-                var queueStateRepo = services.GetRequiredService<IQueueStateRepository>();
-                var savedState = Task.Run(() => queueStateRepo.LoadAsync()).GetAwaiter().GetResult();
-                if (savedState != null)
-                {
-                    var activePlaylist = services.GetRequiredService<ActivePlaylistService>();
-                    activePlaylist.RestoreState(savedState);
-                    Log($"Session restored: {savedState.PlayOrder.Count} tracks, index {savedState.CurrentIndex}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log($"Failed to restore session (non-fatal): {ex.Message}");
-            }
         }
         catch (Exception ex)
         {
@@ -55,6 +37,9 @@ public partial class App : Application
     {
         Log("CreateWindow called");
         var window = new Window(new AppShell());
+
+        MainThread.BeginInvokeOnMainThread(async () => await InitializeServicesAsync());
+
         window.Destroying += (_, _) =>
         {
             try
@@ -70,6 +55,57 @@ public partial class App : Application
             }
         };
         return window;
+    }
+
+    private async Task InitializeServicesAsync()
+    {
+        try
+        {
+            UpdateStatus("Migrating database...");
+            await Task.Run(() =>
+            {
+                using var scope = Services.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<FsmpDbContext>();
+                context.Database.Migrate();
+            });
+            Log("Database migration done");
+
+            UpdateStatus("Restoring session...");
+            try
+            {
+                var queueStateRepo = Services.GetRequiredService<IQueueStateRepository>();
+                var savedState = await Task.Run(() => queueStateRepo.LoadAsync());
+                if (savedState != null)
+                {
+                    var activePlaylist = Services.GetRequiredService<ActivePlaylistService>();
+                    activePlaylist.RestoreState(savedState);
+                    Log($"Session restored: {savedState.PlayOrder.Count} tracks, index {savedState.CurrentIndex}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to restore session (non-fatal): {ex.Message}");
+            }
+
+            UpdateStatus("Ready");
+            IsInitialized = true;
+            InitializationComplete?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus($"Error: {ex.Message}");
+            Log($"Init failed: {ex}");
+            // App still usable — pages handle missing data gracefully
+            IsInitialized = true;
+            InitializationComplete?.Invoke();
+        }
+    }
+
+    private static void UpdateStatus(string message)
+    {
+        InitStatusMessage = message;
+        Log($"Init status: {message}");
+        InitializationStatusChanged?.Invoke();
     }
 
     internal static void Log(string message)

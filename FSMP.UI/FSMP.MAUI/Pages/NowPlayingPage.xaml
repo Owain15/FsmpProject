@@ -6,69 +6,80 @@
              x:Class="FSMP.MAUI.Pages.NowPlayingPage"
              x:DataType="vm:NowPlayingViewModel"
              Title="Now Playing">
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="12">
 
-            <!-- Track Info -->
-            <Label Text="{Binding TrackTitle}" FontSize="28" FontAttributes="Bold" />
-            <Label Text="{Binding TrackArtist}" FontSize="18" TextColor="Gray" />
-            <Label Text="{Binding TrackAlbum}" FontSize="16" TextColor="DarkGray" />
+                <!-- Track Info -->
+                <Label Text="{Binding TrackTitle}" FontSize="28" FontAttributes="Bold" />
+                <Label Text="{Binding TrackArtist}" FontSize="18" TextColor="Gray" />
+                <Label Text="{Binding TrackAlbum}" FontSize="16" TextColor="DarkGray" />
 
-            <!-- Playback State -->
-            <Label Text="{Binding PlaybackState}" FontSize="14" TextColor="Gray" />
+                <!-- Playback State -->
+                <Label Text="{Binding PlaybackState}" FontSize="14" TextColor="Gray" />
 
-            <!-- Progress -->
-            <ProgressBar Progress="{Binding Progress}" />
-            <HorizontalStackLayout Spacing="0">
-                <Label Text="{Binding PositionText}" FontSize="12" HorizontalOptions="Start" />
-                <Label Text=" / " FontSize="12" />
-                <Label Text="{Binding DurationText}" FontSize="12" />
-            </HorizontalStackLayout>
+                <!-- Progress -->
+                <ProgressBar Progress="{Binding Progress}" />
+                <HorizontalStackLayout Spacing="0">
+                    <Label Text="{Binding PositionText}" FontSize="12" HorizontalOptions="Start" />
+                    <Label Text=" / " FontSize="12" />
+                    <Label Text="{Binding DurationText}" FontSize="12" />
+                </HorizontalStackLayout>
 
-            <!-- Transport Controls -->
-            <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
-                <Button Text="Prev" Command="{Binding PreviousCommand}" WidthRequest="80" />
-                <Button Text="Play/Pause" Command="{Binding PlayPauseCommand}" WidthRequest="100" />
-                <Button Text="Next" Command="{Binding NextCommand}" WidthRequest="80" />
-                <Button Text="Stop" Command="{Binding StopCommand}" WidthRequest="80" />
-            </HorizontalStackLayout>
+                <!-- Transport Controls -->
+                <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                    <Button Text="Prev" Command="{Binding PreviousCommand}" WidthRequest="80" />
+                    <Button Text="Play/Pause" Command="{Binding PlayPauseCommand}" WidthRequest="100" />
+                    <Button Text="Next" Command="{Binding NextCommand}" WidthRequest="80" />
+                    <Button Text="Stop" Command="{Binding StopCommand}" WidthRequest="80" />
+                </HorizontalStackLayout>
 
-            <!-- Mode Controls -->
-            <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
-                <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="120" />
-                <Button Text="{Binding IsShuffled, StringFormat='Shuffle: {0}'}"
-                        Command="{Binding ToggleShuffleCommand}" WidthRequest="120" />
-            </HorizontalStackLayout>
+                <!-- Mode Controls -->
+                <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                    <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="120" />
+                    <Button Text="{Binding IsShuffled, StringFormat='Shuffle: {0}'}"
+                            Command="{Binding ToggleShuffleCommand}" WidthRequest="120" />
+                </HorizontalStackLayout>
 
-            <!-- Volume -->
-            <HorizontalStackLayout Spacing="8">
-                <Label Text="Volume" VerticalOptions="Center" />
-                <Slider Minimum="0" Maximum="1" Value="{Binding Volume}"
-                        HorizontalOptions="Fill" WidthRequest="200" />
-            </HorizontalStackLayout>
+                <!-- Volume -->
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="Volume" VerticalOptions="Center" />
+                    <Slider Minimum="0" Maximum="1" Value="{Binding Volume}"
+                            HorizontalOptions="Fill" WidthRequest="200" />
+                </HorizontalStackLayout>
 
-            <!-- Queue -->
-            <Label Text="Queue" FontSize="20" FontAttributes="Bold" Margin="0,12,0,0" />
-            <CollectionView ItemsSource="{Binding QueueItems}" SelectionMode="Single"
-                            x:Name="QueueCollectionView"
-                            SelectionChanged="OnQueueSelectionChanged">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:QueueItem">
-                        <Grid Padding="4" ColumnDefinitions="30,*,Auto,60" ColumnSpacing="8">
-                            <Grid.Triggers>
-                                <DataTrigger TargetType="Grid" Binding="{Binding IsCurrent}" Value="True">
-                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#E0E0FF, Dark=#3A3A6A}" />
+                <!-- Queue -->
+                <Label Text="Queue" FontSize="20" FontAttributes="Bold" Margin="0,12,0,0" />
+                <CollectionView ItemsSource="{Binding QueueItems}" SelectionMode="Single"
+                                x:Name="QueueCollectionView"
+                                SelectionChanged="OnQueueSelectionChanged">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:QueueItem">
+                            <Grid Padding="4" ColumnDefinitions="30,*,Auto,60" ColumnSpacing="8">
+                                <Grid.Triggers>
+                                    <DataTrigger TargetType="Grid" Binding="{Binding IsCurrent}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#E0E0FF, Dark=#3A3A6A}" />
                                 </DataTrigger>
-                            </Grid.Triggers>
-                            <Label Grid.Column="0" Text="{Binding Index}" FontAttributes="Bold" />
-                            <Label Grid.Column="1" Text="{Binding Title}" />
-                            <Label Grid.Column="2" Text="{Binding Artist}" TextColor="Gray" />
-                            <Label Grid.Column="3" Text="{Binding Duration, StringFormat='{0:m\\:ss}'}" TextColor="Gray" FontSize="12" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                </Grid.Triggers>
+                                <Label Grid.Column="0" Text="{Binding Index}" FontAttributes="Bold" />
+                                <Label Grid.Column="1" Text="{Binding Title}" />
+                                <Label Grid.Column="2" Text="{Binding Artist}" TextColor="Gray" />
+                                <Label Grid.Column="3" Text="{Binding Duration, StringFormat='{0:m\\:ss}'}" TextColor="Gray" FontSize="12" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-        </VerticalStackLayout>
-    </ScrollView>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading overlay -->
+        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
+                <ActivityIndicator IsRunning="True" Color="White" />
+                <Label x:Name="StatusLabel" Text="Starting..." TextColor="White" FontSize="14"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentPage>

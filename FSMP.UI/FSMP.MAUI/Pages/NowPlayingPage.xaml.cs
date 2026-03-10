@@ -27,6 +27,19 @@ public partial class NowPlayingPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        if (App.IsInitialized)
+        {
+            LoadingOverlay.IsVisible = false;
+            await LoadDataAsync();
+            return;
+        }
+        StatusLabel.Text = App.InitStatusMessage;
+        App.InitializationStatusChanged += OnStatusChanged;
+        App.InitializationComplete += OnInitComplete;
+    }
+
+    private async Task LoadDataAsync()
+    {
         try
         {
             CreateScopeAndViewModel();
@@ -36,6 +49,24 @@ public partial class NowPlayingPage : ContentPage
         {
             App.Log($"NowPlayingPage.OnAppearing error: {ex}");
         }
+    }
+
+    private void OnStatusChanged()
+        => MainThread.BeginInvokeOnMainThread(() => StatusLabel.Text = App.InitStatusMessage);
+
+    private async void OnInitComplete()
+    {
+        App.InitializationStatusChanged -= OnStatusChanged;
+        App.InitializationComplete -= OnInitComplete;
+        MainThread.BeginInvokeOnMainThread(() => LoadingOverlay.IsVisible = false);
+        await LoadDataAsync();
+    }
+
+    protected override void OnDisappearing()
+    {
+        App.InitializationStatusChanged -= OnStatusChanged;
+        App.InitializationComplete -= OnInitComplete;
+        base.OnDisappearing();
     }
 
     private void OnQueueSelectionChanged(object? sender, SelectionChangedEventArgs e)

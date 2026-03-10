@@ -35,16 +35,47 @@ public partial class LibraryPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        if (App.IsInitialized)
+        {
+            LoadingOverlay.IsVisible = false;
+            await LoadDataAsync();
+            return;
+        }
+        StatusLabel.Text = App.InitStatusMessage;
+        App.InitializationStatusChanged += OnStatusChanged;
+        App.InitializationComplete += OnInitComplete;
+    }
+
+    private async Task LoadDataAsync()
+    {
         try
         {
-            App.Log("LibraryPage.OnAppearing calling LoadAsync");
+            App.Log("LibraryPage.LoadDataAsync calling LoadAsync");
             CreateScopeAndViewModel();
             await _viewModel.LoadAsync();
-            App.Log($"LibraryPage.OnAppearing done, Items.Count={_viewModel.Items.Count}");
+            App.Log($"LibraryPage.LoadDataAsync done, Items.Count={_viewModel.Items.Count}");
         }
         catch (Exception ex)
         {
             App.Log($"LibraryPage.OnAppearing error: {ex}");
         }
+    }
+
+    private void OnStatusChanged()
+        => MainThread.BeginInvokeOnMainThread(() => StatusLabel.Text = App.InitStatusMessage);
+
+    private async void OnInitComplete()
+    {
+        App.InitializationStatusChanged -= OnStatusChanged;
+        App.InitializationComplete -= OnInitComplete;
+        MainThread.BeginInvokeOnMainThread(() => LoadingOverlay.IsVisible = false);
+        await LoadDataAsync();
+    }
+
+    protected override void OnDisappearing()
+    {
+        App.InitializationStatusChanged -= OnStatusChanged;
+        App.InitializationComplete -= OnInitComplete;
+        base.OnDisappearing();
     }
 }
