@@ -121,22 +121,40 @@ public class LibVlcMediaPlayerAdapterTests : IDisposable
             message: "EndReached event should fire when short WAV finishes");
     }
 
+    /// <summary>
+    /// Repeatedly sets and checks a volume value until it sticks.
+    /// LibVLC's volume setter is async internally and may not take effect immediately.
+    /// </summary>
+    private static async Task SetVolumeAndVerify(LibVlcMediaPlayerAdapter adapter, int target, int timeoutMs = 10000)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (DateTime.UtcNow < deadline)
+        {
+            adapter.Volume = target;
+            await Task.Delay(100);
+            if (adapter.Volume == target)
+                return;
+        }
+        adapter.Volume.Should().Be(target, $"Volume should be {target} after repeated attempts");
+    }
+
     [Fact]
     public async Task Volume_GetSet_WorksWhilePlaying()
     {
+        // Use a longer WAV to prevent playback ending mid-assertion
+        var longWavPath = Path.Combine(_tempDir, "long.wav");
+        WavGenerator.CreateTestWav(longWavPath, durationSeconds: 2.0);
+
         using var adapter = new LibVlcMediaPlayerAdapter(TestVlcOptions);
-        await adapter.LoadMediaAsync(_testWavPath);
+        await adapter.LoadMediaAsync(longWavPath);
 
         bool playingFired = false;
         adapter.Playing += (_, _) => playingFired = true;
         adapter.Play();
         await WaitForFlag(() => playingFired);
 
-        adapter.Volume = 50;
-        await WaitForFlag(() => adapter.Volume == 50, message: "Volume should be set to 50");
-
-        adapter.Volume = 100;
-        await WaitForFlag(() => adapter.Volume == 100, message: "Volume should be set to 100");
+        await SetVolumeAndVerify(adapter, 50);
+        await SetVolumeAndVerify(adapter, 100);
 
         adapter.Stop();
     }
@@ -153,22 +171,39 @@ public class LibVlcMediaPlayerAdapterTests : IDisposable
         adapter.HasMedia.Should().BeFalse();
     }
 
+    /// <summary>
+    /// Repeatedly sets and checks mute until it sticks.
+    /// </summary>
+    private static async Task SetMuteAndVerify(LibVlcMediaPlayerAdapter adapter, bool target, int timeoutMs = 10000)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (DateTime.UtcNow < deadline)
+        {
+            adapter.Mute = target;
+            await Task.Delay(100);
+            if (adapter.Mute == target)
+                return;
+        }
+        adapter.Mute.Should().Be(target, $"Mute should be {target} after repeated attempts");
+    }
+
     [Fact]
     public async Task Mute_GetSet_WorksWhilePlaying()
     {
+        // Use a longer WAV to prevent playback ending mid-assertion
+        var longWavPath = Path.Combine(_tempDir, "long.wav");
+        WavGenerator.CreateTestWav(longWavPath, durationSeconds: 2.0);
+
         using var adapter = new LibVlcMediaPlayerAdapter(TestVlcOptions);
-        await adapter.LoadMediaAsync(_testWavPath);
+        await adapter.LoadMediaAsync(longWavPath);
 
         bool playingFired = false;
         adapter.Playing += (_, _) => playingFired = true;
         adapter.Play();
         await WaitForFlag(() => playingFired);
 
-        adapter.Mute = true;
-        await WaitForFlag(() => adapter.Mute, message: "Mute should be true");
-
-        adapter.Mute = false;
-        await WaitForFlag(() => !adapter.Mute, message: "Mute should be false");
+        await SetMuteAndVerify(adapter, true);
+        await SetMuteAndVerify(adapter, false);
 
         adapter.Stop();
     }
