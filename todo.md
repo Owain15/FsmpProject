@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete | -- | -- |
 
-**Overall coverage**: 93.4% | **Tests**: 1042 passing (1041 reliable, 1 flaky integration) | **Build**: Passing
+**Overall coverage**: 93.4% | **Tests**: 1061 passing (1060 reliable, 1 flaky integration) | **Build**: Passing
 
 ---
 

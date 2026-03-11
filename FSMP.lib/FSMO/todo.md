@@ -237,6 +237,23 @@
 
 ---
 
+## Slice 11: Directory Comparison & Sync
+
+**What it delivers**: Compare two directories and copy missing tracks from a target into the app's organized structure
+
+- [x] Create `DirectoryComparer.cs` in FSMO/
+  - [x] `List<FileInfo> FindMissingTracks(string appPath, string targetPath)` — find tracks in target missing from app (by filename, case-insensitive)
+  - [x] `OrganizeResult CopyMissingToApp(string appPath, string targetPath, DuplicateStrategy)` — copy missing tracks into Artist/Album structure
+  - [x] Input validation: null/empty paths, directory existence
+- [x] Create `DirectoryComparerTests.cs` in `FSMP.Tests/FSMO/` (19 tests)
+  - [x] FindMissingTracks: returns missing files, empty when all present, handles empty dirs, case-insensitive, subdirectories, input validation
+  - [x] CopyMissingToApp: copies to correct structure, skips existing, handles no metadata, correct counts, preserves originals, input validation
+- [x] Create `README.md` documenting all FSMO public APIs
+- [x] **Build**: Pass
+- [x] **Tests**: Pass (620 total, 19 new)
+
+---
+
 ## Possible Extensions
 
 - Project could be rewritten in C++ and integrated via P/Invoke for performance-critical operations
@@ -245,6 +262,6 @@
 
 ## Progress Summary
 
-**Completed Slices**: 10 / 10
+**Completed Slices**: 11 / 11
 **Status**: All slices complete — FSMO feature is fully implemented and tested
 **Next Action**: None (feature complete)
