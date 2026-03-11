@@ -16,6 +16,7 @@ public partial class App : Application
     public static string InitStatusMessage { get; private set; } = "Starting...";
     public static event Action? InitializationStatusChanged;
     public static event Action? InitializationComplete;
+    private static int _initStarted;
 
     public App(IServiceProvider services)
     {
@@ -38,7 +39,17 @@ public partial class App : Application
         Log("CreateWindow called");
         var window = new Window(new AppShell());
 
-        MainThread.BeginInvokeOnMainThread(async () => await InitializeServicesAsync());
+#if WINDOWS
+        // Dismiss the native Win32 splash now that the MAUI window is ready
+        window.Created += (_, _) =>
+        {
+            FSMP.MAUI.WinUI.NativeSplash.Close();
+            Log("Native splash dismissed");
+        };
+#endif
+
+        // Fire-and-forget on background thread — don't block the main thread rendering pipeline
+        _ = Task.Run(InitializeServicesAsync);
 
         window.Destroying += (_, _) =>
         {
@@ -59,22 +70,47 @@ public partial class App : Application
 
     private async Task InitializeServicesAsync()
     {
+        // Guard against duplicate calls (MAUI can construct App twice)
+        if (Interlocked.Exchange(ref _initStarted, 1) == 1) return;
+
         try
         {
             UpdateStatus("Migrating database...");
-            await Task.Run(() =>
+
+            // Clear stale SQLite lock files that persist after force-kill
+            var dbPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP", "fsmp.db");
+            foreach (var ext in new[] { "-wal", "-shm" })
             {
+                var lockFile = dbPath + ext;
+                if (File.Exists(lockFile))
+                {
+                    Log($"Removing stale lock file: {lockFile}");
+                    try { File.Delete(lockFile); } catch (Exception ex) { Log($"Could not delete {lockFile}: {ex.Message}"); }
+                }
+            }
+
+            // Run migration with a 15-second timeout to avoid hanging indefinitely
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            try
+            {
+                cts.Token.Register(() => Log("Migration timeout triggered — cancelling"));
                 using var scope = Services.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<FsmpDbContext>();
-                context.Database.Migrate();
-            });
-            Log("Database migration done");
+                await Task.Run(() => context.Database.Migrate(), cts.Token);
+                Log("Database migration done");
+            }
+            catch (OperationCanceledException)
+            {
+                Log("Database migration timed out after 15 seconds");
+                UpdateStatus("Migration timed out — continuing without database");
+            }
 
             UpdateStatus("Restoring session...");
             try
             {
                 var queueStateRepo = Services.GetRequiredService<IQueueStateRepository>();
-                var savedState = await Task.Run(() => queueStateRepo.LoadAsync());
+                var savedState = await queueStateRepo.LoadAsync();
                 if (savedState != null)
                 {
                     var activePlaylist = Services.GetRequiredService<ActivePlaylistService>();
@@ -89,7 +125,7 @@ public partial class App : Application
 
             UpdateStatus("Ready");
             IsInitialized = true;
-            InitializationComplete?.Invoke();
+            MainThread.BeginInvokeOnMainThread(() => InitializationComplete?.Invoke());
         }
         catch (Exception ex)
         {
@@ -97,7 +133,7 @@ public partial class App : Application
             Log($"Init failed: {ex}");
             // App still usable — pages handle missing data gracefully
             IsInitialized = true;
-            InitializationComplete?.Invoke();
+            MainThread.BeginInvokeOnMainThread(() => InitializationComplete?.Invoke());
         }
     }
 
@@ -105,7 +141,7 @@ public partial class App : Application
     {
         InitStatusMessage = message;
         Log($"Init status: {message}");
-        InitializationStatusChanged?.Invoke();
+        MainThread.BeginInvokeOnMainThread(() => InitializationStatusChanged?.Invoke());
     }
 
     internal static void Log(string message)
