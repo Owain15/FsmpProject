@@ -34,13 +34,21 @@ public class NowPlayingViewModelTests
             func => func());
     }
 
+    private async Task SubscribeViaLoadAsync()
+    {
+        _playbackMock.Setup(p => p.GetCurrentTrackAsync())
+            .ReturnsAsync(Result.Failure<Track?>("No track"));
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+            .ReturnsAsync(Result.Success(new List<QueueItem>()));
+        await _vm.LoadAsync();
+    }
+
     [Fact]
     public void Constructor_SetsDefaults()
     {
         _vm.TrackTitle.Should().Be("No track loaded");
         _vm.TrackArtist.Should().BeEmpty();
         _vm.TrackAlbum.Should().BeEmpty();
-        _vm.Volume.Should().Be(0.75f);
         _vm.QueueItems.Should().BeEmpty();
     }
 
@@ -254,8 +262,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void StateChanged_Event_UpdatesPlaybackState()
+    public async Task StateChanged_Event_UpdatesPlaybackState()
     {
+        await SubscribeViaLoadAsync();
         _playerMock.Raise(p => p.StateChanged += null,
             _playerMock.Object,
             new PlaybackStateChangedEventArgs { NewState = PlaybackState.Playing });
@@ -264,8 +273,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void PositionChanged_Event_UpdatesPositionAndDuration()
+    public async Task PositionChanged_Event_UpdatesPositionAndDuration()
     {
+        await SubscribeViaLoadAsync();
         var pos = TimeSpan.FromSeconds(45);
         var dur = TimeSpan.FromMinutes(3);
 
@@ -280,6 +290,7 @@ public class NowPlayingViewModelTests
     [Fact]
     public async Task TrackChanged_Event_UpdatesTrackInfo()
     {
+        await SubscribeViaLoadAsync();
         var track = new Track
         {
             Title = "New Song",
@@ -318,8 +329,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void Progress_CalculatesCorrectly()
+    public async Task Progress_CalculatesCorrectly()
     {
+        await SubscribeViaLoadAsync();
         var pos = TimeSpan.FromSeconds(90);
         var dur = TimeSpan.FromSeconds(180);
 
@@ -337,8 +349,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void PositionText_FormatsCorrectly()
+    public async Task PositionText_FormatsCorrectly()
     {
+        await SubscribeViaLoadAsync();
         _playerMock.Raise(p => p.PositionChanged += null,
             _playerMock.Object,
             new PositionChangedEventArgs
@@ -352,8 +365,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void PositionText_WithHours_IncludesHours()
+    public async Task PositionText_WithHours_IncludesHours()
     {
+        await SubscribeViaLoadAsync();
         _playerMock.Raise(p => p.PositionChanged += null,
             _playerMock.Object,
             new PositionChangedEventArgs
@@ -367,8 +381,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void UnsubscribeFromEvents_RemovesHandlers()
+    public async Task UnsubscribeFromEvents_RemovesHandlers()
     {
+        await SubscribeViaLoadAsync();
         _vm.UnsubscribeFromEvents();
 
         // Raise events after unsubscribe — state should not change
@@ -382,6 +397,7 @@ public class NowPlayingViewModelTests
     [Fact]
     public async Task PropertyChanged_RaisedForTrackTitle()
     {
+        await SubscribeViaLoadAsync();
         var raised = new List<string>();
         _vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName!);
 
@@ -426,12 +442,13 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void SetProperty_DoesNotRaise_WhenValueUnchanged()
+    public async Task SetProperty_DoesNotRaise_WhenValueUnchanged()
     {
+        await SubscribeViaLoadAsync();
         var raised = false;
         _vm.PropertyChanged += (_, _) => raised = true;
 
-        // Volume is already 0.75f from constructor
+        // Volume is already 0.75f from LoadAsync
         _vm.Volume = 0.75f;
 
         raised.Should().BeFalse();

@@ -24,6 +24,7 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     private float _volume;
     private string _repeatModeText = "Repeat: Off";
     private bool _isShuffled;
+    private bool _subscribed;
 
     public NowPlayingViewModel(
         IPlaybackController playbackController,
@@ -36,7 +37,6 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         _dispatchToUI = dispatchToUI ?? throw new ArgumentNullException(nameof(dispatchToUI));
         _dispatchToUIAsync = dispatchToUIAsync ?? throw new ArgumentNullException(nameof(dispatchToUIAsync));
 
-        _volume = _audioService.Volume;
         QueueItems = new ObservableCollection<QueueItem>();
 
         PlayPauseCommand = new AsyncRelayCommand(OnPlayPause);
@@ -46,8 +46,6 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         ToggleRepeatCommand = new RelayCommand(OnToggleRepeat);
         ToggleShuffleCommand = new RelayCommand(OnToggleShuffle);
         JumpToCommand = new AsyncRelayCommand<QueueItem>(OnJumpTo);
-
-        SubscribeToEvents();
     }
 
     public string TrackTitle
@@ -141,6 +139,13 @@ public class NowPlayingViewModel : INotifyPropertyChanged
 
     public async Task LoadAsync()
     {
+        if (!_subscribed)
+        {
+            _subscribed = true;
+            SubscribeToEvents();
+            _volume = _audioService.Volume;
+        }
+
         var trackResult = await _playbackController.GetCurrentTrackAsync();
         if (trackResult.IsSuccess && trackResult.Value is not null)
         {
@@ -257,6 +262,8 @@ public class NowPlayingViewModel : INotifyPropertyChanged
 
     public void UnsubscribeFromEvents()
     {
+        if (!_subscribed) return;
+        _subscribed = false;
         _audioService.Player.StateChanged -= OnStateChanged;
         _audioService.Player.PositionChanged -= OnPositionChanged;
         _audioService.TrackChanged -= OnTrackChanged;

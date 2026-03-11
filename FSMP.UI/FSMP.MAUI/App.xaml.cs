@@ -75,6 +75,10 @@ public partial class App : Application
 
         try
         {
+            UpdateStatus("Initializing audio engine...");
+            var audioFactory = Services.GetRequiredService<IAudioPlayerFactory>();
+            await audioFactory.InitializeAsync();
+
             UpdateStatus("Migrating database...");
 
             // Clear stale SQLite lock files that persist after force-kill

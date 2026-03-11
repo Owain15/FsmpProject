@@ -50,7 +50,6 @@ public class NowPlayingViewModelTests
         _vm.PlaybackState.Should().Be(PlaybackState.Stopped);
         _vm.RepeatModeText.Should().Be("Repeat: Off");
         _vm.IsShuffled.Should().BeFalse();
-        _vm.Volume.Should().Be(0.75f);
     }
 
     [Fact]
@@ -195,8 +194,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void StateChangedEvent_UpdatesPlaybackState()
+    public async Task StateChangedEvent_UpdatesPlaybackState()
     {
+        await _vm.LoadAsync();
         _playerMock.Raise(p => p.StateChanged += null,
             _playerMock.Object,
             new PlaybackStateChangedEventArgs { NewState = PlaybackState.Playing });
@@ -205,8 +205,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void PositionChangedEvent_UpdatesPositionAndDuration()
+    public async Task PositionChangedEvent_UpdatesPositionAndDuration()
     {
+        await _vm.LoadAsync();
         _playerMock.Raise(p => p.PositionChanged += null,
             _playerMock.Object,
             new PositionChangedEventArgs
@@ -220,8 +221,9 @@ public class NowPlayingViewModelTests
     }
 
     [Fact]
-    public void Constructor_SubscribesToTrackEnd()
+    public async Task LoadAsync_SubscribesToTrackEnd()
     {
+        await _vm.LoadAsync();
         _playbackMock.Verify(p => p.SubscribeToTrackEnd(It.IsAny<Action>()), Times.Once);
     }
 
