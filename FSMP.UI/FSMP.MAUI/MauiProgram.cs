@@ -3,7 +3,11 @@ using FSMP.Core.Interfaces;
 using FSMP.Core.Services;
 using FSMP.MAUI.Pages;
 using FSMP.MAUI.ViewModels;
+#if WINDOWS
 using FSMP.Platform.Windows.Audio;
+#elif ANDROID
+using FSMP.Platform.Android.Audio;
+#endif
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
 using Microsoft.EntityFrameworkCore;
@@ -33,11 +37,20 @@ public static class MauiProgram
         return builder.Build();
     }
 
+    static string GetAppDataBase()
+    {
+#if ANDROID
+        return FileSystem.AppDataDirectory;
+#else
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP");
+#endif
+    }
+
     static void RegisterServices(IServiceCollection services)
     {
-        // Database — share the same path as the console app
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var dbPath = Path.Combine(appData, "FSMP", "fsmp.db");
+        // Database path — platform-aware
+        var appDataBase = GetAppDataBase();
+        var dbPath = Path.Combine(appDataBase, "fsmp.db");
         Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
         services.AddDbContext<FsmpDbContext>(options =>
@@ -55,16 +68,20 @@ public static class MauiProgram
         // Library services
         services.AddScoped<MetadataService>();
 
-        // Queue state persistence (shares queue-state.json with console app)
-        var queueStatePath = Path.Combine(appData, "FSMP", "queue-state.json");
+        // Queue state persistence
+        var queueStatePath = Path.Combine(appDataBase, "queue-state.json");
         services.AddSingleton<IQueueStateRepository>(_ => new FsmpDataAcsses.Repositories.JsonQueueStateRepository(queueStatePath));
 
-        // Config service (uses same %AppData%\FSMP\config.json as console app)
-        var configPath = Path.Combine(appData, "FSMP", "config.json");
+        // Config service
+        var configPath = Path.Combine(appDataBase, "config.json");
         services.AddSingleton(_ => new ConfigurationService(configPath));
 
         // Audio
+#if WINDOWS
         services.AddSingleton<IAudioPlayerFactory, LibVlcAudioPlayerFactory>();
+#elif ANDROID
+        services.AddSingleton<IAudioPlayerFactory, LibVlcAndroidAudioPlayerFactory>();
+#endif
         services.AddSingleton<IAudioService, AudioService>();
         services.AddSingleton<ActivePlaylistService>();
         services.AddSingleton<IActivePlaylistService>(sp => sp.GetRequiredService<ActivePlaylistService>());

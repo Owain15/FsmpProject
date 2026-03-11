@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net10.0-windows10.0.19041.0;net10.0-android36.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RootNamespace>FSMP.MAUI</RootNamespace>
     <UseMaui>true</UseMaui>
@@ -9,8 +9,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>ARM64;x64</Platforms>
-    <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
-    <RuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64' And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">win-arm64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'x64' And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">win-x64</RuntimeIdentifier>
 
     <ApplicationTitle>FSMP Music Player</ApplicationTitle>
     <ApplicationId>com.fsmp.musicplayer</ApplicationId>
@@ -21,6 +21,7 @@
     <WindowsPackageType>None</WindowsPackageType>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">30</SupportedOSPlatformVersion>
     <VlcWindowsX64Enabled>true</VlcWindowsX64Enabled>
     <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
@@ -36,17 +37,30 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+  </ItemGroup>
+
+  <!-- Windows-specific dependencies -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\FSMP.lib\FSMP.Core\FSMP.Core.csproj" />
+    <ProjectReference Include="..\..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
+  </ItemGroup>
+
+  <!-- Windows platform project -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
     <ProjectReference Include="..\..\FSMP.lib\FSMP.Platform.Windows\FSMP.Platform.Windows.csproj" />
-<ProjectReference Include="..\..\FSMP.db\entity\FsmpDataAcsses\FsmpDataAcsses\FsmpDataAcsses.csproj" />
+  </ItemGroup>
+
+  <!-- Android platform project -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <ProjectReference Include="..\..\FSMP.lib\FSMP.Platform.Android\FSMP.Platform.Android.csproj" />
   </ItemGroup>
 
   <!-- Copy ARM64 LibVLC native libraries to output (NuGet package only ships x64/x86) -->
-  <ItemGroup Condition="'$(Platform)' == 'ARM64'">
+  <ItemGroup Condition="'$(Platform)' == 'ARM64' And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
     <Content Include="..\..\dependencies\libvlc\libvlc.dll">
       <Link>libvlc\win-arm64\libvlc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
