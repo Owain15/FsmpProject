@@ -35,23 +35,13 @@ Cross-platform business logic for playlist management, active playback queue, an
 
 ## Current Status
 
-### Cross-Platform Migration Phase 2
+**Status**: Complete | **Coverage**: 88.1% | **Tests**: 45+ passing
 
-- [x] Add `InitializationError` property to `IAudioPlayerFactory` interface
+All cross-platform interfaces, models, services, ViewModels, and orchestration layer are implemented. Used by both Console and MAUI apps.
 
-## Current Status
+### Completed (post-v1)
 
-### MAUI ViewModels
-
-- [x] `NowPlayingViewModel.cs` — Playback controls, queue display, auto-advance
-- [x] `LibraryBrowseViewModel.cs` — Artist/Album/Track drill-down with play/queue
-- [x] `SettingsViewModel.cs` — Config management, library paths, scan, save
-- [x] `PlaylistsViewModel.cs` — Playlist CRUD, load into queue
-
-**Status**: Complete | **Coverage**: 99.53% | **Tests**: 45+ passing
-
-### MAUI Session Restore Integration
-
-- [x] `ActivePlaylistService.GetState()` / `RestoreState()` used by MAUI App.xaml.cs for session persistence
-- [x] `IQueueStateRepository` registered in MAUI DI (MauiProgram.cs)
-- [x] Deadlock fix: async calls wrapped in `Task.Run()` to avoid MAUI SynchronizationContext capture
+- [x] Cross-Platform Migration Phase 2 — `InitializationError` on `IAudioPlayerFactory`
+- [x] MAUI ViewModels — NowPlaying, LibraryBrowse, Settings, Playlists
+- [x] MAUI Session Restore — GetState/RestoreState, IQueueStateRepository DI, deadlock fix
+- [x] Tag Management — ITagService, ITagRepository, tag filtering in ILibraryBrowser

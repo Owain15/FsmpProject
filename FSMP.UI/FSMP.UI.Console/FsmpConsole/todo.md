@@ -23,9 +23,7 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ## Current Status
 
-**Status**: Complete (v1) | **Coverage**: 80.37% | **Tests**: see FSMP.Tests
-
-> Note: Coverage dropped after removing dead code (PlaybackUI.cs, LibraryManager.cs) that was superseded by PlayerUI.cs but had been inflating coverage numbers.
+**Status**: Complete | **Coverage**: 89.2% | **Tests**: see FSMP.Tests
 
 ---
 
@@ -100,18 +98,19 @@ Interactive console application for FSMP, providing menu-driven access to librar
 
 ---
 
-## Future Work
+## Cross-Platform Migration
 
-### Cross-Platform Migration (when Phase 8 begins)
+**Status**: Complete
 
-- [ ] Refactor to use FSMP.Core instead of FsmpLibrary directly
-- [ ] Refactor to use FSMP.Platform.Windows for audio playback
-- [ ] Update DI registration for new architecture
-- [ ] Ensure backward compatibility with existing config and database
+- [x] Refactor to use FSMP.Core instead of FsmpLibrary directly
+- [x] Refactor to use FSMP.Platform.Windows for audio playback
+- [x] Update DI registration for new architecture
+- [x] Backward compatibility with existing config and database maintained
+
+FsmpLibrary has been fully removed from the solution. Console now references FSMP.Core + FSMP.Platform.Windows.
 
 ---
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist/Player UI + Orchestration refactor
-**Next Action**: Cross-platform migration when ready
+**Status**: Complete — all features implemented, cross-platform migration done

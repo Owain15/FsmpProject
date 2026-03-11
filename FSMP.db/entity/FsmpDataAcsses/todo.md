@@ -36,7 +36,7 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 ## Current Status
 
-**Status**: Complete (v1) | **Coverage**: 98.18% | **Tests**: see FSMP.Tests
+**Status**: Complete | **Coverage**: 98.5% | **Tests**: see FSMP.Tests
 
 ---
 
@@ -78,5 +78,5 @@ Entity Framework Core data access layer with SQLite, implementing the repository
 
 ## Progress Summary
 
-**Status**: Complete (v1) + Playlist repository + PlaylistService + Orchestration interfaces
-**Next Action**: Cross-platform migration when ready
+**Status**: Complete — all repositories, services, migrations, and orchestration interfaces implemented
+**Next Action**: Android cross-platform support when ready

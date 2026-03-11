@@ -15,4 +15,4 @@ Test suite for the FSMP solution — unit tests, integration tests, and test hel
 
 ## How It Fits In
 
-Testing Layer — references FsmpLibrary, FsmpDataAcsses, and other projects under test. No production project depends on this project.
+Testing Layer — references FSMP.Core, FSMP.Platform.Windows, FsmpDataAcsses, FSMO, and FsmpConsole. No production project depends on this project.
