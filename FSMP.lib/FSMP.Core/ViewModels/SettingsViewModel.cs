@@ -17,6 +17,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     private int _defaultVolume = 75;
     private bool _isBusy;
     private string _statusMessage = string.Empty;
+    private string _selectedTheme = "Light";
     private Configuration? _config;
 
     public SettingsViewModel(ILibraryManager libraryManager, IConfigurationService configService, Action<Action> dispatchToUI)
@@ -58,6 +59,14 @@ public class SettingsViewModel : INotifyPropertyChanged
         private set => SetProperty(ref _statusMessage, value);
     }
 
+    public IReadOnlyList<string> AvailableThemes { get; } = new[] { "Light", "Dark", "Light Blue" };
+
+    public string SelectedTheme
+    {
+        get => _selectedTheme;
+        set => SetProperty(ref _selectedTheme, value);
+    }
+
     public ICommand AddPathCommand { get; }
     public ICommand RemovePathCommand { get; }
     public ICommand ScanCommand { get; }
@@ -76,6 +85,7 @@ public class SettingsViewModel : INotifyPropertyChanged
                     LibraryPaths.Add(path);
                 AutoScanOnStartup = _config.AutoScanOnStartup;
                 DefaultVolume = _config.DefaultVolume;
+                SelectedTheme = _config.Theme;
             });
         }
     }
@@ -124,6 +134,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         _config.AutoScanOnStartup = AutoScanOnStartup;
         _config.DefaultVolume = DefaultVolume;
+        _config.Theme = SelectedTheme;
         await _configService.SaveConfigurationAsync(_config);
         StatusMessage = "Settings saved.";
     }

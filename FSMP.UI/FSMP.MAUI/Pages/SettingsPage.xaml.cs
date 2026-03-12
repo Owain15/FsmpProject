@@ -1,4 +1,5 @@
 using FSMP.Core.ViewModels;
+using FSMP.MAUI.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FSMP.MAUI.Pages;
@@ -14,6 +15,7 @@ public partial class SettingsPage : ContentPage
         _viewModel = _scope.ServiceProvider.GetRequiredService<SettingsViewModel>();
         InitializeComponent();
         BindingContext = _viewModel;
+        ThemePicker.SelectedIndexChanged += OnThemePickerChanged;
         Unloaded += (_, _) => _scope.Dispose();
     }
 
@@ -52,6 +54,12 @@ public partial class SettingsPage : ContentPage
         App.InitializationComplete -= OnInitComplete;
         MainThread.BeginInvokeOnMainThread(() => LoadingOverlay.IsVisible = false);
         await LoadDataAsync();
+    }
+
+    private void OnThemePickerChanged(object? sender, EventArgs e)
+    {
+        if (ThemePicker.SelectedItem is string theme)
+            ThemeManager.ApplyTheme(theme);
     }
 
     protected override void OnDisappearing()

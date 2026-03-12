@@ -6,6 +6,7 @@
              xmlns:sel="clr-namespace:FSMP.MAUI.Selectors"
              x:Class="FSMP.MAUI.Pages.LibraryPage"
              x:DataType="vm:LibraryBrowseViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Library">
 
     <ContentPage.Resources>
@@ -61,7 +62,8 @@
         <VerticalStackLayout Padding="16" Spacing="8">
 
             <!-- Title -->
-            <Label Text="{Binding PageTitle}" FontSize="24" FontAttributes="Bold" />
+            <Label Text="{Binding PageTitle}" FontSize="24" FontAttributes="Bold"
+                   TextColor="{DynamicResource ThemeText}" />
 
             <!-- Actions -->
             <HorizontalStackLayout Spacing="8">

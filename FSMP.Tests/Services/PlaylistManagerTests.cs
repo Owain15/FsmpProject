@@ -145,6 +145,69 @@ public class PlaylistManagerTests
     }
 
     [Fact]
+    public async Task RenamePlaylistAsync_ReturnsSuccess()
+    {
+        var result = await _manager.RenamePlaylistAsync(1, "New Name");
+
+        result.IsSuccess.Should().BeTrue();
+        _playlistServiceMock.Verify(s => s.RenamePlaylistAsync(1, "New Name"), Times.Once);
+    }
+
+    [Fact]
+    public async Task RenamePlaylistAsync_ReturnsFailure_OnException()
+    {
+        _playlistServiceMock.Setup(s => s.RenamePlaylistAsync(99, It.IsAny<string>()))
+            .ThrowsAsync(new InvalidOperationException("not found"));
+
+        var result = await _manager.RenamePlaylistAsync(99, "X");
+
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("renaming");
+    }
+
+    [Fact]
+    public async Task AddTrackToPlaylistAsync_ReturnsSuccess()
+    {
+        var result = await _manager.AddTrackToPlaylistAsync(1, 10);
+
+        result.IsSuccess.Should().BeTrue();
+        _playlistServiceMock.Verify(s => s.AddTrackAsync(1, 10), Times.Once);
+    }
+
+    [Fact]
+    public async Task AddTrackToPlaylistAsync_ReturnsFailure_OnException()
+    {
+        _playlistServiceMock.Setup(s => s.AddTrackAsync(99, 10))
+            .ThrowsAsync(new InvalidOperationException("not found"));
+
+        var result = await _manager.AddTrackToPlaylistAsync(99, 10);
+
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("adding track");
+    }
+
+    [Fact]
+    public async Task RemoveTrackFromPlaylistAsync_ReturnsSuccess()
+    {
+        var result = await _manager.RemoveTrackFromPlaylistAsync(1, 0);
+
+        result.IsSuccess.Should().BeTrue();
+        _playlistServiceMock.Verify(s => s.RemoveTrackAtPositionAsync(1, 0), Times.Once);
+    }
+
+    [Fact]
+    public async Task RemoveTrackFromPlaylistAsync_ReturnsFailure_OnException()
+    {
+        _playlistServiceMock.Setup(s => s.RemoveTrackAtPositionAsync(1, 99))
+            .ThrowsAsync(new InvalidOperationException("position out of range"));
+
+        var result = await _manager.RemoveTrackFromPlaylistAsync(1, 99);
+
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("removing track");
+    }
+
+    [Fact]
     public async Task LoadPlaylistIntoQueueAsync_ReturnsFailure_WhenEmpty()
     {
         var playlist = new Playlist

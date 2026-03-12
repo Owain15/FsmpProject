@@ -71,6 +71,22 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 
 ---
 
+### MAUI Theme System
+
+**Status**: Complete
+**Goal**: Add theme selection (Light, Dark, Light Blue) to Settings with persistence
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Add `Theme` property to `Configuration` model | Done |
+| 2 | Create theme ResourceDictionaries (Light, Dark, Light Blue) | Done |
+| 3 | Create `ThemeManager` helper for runtime theme switching | Done |
+| 4 | Add theme Picker to Settings page with live preview | Done |
+| 5 | Apply saved theme on app startup | Done |
+| 6 | Persist theme selection via config.json | Done |
+
+---
+
 ## Deferred Work
 
 ### Android Support

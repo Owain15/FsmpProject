@@ -11,4 +11,5 @@ public class Configuration
     public int DefaultVolume { get; set; } = 75;
     public bool RememberLastPlayed { get; set; } = true;
     public string? LastPlayedTrackPath { get; set; }
+    public string Theme { get; set; } = "Light";
 }

@@ -3,6 +3,10 @@
     "Windows Machine": {
       "commandName": "Project",
       "nativeDebugging": false
+    },
+    "Android Emulator": {
+      "commandName": "Project",
+      "commandLineArgs": "-f net10.0-android36.0"
     }
   }
 }

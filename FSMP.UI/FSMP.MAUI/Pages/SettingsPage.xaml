@@ -4,15 +4,18 @@
              xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
              x:Class="FSMP.MAUI.Pages.SettingsPage"
              x:DataType="vm:SettingsViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Settings">
     <Grid>
         <ScrollView>
             <VerticalStackLayout Padding="16" Spacing="12">
 
-                <Label Text="Settings" FontSize="24" FontAttributes="Bold" />
+                <Label Text="Settings" FontSize="24" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}" />
 
                 <!-- Library Paths -->
-                <Label Text="Library Paths" FontSize="18" FontAttributes="Bold" />
+                <Label Text="Library Paths" FontSize="18" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}" />
 
                 <CollectionView ItemsSource="{Binding LibraryPaths}" SelectionMode="None">
                     <CollectionView.ItemTemplate>
@@ -47,13 +50,23 @@
 
                 <!-- Auto-scan toggle -->
                 <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="Auto-scan on startup" FontSize="16" VerticalOptions="Center" />
+                    <Label Text="Auto-scan on startup" FontSize="16" VerticalOptions="Center"
+                           TextColor="{DynamicResource ThemeText}" />
                     <Switch Grid.Column="1" IsToggled="{Binding AutoScanOnStartup}" />
                 </Grid>
 
                 <!-- Volume slider -->
-                <Label Text="{Binding DefaultVolume, StringFormat='Default Volume: {0}%'}" FontSize="16" />
+                <Label Text="{Binding DefaultVolume, StringFormat='Default Volume: {0}%'}" FontSize="16"
+                       TextColor="{DynamicResource ThemeText}" />
                 <Slider Minimum="0" Maximum="100" Value="{Binding DefaultVolume}" />
+
+                <!-- Theme -->
+                <Label Text="Theme" FontSize="18" FontAttributes="Bold" Margin="0,8,0,0"
+                       TextColor="{DynamicResource ThemeText}" />
+                <Picker x:Name="ThemePicker"
+                        ItemsSource="{Binding AvailableThemes}"
+                        SelectedItem="{Binding SelectedTheme}"
+                        FontSize="16" />
 
                 <!-- Save -->
                 <Button Text="Save Settings" Command="{Binding SaveCommand}"

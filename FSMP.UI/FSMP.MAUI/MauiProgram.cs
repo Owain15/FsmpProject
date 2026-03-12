@@ -6,7 +6,7 @@ using FSMP.MAUI.ViewModels;
 #if WINDOWS
 using FSMP.Platform.Windows.Audio;
 #elif ANDROID
-using FSMP.Platform.Android.Audio;
+using global::FSMP.Platform.Android.Audio;
 #endif
 using FsmpDataAcsses;
 using FsmpDataAcsses.Services;
@@ -121,6 +121,7 @@ public static class MauiProgram
         services.AddTransient<NowPlayingPage>();
         services.AddTransient<SettingsPage>();
         services.AddTransient<PlaylistsPage>();
+        services.AddTransient<PlaylistDetailPage>();
 
         // ViewModels
         services.AddTransient<NowPlayingViewModel>();
@@ -136,6 +137,10 @@ public static class MauiProgram
                 MainThread.BeginInvokeOnMainThread));
         services.AddTransient<Core.ViewModels.PlaylistsViewModel>(sp =>
             new Core.ViewModels.PlaylistsViewModel(
+                sp.GetRequiredService<IPlaylistManager>(),
+                MainThread.BeginInvokeOnMainThread));
+        services.AddTransient<Core.ViewModels.PlaylistDetailViewModel>(sp =>
+            new Core.ViewModels.PlaylistDetailViewModel(
                 sp.GetRequiredService<IPlaylistManager>(),
                 MainThread.BeginInvokeOnMainThread));
     }

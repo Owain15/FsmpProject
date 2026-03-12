@@ -5,13 +5,15 @@
              xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
              x:Class="FSMP.MAUI.Pages.NowPlayingPage"
              x:DataType="vm:NowPlayingViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Now Playing">
     <Grid>
         <ScrollView>
             <VerticalStackLayout Padding="16" Spacing="12">
 
                 <!-- Track Info -->
-                <Label Text="{Binding TrackTitle}" FontSize="28" FontAttributes="Bold" />
+                <Label Text="{Binding TrackTitle}" FontSize="28" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}" />
                 <Label Text="{Binding TrackArtist}" FontSize="18" TextColor="Gray" />
                 <Label Text="{Binding TrackAlbum}" FontSize="16" TextColor="DarkGray" />
 
@@ -49,7 +51,8 @@
                 </HorizontalStackLayout>
 
                 <!-- Queue -->
-                <Label Text="Queue" FontSize="20" FontAttributes="Bold" Margin="0,12,0,0" />
+                <Label Text="Queue" FontSize="20" FontAttributes="Bold" Margin="0,12,0,0"
+                       TextColor="{DynamicResource ThemeText}" />
                 <CollectionView ItemsSource="{Binding QueueItems}" SelectionMode="Single"
                                 x:Name="QueueCollectionView"
                                 SelectionChanged="OnQueueSelectionChanged">

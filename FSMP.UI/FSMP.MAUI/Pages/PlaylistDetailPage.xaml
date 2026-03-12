@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
+             x:Class="FSMP.MAUI.Pages.PlaylistDetailPage"
+             x:DataType="vm:PlaylistDetailViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
+             Title="Edit Playlist">
+    <VerticalStackLayout Padding="16" Spacing="12">
+
+        <!-- Rename -->
+        <Label Text="Playlist Name" FontSize="14" FontAttributes="Bold"
+               TextColor="{DynamicResource ThemeText}" />
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Entry x:Name="NameEntry" Text="{Binding PlaylistName}" FontSize="14" />
+            <Button Grid.Column="1" Text="Rename"
+                    Command="{Binding RenameCommand}"
+                    CommandParameter="{Binding Source={x:Reference NameEntry}, Path=Text}" />
+        </Grid>
+
+        <!-- Status -->
+        <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="Gray" />
+
+        <!-- Tracks -->
+        <Label Text="Tracks" FontSize="20" FontAttributes="Bold"
+               TextColor="{DynamicResource ThemeText}" />
+        <CollectionView ItemsSource="{Binding Tracks}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:PlaylistTrack">
+                    <Grid Padding="8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Label Text="{Binding Position}" FontSize="14" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding Track.Title}" FontSize="14" VerticalOptions="Center" />
+                        <Button Grid.Column="2" Text="Remove" FontSize="12" TextColor="Red"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistDetailViewModel}}, Path=RemoveTrackCommand}"
+                                CommandParameter="{Binding .}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="No tracks in this playlist." TextColor="Gray" Padding="8" />
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </VerticalStackLayout>
+</ContentPage>

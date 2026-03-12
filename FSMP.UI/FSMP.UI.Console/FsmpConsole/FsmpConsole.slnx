@@ -31,4 +31,8 @@
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
   </Project>
+  <Project Path="../../../FSMP.lib/FSMP.Platform.Android/FSMP.Platform.Android.csproj">
+    <Build Solution="*|ARM64" Project="false" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
 </Solution>

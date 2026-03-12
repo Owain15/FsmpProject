@@ -88,4 +88,43 @@ public class PlaylistManager : IPlaylistManager
             return Result.Failure($"Error loading playlist: {ex.Message}");
         }
     }
+
+    public async Task<Result> RenamePlaylistAsync(int playlistId, string newName)
+    {
+        try
+        {
+            await _playlistService.RenamePlaylistAsync(playlistId, newName);
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error renaming playlist: {ex.Message}");
+        }
+    }
+
+    public async Task<Result> AddTrackToPlaylistAsync(int playlistId, int trackId)
+    {
+        try
+        {
+            await _playlistService.AddTrackAsync(playlistId, trackId);
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error adding track: {ex.Message}");
+        }
+    }
+
+    public async Task<Result> RemoveTrackFromPlaylistAsync(int playlistId, int position)
+    {
+        try
+        {
+            await _playlistService.RemoveTrackAtPositionAsync(playlistId, position);
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error removing track: {ex.Message}");
+        }
+    }
 }

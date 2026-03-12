@@ -54,6 +54,14 @@ public partial class PlaylistsPage : ContentPage
         await LoadDataAsync();
     }
 
+    private async void OnEditPlaylistClicked(object? sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.CommandParameter is FSMP.Core.Models.Playlist playlist)
+        {
+            await Shell.Current.GoToAsync($"playlistDetail?playlistId={playlist.PlaylistId}");
+        }
+    }
+
     protected override void OnDisappearing()
     {
         App.InitializationStatusChanged -= OnStatusChanged;

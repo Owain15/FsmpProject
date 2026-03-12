@@ -1,5 +1,6 @@
 using FSMP.Core;
 using FSMP.Core.Interfaces;
+using FSMP.MAUI.Helpers;
 using FsmpDataAcsses;
 using Microsoft.EntityFrameworkCore;
 
@@ -116,6 +117,20 @@ public partial class App : Application
             catch (Exception ex)
             {
                 Log($"Failed to restore session (non-fatal): {ex.Message}");
+            }
+
+            // Apply saved theme
+            try
+            {
+                var configService = Services.GetRequiredService<IConfigurationService>();
+                var config = await configService.LoadConfigurationAsync();
+                MainThread.BeginInvokeOnMainThread(() => ThemeManager.ApplyTheme(config.Theme));
+                Log($"Theme applied: {config.Theme}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to apply theme (non-fatal): {ex.Message}");
+                MainThread.BeginInvokeOnMainThread(() => ThemeManager.ApplyTheme("Light"));
             }
 
             UpdateStatus("Ready");
