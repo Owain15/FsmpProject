@@ -39,15 +39,6 @@ public partial class App : Application
         Log("CreateWindow called");
         var window = new Window(new AppShell());
 
-#if WINDOWS
-        // Dismiss the native Win32 splash now that the MAUI window is ready
-        window.Created += (_, _) =>
-        {
-            FSMP.MAUI.WinUI.NativeSplash.Close();
-            Log("Native splash dismissed");
-        };
-#endif
-
         // Fire-and-forget on background thread — don't block the main thread rendering pipeline
         _ = Task.Run(InitializeServicesAsync);
 
