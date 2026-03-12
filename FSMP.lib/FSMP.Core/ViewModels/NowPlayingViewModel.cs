@@ -143,7 +143,6 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         {
             _subscribed = true;
             SubscribeToEvents();
-            _volume = _audioService.Volume;
         }
 
         var trackResult = await _playbackController.GetCurrentTrackAsync();
