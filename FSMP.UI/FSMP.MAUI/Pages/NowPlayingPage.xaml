@@ -21,7 +21,10 @@
                 <Label Text="{Binding PlaybackState}" FontSize="14" TextColor="Gray" />
 
                 <!-- Progress -->
-                <ProgressBar Progress="{Binding Progress}" />
+                <Slider x:Name="ProgressSlider" Minimum="0" Maximum="1"
+                        Value="{Binding Progress, Mode=TwoWay}"
+                        DragStarted="OnSeekStarted"
+                        DragCompleted="OnSeekCompleted" />
                 <HorizontalStackLayout Spacing="0">
                     <Label Text="{Binding PositionText}" FontSize="12" HorizontalOptions="Start" />
                     <Label Text=" / " FontSize="12" />

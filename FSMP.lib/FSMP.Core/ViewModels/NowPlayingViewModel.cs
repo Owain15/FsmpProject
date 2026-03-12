@@ -25,6 +25,7 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     private string _repeatModeText = "Repeat: Off";
     private bool _isShuffled;
     private bool _subscribed;
+    private bool _isSeeking;
 
     public NowPlayingViewModel(
         IPlaybackController playbackController,
@@ -98,9 +99,28 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         }
     }
 
-    public double Progress => Duration.TotalSeconds > 0
-        ? Position.TotalSeconds / Duration.TotalSeconds
-        : 0;
+    private double _progress;
+    public double Progress
+    {
+        get => Duration.TotalSeconds > 0
+            ? Position.TotalSeconds / Duration.TotalSeconds
+            : 0;
+        set
+        {
+            // Only act on user-initiated changes (from slider drag)
+            if (_isSeeking && Duration.TotalSeconds > 0)
+            {
+                var target = TimeSpan.FromSeconds(value * Duration.TotalSeconds);
+                _ = _audioService.Player.SeekAsync(target);
+            }
+        }
+    }
+
+    public bool IsSeeking
+    {
+        get => _isSeeking;
+        set => SetProperty(ref _isSeeking, value);
+    }
 
     public string PositionText => FormatTime(Position);
     public string DurationText => FormatTime(Duration);
@@ -186,6 +206,7 @@ public class NowPlayingViewModel : INotifyPropertyChanged
 
     private void OnPositionChanged(object? sender, PositionChangedEventArgs e)
     {
+        if (_isSeeking) return;
         _dispatchToUI(() =>
         {
             Position = e.Position;

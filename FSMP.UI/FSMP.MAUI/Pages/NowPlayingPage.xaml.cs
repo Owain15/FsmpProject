@@ -69,6 +69,18 @@ public partial class NowPlayingPage : ContentPage
         base.OnDisappearing();
     }
 
+    private void OnSeekStarted(object? sender, EventArgs e)
+    {
+        _viewModel.IsSeeking = true;
+    }
+
+    private void OnSeekCompleted(object? sender, EventArgs e)
+    {
+        // Trigger the seek via the Progress setter, then release
+        _viewModel.Progress = ProgressSlider.Value;
+        _viewModel.IsSeeking = false;
+    }
+
     private void OnQueueSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is QueueItem item)
