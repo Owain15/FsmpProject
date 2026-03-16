@@ -11,6 +11,7 @@ public partial class NowPlayingPage : ContentPage
     private bool _isQueueVisible;
     private bool _isWideLayout;
     private const double WideBreakpoint = 800;
+    private const double AlbumArtMinHeight = 80;
 
     public NowPlayingPage()
     {
@@ -106,6 +107,12 @@ public partial class NowPlayingPage : ContentPage
 
         if (wasWide != _isWideLayout)
             ApplyQueueLayout();
+
+        // Hide album art area when too small
+        if (AlbumArtArea.Height >= 0)
+        {
+            AlbumArtPlaceholder.IsVisible = AlbumArtArea.Height >= AlbumArtMinHeight;
+        }
     }
 
     private void ApplyQueueLayout()

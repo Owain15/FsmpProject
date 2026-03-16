@@ -40,6 +40,9 @@ public partial class App : Application
         Log("CreateWindow called");
         var window = new Window(new AppShell());
 
+        window.MinimumWidth = 480;
+        window.MinimumHeight = 350;
+
         // Fire-and-forget on background thread — don't block the main thread rendering pipeline
         _ = Task.Run(InitializeServicesAsync);
 
