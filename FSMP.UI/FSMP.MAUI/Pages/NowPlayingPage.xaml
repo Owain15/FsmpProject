@@ -7,8 +7,10 @@
              x:DataType="vm:NowPlayingViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Now Playing">
-    <Grid>
-        <ScrollView>
+    <Grid x:Name="RootGrid" ColumnDefinitions="*,Auto">
+
+        <!-- Column 0: Player controls -->
+        <ScrollView Grid.Column="0">
             <VerticalStackLayout Padding="16" Spacing="12">
 
                 <!-- Track Info -->
@@ -53,10 +55,33 @@
                             HorizontalOptions="Fill" WidthRequest="200" />
                 </HorizontalStackLayout>
 
-                <!-- Queue -->
-                <Label Text="Queue" FontSize="20" FontAttributes="Bold" Margin="0,12,0,0"
-                       TextColor="{DynamicResource ThemeText}" />
-                <CollectionView ItemsSource="{Binding QueueItems}" SelectionMode="Single"
+                <!-- Queue toggle button -->
+                <Button x:Name="QueueToggleButton" Text="&#x2630; Queue"
+                        Clicked="OnToggleQueue" HorizontalOptions="Start"
+                        Margin="0,8,0,0" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Column 1: Queue sidebar (hidden by default) -->
+        <Border x:Name="QueueSidebar" Grid.Column="1" IsVisible="False"
+                WidthRequest="300"
+                BackgroundColor="{DynamicResource ThemeBackground}"
+                Stroke="{DynamicResource ThemeText}" StrokeThickness="0.5"
+                Padding="0">
+            <Grid RowDefinitions="Auto,*">
+                <!-- Sidebar header -->
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="12,8">
+                    <Label Text="Queue" FontSize="20" FontAttributes="Bold"
+                           TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Text="&#x2715;" Clicked="OnToggleQueue"
+                            BackgroundColor="Transparent" FontSize="18"
+                            TextColor="{DynamicResource ThemeText}"
+                            WidthRequest="40" HeightRequest="40" Padding="0" />
+                </Grid>
+
+                <!-- Queue list -->
+                <CollectionView Grid.Row="1" ItemsSource="{Binding QueueItems}" SelectionMode="Single"
                                 x:Name="QueueCollectionView"
                                 SelectionChanged="OnQueueSelectionChanged">
                     <CollectionView.ItemTemplate>
@@ -65,7 +90,7 @@
                                 <Grid.Triggers>
                                     <DataTrigger TargetType="Grid" Binding="{Binding IsCurrent}" Value="True">
                                         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#E0E0FF, Dark=#3A3A6A}" />
-                                </DataTrigger>
+                                    </DataTrigger>
                                 </Grid.Triggers>
                                 <Label Grid.Column="0" Text="{Binding Index}" FontAttributes="Bold" />
                                 <Label Grid.Column="1" Text="{Binding Title}" />
@@ -75,12 +100,11 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
-            </VerticalStackLayout>
-        </ScrollView>
+            </Grid>
+        </Border>
 
         <!-- Loading overlay -->
-        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
+        <Grid x:Name="LoadingOverlay" Grid.ColumnSpan="2" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
             <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
                 <ActivityIndicator IsRunning="True" Color="White" />
                 <Label x:Name="StatusLabel" Text="Starting..." TextColor="White" FontSize="14"

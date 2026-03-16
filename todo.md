@@ -18,6 +18,20 @@
 
 ## Active Work
 
+### MAUI Now Playing — Responsive Queue Sidebar
+
+**Status**: Complete
+**Goal**: Move queue to a collapsible sidebar with responsive wide/narrow layout
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Two-column Grid layout with sidebar panel in NowPlayingPage.xaml | Done |
+| 2 | Toggle button + SizeChanged responsive logic in code-behind | Done |
+| 3 | Pass `truncate: false` to show full queue in MAUI | Done |
+| 4 | Theme support via DynamicResource | Done |
+
+---
+
 ### UI Philosophy — Startup Feedback & Loading States
 
 **Status**: Complete
@@ -68,6 +82,19 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 | 7 | Verify end-to-end: add directory → scan → browse → queue → play | Done |
 | 8 | Update build.cmd with MAUI build support | Done (solution build includes MAUI) |
 | 9 | Add ViewModel tests to maintain 80%+ coverage | Done |
+
+---
+
+### MAUI Now Playing — Seek Slider
+
+**Status**: Complete
+**Goal**: Replace read-only ProgressBar with draggable Slider for track seeking
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Replace ProgressBar with two-way bound Slider in NowPlayingPage.xaml | Done |
+| 2 | Add IsSeeking flag to suppress position updates during drag | Done |
+| 3 | Wire DragStarted/DragCompleted to SeekAsync via Progress setter | Done |
 
 ---
 

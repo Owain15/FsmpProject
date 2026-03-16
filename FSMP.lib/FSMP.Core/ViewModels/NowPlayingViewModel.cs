@@ -237,7 +237,7 @@ public class NowPlayingViewModel : INotifyPropertyChanged
 
     private async Task RefreshQueueAsync()
     {
-        var queueResult = await _playbackController.GetQueueItemsAsync();
+        var queueResult = await _playbackController.GetQueueItemsAsync(truncate: false);
         QueueItems.Clear();
         if (queueResult.IsSuccess)
         {
