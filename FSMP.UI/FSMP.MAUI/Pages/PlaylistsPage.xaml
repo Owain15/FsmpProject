@@ -23,7 +23,7 @@
             </Grid>
 
             <!-- Status -->
-            <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="Gray" />
+            <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
 
             <!-- Playlist list -->
             <CollectionView ItemsSource="{Binding Playlists}" SelectionMode="None">
@@ -31,8 +31,8 @@
                     <DataTemplate x:DataType="models:Playlist">
                         <Grid Padding="8" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
                             <VerticalStackLayout VerticalOptions="Center">
-                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
-                                <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource ThemeText}" />
+                                <Label Text="{Binding Description}" FontSize="12" TextColor="{DynamicResource ThemeTextSecondary}" />
                             </VerticalStackLayout>
                             <Button Grid.Column="1" Text="✎ Edit" FontSize="12"
                                     Clicked="OnEditPlaylistClicked"
@@ -41,24 +41,24 @@
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}, Path=LoadIntoQueueCommand}"
                                     CommandParameter="{Binding .}" />
                             <c:IconButton Grid.Column="3" Icon="🗑" Label="Delete"
-                                    ButtonTextColor="Red"
+                                    ButtonTextColor="{DynamicResource ThemeError}"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}, Path=DeletePlaylistCommand}"
                                     CommandParameter="{Binding .}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
                 <CollectionView.EmptyView>
-                    <Label Text="No playlists yet. Create one above!" TextColor="Gray" Padding="8" />
+                    <Label Text="No playlists yet. Create one above!" TextColor="{DynamicResource ThemeTextSecondary}" Padding="8" />
                 </CollectionView.EmptyView>
             </CollectionView>
 
         </VerticalStackLayout>
 
         <!-- Loading overlay -->
-        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
+        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="{DynamicResource ThemeOverlay}" ZIndex="100">
             <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
-                <ActivityIndicator IsRunning="True" Color="White" />
-                <Label x:Name="StatusLabel" Text="Starting..." TextColor="White" FontSize="14"
+                <ActivityIndicator IsRunning="True" Color="{DynamicResource ThemeOnOverlay}" />
+                <Label x:Name="StatusLabel" Text="Starting..." TextColor="{DynamicResource ThemeOnOverlay}" FontSize="14"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>

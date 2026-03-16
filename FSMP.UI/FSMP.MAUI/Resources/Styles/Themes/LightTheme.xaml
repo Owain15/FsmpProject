@@ -10,5 +10,26 @@
     <Color x:Key="ThemeSecondary">#E8EAF6</Color>
     <Color x:Key="ThemeCardBackground">#F5F5F5</Color>
     <Color x:Key="ThemeSurface">#FFFFFF</Color>
+    <Color x:Key="ThemeTextSecondary">#757575</Color>
+    <Color x:Key="ThemeBorder">#E0E0E0</Color>
+    <Color x:Key="ThemeOverlay">#80000000</Color>
+    <Color x:Key="ThemeOnOverlay">#FFFFFF</Color>
+    <Color x:Key="ThemeChipBackground">#E0E0E0</Color>
+    <Color x:Key="ThemeHighlight">#E0E0FF</Color>
+
+    <Color x:Key="ThemeButtonBackground">#1A237E</Color>
+    <Color x:Key="ThemeButtonText">#FFFFFF</Color>
+    <Color x:Key="ThemeButtonDisabledBg">#E0E0E0</Color>
+    <Color x:Key="ThemeButtonDisabledText">#9E9E9E</Color>
+    <Color x:Key="ThemeShellBackground">#FFFFFF</Color>
+    <Color x:Key="ThemeShellText">#1B1B1B</Color>
+    <Color x:Key="ThemeShellTabBar">#FFFFFF</Color>
+    <Color x:Key="ThemeShellTabSelected">#1A237E</Color>
+    <Color x:Key="ThemeShellTabUnselected">#757575</Color>
+    <Color x:Key="ThemeSliderTrack">#1A237E</Color>
+    <Color x:Key="ThemeSliderTrackBg">#E0E0E0</Color>
+    <Color x:Key="ThemeEntryText">#1B1B1B</Color>
+    <Color x:Key="ThemeEntryPlaceholder">#9E9E9E</Color>
+    <Color x:Key="ThemeError">#D32F2F</Color>
 
 </ResourceDictionary>

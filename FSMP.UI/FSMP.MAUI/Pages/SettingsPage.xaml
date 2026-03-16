@@ -22,7 +22,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
                             <Grid Padding="4" ColumnDefinitions="*,Auto">
-                                <Label Text="{Binding .}" FontSize="14" VerticalOptions="Center" />
+                                <Label Text="{Binding .}" FontSize="14" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
                                 <c:IconButton Grid.Column="1" Icon="✕"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=RemovePathCommand}"
                                         CommandParameter="{Binding .}" />
@@ -30,7 +30,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                     <CollectionView.EmptyView>
-                        <Label Text="No library paths configured." TextColor="Gray" />
+                        <Label Text="No library paths configured." TextColor="{DynamicResource ThemeTextSecondary}" />
                     </CollectionView.EmptyView>
                 </CollectionView>
 
@@ -45,7 +45,7 @@
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
                     <c:IconButton Icon="🔍" Label="Scan" Command="{Binding ScanCommand}" />
                     <Label Grid.Column="1" Text="{Binding StatusMessage}" FontSize="14"
-                           VerticalOptions="Center" TextColor="Gray" />
+                           VerticalOptions="Center" TextColor="{DynamicResource ThemeTextSecondary}" />
                 </Grid>
 
                 <!-- Auto-scan toggle -->
@@ -83,10 +83,10 @@
         </ScrollView>
 
         <!-- Loading overlay -->
-        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
+        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="{DynamicResource ThemeOverlay}" ZIndex="100">
             <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
-                <ActivityIndicator IsRunning="True" Color="White" />
-                <Label x:Name="StatusLabel" Text="Starting..." TextColor="White" FontSize="14"
+                <ActivityIndicator IsRunning="True" Color="{DynamicResource ThemeOnOverlay}" />
+                <Label x:Name="StatusLabel" Text="Starting..." TextColor="{DynamicResource ThemeOnOverlay}" FontSize="14"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>

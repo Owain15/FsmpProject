@@ -18,9 +18,17 @@
                 <Label Text="Now Playing" FontSize="24" FontAttributes="Bold"
                        TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
                 <Button x:Name="QueueToggleButton" Grid.Column="1" Text="&#x2630; Queue"
-                        Clicked="OnToggleQueue" Padding="8,4" VerticalOptions="Center" />
+                        Clicked="OnToggleQueue" Padding="8,4" VerticalOptions="Center"
+                        BackgroundColor="{DynamicResource ThemeBackground}"
+                        TextColor="{DynamicResource ThemeText}"
+                        BorderColor="{DynamicResource ThemeBorder}"
+                        BorderWidth="1" />
                 <Button x:Name="TagsToggleButton" Grid.Column="2" Text="&#x1F3F7; Tags"
-                        Clicked="OnToggleTags" Padding="8,4" VerticalOptions="Center" />
+                        Clicked="OnToggleTags" Padding="8,4" VerticalOptions="Center"
+                        BackgroundColor="{DynamicResource ThemeBackground}"
+                        TextColor="{DynamicResource ThemeText}"
+                        BorderColor="{DynamicResource ThemeBorder}"
+                        BorderWidth="1" />
             </Grid>
 
             <!-- Row 1: Track display -->
@@ -28,9 +36,9 @@
                 <Label Text="{Binding TrackTitle}" FontSize="22" FontAttributes="Bold"
                        TextColor="{DynamicResource ThemeText}" />
                 <HorizontalStackLayout Spacing="8">
-                    <Label Text="{Binding TrackArtist}" FontSize="14" TextColor="Gray" />
-                    <Label Text="·" FontSize="14" TextColor="Gray" />
-                    <Label Text="{Binding TrackAlbum}" FontSize="14" TextColor="DarkGray" />
+                    <Label Text="{Binding TrackArtist}" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
+                    <Label Text="·" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
+                    <Label Text="{Binding TrackAlbum}" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
                 </HorizontalStackLayout>
             </VerticalStackLayout>
 
@@ -47,7 +55,7 @@
 
                 <!-- Row 0: Playback state -->
                 <Label Grid.Row="0"
-                       Text="{Binding PlaybackState}" FontSize="12" TextColor="Gray" />
+                       Text="{Binding PlaybackState}" FontSize="12" TextColor="{DynamicResource ThemeTextSecondary}" />
 
                 <!-- Row 1: Progress slider -->
                 <Slider Grid.Row="1" x:Name="ProgressSlider"
@@ -59,9 +67,9 @@
                 <!-- Row 2: Time (left) | Volume (right) -->
                 <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
                     <HorizontalStackLayout Spacing="0" VerticalOptions="Center">
-                        <Label Text="{Binding PositionText}" FontSize="12" />
-                        <Label Text=" / " FontSize="12" />
-                        <Label Text="{Binding DurationText}" FontSize="12" />
+                        <Label Text="{Binding PositionText}" FontSize="12" TextColor="{DynamicResource ThemeText}" />
+                        <Label Text=" / " FontSize="12" TextColor="{DynamicResource ThemeText}" />
+                        <Label Text="{Binding DurationText}" FontSize="12" TextColor="{DynamicResource ThemeText}" />
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
                         <Label Text="🔊" VerticalOptions="Center" FontSize="16">
@@ -84,9 +92,17 @@
                 <!-- Row 4: Repeat/Shuffle centered under transport -->
                 <Grid Grid.Row="4">
                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="140" />
+                        <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="140"
+                                BackgroundColor="{DynamicResource ThemeBackground}"
+                                TextColor="{DynamicResource ThemeText}"
+                                BorderColor="{DynamicResource ThemeBorder}"
+                                BorderWidth="1" />
                         <Button Text="{Binding IsShuffled, StringFormat='🔀 Shuffle: {0}'}"
-                                Command="{Binding ToggleShuffleCommand}" WidthRequest="140" />
+                                Command="{Binding ToggleShuffleCommand}" WidthRequest="140"
+                                BackgroundColor="{DynamicResource ThemeBackground}"
+                                TextColor="{DynamicResource ThemeText}"
+                                BorderColor="{DynamicResource ThemeBorder}"
+                                BorderWidth="1" />
                     </HorizontalStackLayout>
                 </Grid>
             </Grid>
@@ -97,7 +113,7 @@
         <Border x:Name="QueueSidebar" Grid.Column="1" IsVisible="False"
                 WidthRequest="300"
                 BackgroundColor="{DynamicResource ThemeBackground}"
-                Stroke="{DynamicResource ThemeText}" StrokeThickness="0.5"
+                Stroke="{DynamicResource ThemeBorder}" StrokeThickness="0.5"
                 Padding="0">
             <Grid RowDefinitions="Auto,*">
                 <!-- Sidebar header -->
@@ -119,13 +135,13 @@
                             <Grid Padding="4" ColumnDefinitions="30,*,Auto,60" ColumnSpacing="8">
                                 <Grid.Triggers>
                                     <DataTrigger TargetType="Grid" Binding="{Binding IsCurrent}" Value="True">
-                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#E0E0FF, Dark=#3A3A6A}" />
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource ThemeHighlight}" />
                                     </DataTrigger>
                                 </Grid.Triggers>
-                                <Label Grid.Column="0" Text="{Binding Index}" FontAttributes="Bold" />
-                                <Label Grid.Column="1" Text="{Binding Title}" />
-                                <Label Grid.Column="2" Text="{Binding Artist}" TextColor="Gray" />
-                                <Label Grid.Column="3" Text="{Binding Duration, StringFormat='{0:m\\:ss}'}" TextColor="Gray" FontSize="12" />
+                                <Label Grid.Column="0" Text="{Binding Index}" FontAttributes="Bold" TextColor="{DynamicResource ThemeText}" />
+                                <Label Grid.Column="1" Text="{Binding Title}" TextColor="{DynamicResource ThemeText}" />
+                                <Label Grid.Column="2" Text="{Binding Artist}" TextColor="{DynamicResource ThemeTextSecondary}" />
+                                <Label Grid.Column="3" Text="{Binding Duration, StringFormat='{0:m\\:ss}'}" TextColor="{DynamicResource ThemeTextSecondary}" FontSize="12" />
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -137,7 +153,7 @@
         <Border x:Name="TagsSidebar" Grid.Column="2" IsVisible="False"
                 WidthRequest="280"
                 BackgroundColor="{DynamicResource ThemeBackground}"
-                Stroke="{DynamicResource ThemeText}" StrokeThickness="0.5"
+                Stroke="{DynamicResource ThemeBorder}" StrokeThickness="0.5"
                 Padding="0">
             <Grid RowDefinitions="Auto,Auto,*">
                 <!-- Sidebar header -->
@@ -147,10 +163,10 @@
                                TextColor="{DynamicResource ThemeText}" />
                         <HorizontalStackLayout Spacing="4">
                             <Label Text="{Binding TrackTitle}" FontSize="14"
-                                   TextColor="Gray" />
-                            <Label Text="," FontSize="14" TextColor="Gray" />
+                                   TextColor="{DynamicResource ThemeTextSecondary}" />
+                            <Label Text="," FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
                             <Label Text="{Binding TrackArtist}" FontSize="14"
-                                   TextColor="Gray" />
+                                   TextColor="{DynamicResource ThemeTextSecondary}" />
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
                     <Button Grid.Column="1" Text="&#x2715;" Clicked="OnToggleTags"
@@ -165,7 +181,11 @@
                            TextColor="{DynamicResource ThemeText}" />
                     <Button Grid.Column="1" Text="&#x2630;"
                             Command="{Binding ToggleTagViewCommand}"
-                            Padding="8,4" FontSize="14" WidthRequest="44" />
+                            Padding="8,4" FontSize="14" WidthRequest="44"
+                            BackgroundColor="{DynamicResource ThemeBackground}"
+                            TextColor="{DynamicResource ThemeText}"
+                            BorderColor="{DynamicResource ThemeBorder}"
+                            BorderWidth="1" />
                 </Grid>
 
                 <!-- Current Tags view (default) -->
@@ -173,7 +193,7 @@
                     <VerticalStackLayout Padding="12,8,12,12" Spacing="8">
 
                         <Label Text="On this track" FontSize="13" FontAttributes="Bold"
-                               TextColor="Gray" />
+                               TextColor="{DynamicResource ThemeTextSecondary}" />
                         <CollectionView ItemsSource="{Binding TrackTags}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:Tags">
@@ -182,7 +202,7 @@
                                                TextColor="{DynamicResource ThemeText}" />
                                         <Button Grid.Column="1" Text="&#x1F5D1;" Padding="4,2"
                                                 FontSize="12" BackgroundColor="Transparent"
-                                                TextColor="Gray"
+                                                TextColor="{DynamicResource ThemeTextSecondary}"
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NowPlayingViewModel}}, Path=RemoveTagFromTrackCommand}"
                                                 CommandParameter="{Binding}" />
                                     </Grid>
@@ -194,7 +214,11 @@
                         <Button Text="{Binding TagFilter, StringFormat='Create &quot;{0}&quot;'}"
                                 IsVisible="{Binding ShowCreateNew}"
                                 Command="{Binding CreateAndAddTagCommand}"
-                                Padding="8,4" HorizontalOptions="Start" />
+                                Padding="8,4" HorizontalOptions="Start"
+                                BackgroundColor="{DynamicResource ThemeBackground}"
+                                TextColor="{DynamicResource ThemeText}"
+                                BorderColor="{DynamicResource ThemeBorder}"
+                                BorderWidth="1" />
 
                     </VerticalStackLayout>
                 </ScrollView>
@@ -205,11 +229,15 @@
                     <!-- Header: Tag List + Apply -->
                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="0,0,0,8">
                         <Label Text="Tag List" FontSize="13" FontAttributes="Bold"
-                               TextColor="Gray" VerticalOptions="Center" />
+                               TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                         <Button Grid.Column="1" Text="Apply"
                                 Command="{Binding ApplyPendingTagsCommand}"
                                 IsEnabled="{Binding HasPendingChanges}"
-                                Padding="8,4" FontSize="12" />
+                                Padding="8,4" FontSize="12"
+                                BackgroundColor="{DynamicResource ThemeBackground}"
+                                TextColor="{DynamicResource ThemeText}"
+                                BorderColor="{DynamicResource ThemeBorder}"
+                                BorderWidth="1" />
                     </Grid>
 
                     <CollectionView Grid.Row="1" ItemsSource="{Binding TagListItems}">
@@ -239,14 +267,14 @@
 
                                     <!-- Bin button (visible when saved) -->
                                     <Button Grid.Column="2" Text="&#x1F5D1;" Padding="4,2" FontSize="12"
-                                            BackgroundColor="Transparent" TextColor="Gray"
+                                            BackgroundColor="Transparent" TextColor="{DynamicResource ThemeTextSecondary}"
                                             IsVisible="{Binding IsSaved}"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NowPlayingViewModel}}, Path=QuickRemoveTagCommand}"
                                             CommandParameter="{Binding}" />
 
                                     <!-- Add button (visible when not saved) -->
                                     <Button Grid.Column="2" Text="＋" Padding="4,2" FontSize="12"
-                                            BackgroundColor="Transparent" TextColor="Gray"
+                                            BackgroundColor="Transparent" TextColor="{DynamicResource ThemeTextSecondary}"
                                             IsVisible="{Binding IsSaved, Converter={StaticResource InvertBoolConverter}}"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NowPlayingViewModel}}, Path=QuickAddTagCommand}"
                                             CommandParameter="{Binding}" />
@@ -259,16 +287,20 @@
                     <Button Grid.Row="1" Text="{Binding TagFilter, StringFormat='Create &quot;{0}&quot;'}"
                             IsVisible="{Binding ShowCreateNew}"
                             Command="{Binding CreateAndAddTagCommand}"
-                            Padding="8,4" HorizontalOptions="Start" VerticalOptions="End" />
+                            Padding="8,4" HorizontalOptions="Start" VerticalOptions="End"
+                            BackgroundColor="{DynamicResource ThemeBackground}"
+                            TextColor="{DynamicResource ThemeText}"
+                            BorderColor="{DynamicResource ThemeBorder}"
+                            BorderWidth="1" />
                 </Grid>
             </Grid>
         </Border>
 
         <!-- Loading overlay -->
-        <Grid x:Name="LoadingOverlay" Grid.ColumnSpan="3" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
+        <Grid x:Name="LoadingOverlay" Grid.ColumnSpan="3" IsVisible="True" BackgroundColor="{DynamicResource ThemeOverlay}" ZIndex="100">
             <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
-                <ActivityIndicator IsRunning="True" Color="White" />
-                <Label x:Name="StatusLabel" Text="Starting..." TextColor="White" FontSize="14"
+                <ActivityIndicator IsRunning="True" Color="{DynamicResource ThemeOnOverlay}" />
+                <Label x:Name="StatusLabel" Text="Starting..." TextColor="{DynamicResource ThemeOnOverlay}" FontSize="14"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>

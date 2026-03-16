@@ -21,7 +21,7 @@
         </Grid>
 
         <!-- Status -->
-        <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="Gray" />
+        <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
 
         <!-- Tracks -->
         <Label Text="Tracks" FontSize="20" FontAttributes="Bold"
@@ -30,17 +30,17 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:PlaylistTrack">
                     <Grid Padding="8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                        <Label Text="{Binding Position}" FontSize="14" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="{Binding Track.Title}" FontSize="14" VerticalOptions="Center" />
+                        <Label Text="{Binding Position}" FontSize="14" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
+                        <Label Grid.Column="1" Text="{Binding Track.Title}" FontSize="14" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
                         <c:IconButton Grid.Column="2" Icon="✕"
-                                ButtonTextColor="Red"
+                                ButtonTextColor="{DynamicResource ThemeError}"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistDetailViewModel}}, Path=RemoveTrackCommand}"
                                 CommandParameter="{Binding .}" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
             <CollectionView.EmptyView>
-                <Label Text="No tracks in this playlist." TextColor="Gray" Padding="8" />
+                <Label Text="No tracks in this playlist." TextColor="{DynamicResource ThemeTextSecondary}" Padding="8" />
             </CollectionView.EmptyView>
         </CollectionView>
 

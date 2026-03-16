@@ -5,5 +5,9 @@
     <Button x:Name="InnerButton"
             Clicked="OnClicked"
             Padding="8,4"
-            FontSize="14" />
+            FontSize="14"
+            BackgroundColor="{DynamicResource ThemeBackground}"
+            TextColor="{DynamicResource ThemeText}"
+            BorderColor="{DynamicResource ThemeBorder}"
+            BorderWidth="1" />
 </ContentView>

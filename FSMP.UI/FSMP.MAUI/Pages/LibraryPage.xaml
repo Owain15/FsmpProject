@@ -15,7 +15,7 @@
             <sel:LibraryItemTemplateSelector.ArtistTemplate>
                 <DataTemplate x:DataType="models:Artist">
                     <Grid Padding="8" ColumnDefinitions="*">
-                        <Label Text="{Binding Name}" FontSize="16" VerticalOptions="Center" />
+                        <Label Text="{Binding Name}" FontSize="16" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=SelectItemCommand}"
@@ -28,9 +28,9 @@
             <sel:LibraryItemTemplateSelector.AlbumTemplate>
                 <DataTemplate x:DataType="models:Album">
                     <Grid Padding="8" ColumnDefinitions="*,Auto">
-                        <Label Text="{Binding Title}" FontSize="16" VerticalOptions="Center" />
+                        <Label Text="{Binding Title}" FontSize="16" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
                         <Label Grid.Column="1" Text="{Binding Year, StringFormat='{0}'}"
-                               FontSize="12" TextColor="Gray" VerticalOptions="Center" />
+                               FontSize="12" TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=SelectItemCommand}"
@@ -44,15 +44,19 @@
                 <DataTemplate x:DataType="models:Track">
                     <Grid Padding="8" ColumnDefinitions="Auto,*,Auto,Auto">
                         <Label Text="{Binding TrackNumber, StringFormat='{0}.'}"
-                               FontSize="14" TextColor="Gray" VerticalOptions="Center" />
+                               FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="{Binding DisplayTitle}"
-                               FontSize="16" VerticalOptions="Center" />
+                               FontSize="16" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
                         <c:IconButton Grid.Column="2" Icon="▶" Label="Play"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=PlayNowCommand}"
                                 CommandParameter="{Binding .}" />
                         <Button Grid.Column="3" Text="＋" WidthRequest="40" FontSize="12"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=AddToQueueCommand}"
-                                CommandParameter="{Binding .}" />
+                                CommandParameter="{Binding .}"
+                                BackgroundColor="{DynamicResource ThemeBackground}"
+                                TextColor="{DynamicResource ThemeText}"
+                                BorderColor="{DynamicResource ThemeBorder}"
+                                BorderWidth="1" />
                     </Grid>
                 </DataTemplate>
             </sel:LibraryItemTemplateSelector.TrackTemplate>
@@ -83,8 +87,8 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Tags">
-                        <Border StrokeShape="RoundRectangle 12" Padding="8,4" BackgroundColor="#E0E0E0">
-                            <Label Text="{Binding Name}" FontSize="12" VerticalOptions="Center" />
+                        <Border StrokeShape="RoundRectangle 12" Padding="8,4" BackgroundColor="{DynamicResource ThemeChipBackground}">
+                            <Label Text="{Binding Name}" FontSize="12" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=FilterByTagCommand}"
@@ -102,10 +106,10 @@
         </VerticalStackLayout>
 
         <!-- Loading overlay -->
-        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
+        <Grid x:Name="LoadingOverlay" IsVisible="True" BackgroundColor="{DynamicResource ThemeOverlay}" ZIndex="100">
             <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
-                <ActivityIndicator IsRunning="True" Color="White" />
-                <Label x:Name="StatusLabel" Text="Starting..." TextColor="White" FontSize="14"
+                <ActivityIndicator IsRunning="True" Color="{DynamicResource ThemeOnOverlay}" />
+                <Label x:Name="StatusLabel" Text="Starting..." TextColor="{DynamicResource ThemeOnOverlay}" FontSize="14"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
