@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
              xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
              x:Class="FSMP.MAUI.Pages.PlaylistDetailPage"
              x:DataType="vm:PlaylistDetailViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
@@ -14,7 +15,7 @@
                TextColor="{DynamicResource ThemeText}" />
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
             <Entry x:Name="NameEntry" Text="{Binding PlaylistName}" FontSize="14" />
-            <Button Grid.Column="1" Text="Rename"
+            <c:IconButton Grid.Column="1" Icon="✎" Label="Rename"
                     Command="{Binding RenameCommand}"
                     CommandParameter="{Binding Source={x:Reference NameEntry}, Path=Text}" />
         </Grid>
@@ -31,7 +32,8 @@
                     <Grid Padding="8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                         <Label Text="{Binding Position}" FontSize="14" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="{Binding Track.Title}" FontSize="14" VerticalOptions="Center" />
-                        <Button Grid.Column="2" Text="Remove" FontSize="12" TextColor="Red"
+                        <c:IconButton Grid.Column="2" Icon="✕"
+                                ButtonTextColor="Red"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistDetailViewModel}}, Path=RemoveTrackCommand}"
                                 CommandParameter="{Binding .}" />
                     </Grid>

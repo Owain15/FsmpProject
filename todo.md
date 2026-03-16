@@ -12,11 +12,28 @@
 | FSMP.Tests | Test suite | Complete | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete | -- | -- |
 
-**Overall coverage**: 93.4% | **Tests**: 1061 passing (1060 reliable, 1 flaky integration) | **Build**: Passing
+**Overall coverage**: 93.4% | **Tests**: 1050 passing, 17 pre-existing NowPlayingViewModel failures | **Build**: Passing
 
 ---
 
 ## Active Work
+
+### MAUI Icon Buttons via Reusable Component
+
+**Status**: Complete
+**Goal**: Replace plain text buttons with icon+label buttons using a reusable IconButton component
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Create IconButton component (Components/IconButton.xaml + .cs) | Done |
+| 2 | Update NowPlayingPage with transport icon buttons | Done |
+| 3 | Update LibraryPage with icon buttons | Done |
+| 4 | Update PlaylistsPage with icon buttons | Done |
+| 5 | Update PlaylistDetailPage with icon buttons | Done |
+| 6 | Update SettingsPage with icon buttons | Done |
+| 7 | Add emoji prefixes to repeat/shuffle mode text in ViewModel | Done |
+
+---
 
 ### MAUI Now Playing — Responsive Queue Sidebar
 

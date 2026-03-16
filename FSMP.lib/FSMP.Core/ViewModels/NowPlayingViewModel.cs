@@ -22,7 +22,7 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     private TimeSpan _position;
     private TimeSpan _duration;
     private float _volume;
-    private string _repeatModeText = "Repeat: Off";
+    private string _repeatModeText = "🔁 Off";
     private bool _isShuffled;
     private bool _subscribed;
     private bool _isSeeking;
@@ -273,10 +273,10 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     {
         RepeatModeText = _playbackController.RepeatMode switch
         {
-            RepeatMode.None => "Repeat: Off",
-            RepeatMode.One => "Repeat: One",
-            RepeatMode.All => "Repeat: All",
-            _ => "Repeat: Off"
+            RepeatMode.None => "🔁 Off",
+            RepeatMode.One => "🔂 One",
+            RepeatMode.All => "🔁 All",
+            _ => "🔁 Off"
         };
     }
 

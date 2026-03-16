@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
              xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
              xmlns:sel="clr-namespace:FSMP.MAUI.Selectors"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
              x:Class="FSMP.MAUI.Pages.LibraryPage"
              x:DataType="vm:LibraryBrowseViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
@@ -46,10 +47,10 @@
                                FontSize="14" TextColor="Gray" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="{Binding DisplayTitle}"
                                FontSize="16" VerticalOptions="Center" />
-                        <Button Grid.Column="2" Text="Play" WidthRequest="60" FontSize="12"
+                        <c:IconButton Grid.Column="2" Icon="▶" Label="Play"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=PlayNowCommand}"
                                 CommandParameter="{Binding .}" />
-                        <Button Grid.Column="3" Text="+" WidthRequest="40" FontSize="12"
+                        <Button Grid.Column="3" Text="＋" WidthRequest="40" FontSize="12"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LibraryBrowseViewModel}}, Path=AddToQueueCommand}"
                                 CommandParameter="{Binding .}" />
                     </Grid>
@@ -67,11 +68,11 @@
 
             <!-- Actions -->
             <HorizontalStackLayout Spacing="8">
-                <Button Text="Play All" Command="{Binding PlayAllCommand}" WidthRequest="100" />
-                <Button Text="Back" Command="{Binding GoBackCommand}"
-                        IsVisible="{Binding CanGoBack}" WidthRequest="80" />
-                <Button Text="Clear Filter" Command="{Binding ClearTagFilterCommand}"
-                        IsVisible="{Binding HasTagFilter}" WidthRequest="110" />
+                <c:IconButton Icon="▶" Label="All" Command="{Binding PlayAllCommand}" ButtonWidthRequest="100" />
+                <c:IconButton Icon="←" Label="Back" Command="{Binding GoBackCommand}"
+                        IsVisible="{Binding CanGoBack}" ButtonWidthRequest="90" />
+                <c:IconButton Icon="✕" Label="Filter" Command="{Binding ClearTagFilterCommand}"
+                        IsVisible="{Binding HasTagFilter}" ButtonWidthRequest="100" />
             </HorizontalStackLayout>
 
             <!-- Tag filter chips -->

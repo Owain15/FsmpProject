@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
              xmlns:models="clr-namespace:FSMP.Core.Models;assembly=FSMP.Core"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
              x:Class="FSMP.MAUI.Pages.NowPlayingPage"
              x:DataType="vm:NowPlayingViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
@@ -35,17 +36,17 @@
 
                 <!-- Transport Controls -->
                 <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
-                    <Button Text="Prev" Command="{Binding PreviousCommand}" WidthRequest="80" />
-                    <Button Text="Play/Pause" Command="{Binding PlayPauseCommand}" WidthRequest="100" />
-                    <Button Text="Next" Command="{Binding NextCommand}" WidthRequest="80" />
-                    <Button Text="Stop" Command="{Binding StopCommand}" WidthRequest="80" />
+                    <c:IconButton Icon="⏮" Label="Prev" Command="{Binding PreviousCommand}" ButtonWidthRequest="90" />
+                    <c:IconButton Icon="⏯" Command="{Binding PlayPauseCommand}" ButtonWidthRequest="60" />
+                    <c:IconButton Icon="⏭" Label="Next" Command="{Binding NextCommand}" ButtonWidthRequest="90" />
+                    <c:IconButton Icon="⏹" Label="Stop" Command="{Binding StopCommand}" ButtonWidthRequest="90" />
                 </HorizontalStackLayout>
 
                 <!-- Mode Controls -->
                 <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
-                    <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="120" />
-                    <Button Text="{Binding IsShuffled, StringFormat='Shuffle: {0}'}"
-                            Command="{Binding ToggleShuffleCommand}" WidthRequest="120" />
+                    <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="140" />
+                    <Button Text="{Binding IsShuffled, StringFormat='🔀 Shuffle: {0}'}"
+                            Command="{Binding ToggleShuffleCommand}" WidthRequest="140" />
                 </HorizontalStackLayout>
 
                 <!-- Volume -->
