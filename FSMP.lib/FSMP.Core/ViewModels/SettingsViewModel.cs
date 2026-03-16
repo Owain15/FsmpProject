@@ -18,6 +18,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     private bool _isBusy;
     private string _statusMessage = string.Empty;
     private string _selectedTheme = "Light";
+    private bool _allowUnsaveFromTagList;
     private Configuration? _config;
 
     public SettingsViewModel(ILibraryManager libraryManager, IConfigurationService configService, Action<Action> dispatchToUI)
@@ -67,6 +68,12 @@ public class SettingsViewModel : INotifyPropertyChanged
         set => SetProperty(ref _selectedTheme, value);
     }
 
+    public bool AllowUnsaveFromTagList
+    {
+        get => _allowUnsaveFromTagList;
+        set => SetProperty(ref _allowUnsaveFromTagList, value);
+    }
+
     public ICommand AddPathCommand { get; }
     public ICommand RemovePathCommand { get; }
     public ICommand ScanCommand { get; }
@@ -86,6 +93,7 @@ public class SettingsViewModel : INotifyPropertyChanged
                 AutoScanOnStartup = _config.AutoScanOnStartup;
                 DefaultVolume = _config.DefaultVolume;
                 SelectedTheme = _config.Theme;
+                AllowUnsaveFromTagList = _config.AllowUnsaveFromTagList;
             });
         }
     }
@@ -135,6 +143,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         _config.AutoScanOnStartup = AutoScanOnStartup;
         _config.DefaultVolume = DefaultVolume;
         _config.Theme = SelectedTheme;
+        _config.AllowUnsaveFromTagList = AllowUnsaveFromTagList;
         await _configService.SaveConfigurationAsync(_config);
         StatusMessage = "Settings saved.";
     }

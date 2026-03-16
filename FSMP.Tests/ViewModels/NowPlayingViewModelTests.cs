@@ -13,6 +13,8 @@ public class NowPlayingViewModelTests
     private readonly Mock<IPlaybackController> _playbackMock;
     private readonly Mock<IAudioService> _audioServiceMock;
     private readonly Mock<IAudioPlayer> _playerMock;
+    private readonly Mock<ITagService> _tagServiceMock;
+    private readonly Mock<IConfigurationService> _configServiceMock;
     private readonly NowPlayingViewModel _vm;
 
     public NowPlayingViewModelTests()
@@ -20,16 +22,23 @@ public class NowPlayingViewModelTests
         _playbackMock = new Mock<IPlaybackController>();
         _audioServiceMock = new Mock<IAudioService>();
         _playerMock = new Mock<IAudioPlayer>();
+        _tagServiceMock = new Mock<ITagService>();
+        _configServiceMock = new Mock<IConfigurationService>();
 
         _audioServiceMock.Setup(a => a.Player).Returns(_playerMock.Object);
         _audioServiceMock.Setup(a => a.Volume).Returns(0.75f);
         _playerMock.Setup(p => p.State).Returns(PlaybackState.Stopped);
         _playerMock.Setup(p => p.Position).Returns(TimeSpan.Zero);
         _playerMock.Setup(p => p.Duration).Returns(TimeSpan.Zero);
+        _tagServiceMock.Setup(t => t.GetAllTagsAsync()).ReturnsAsync(Result.Success(new List<Tags>()));
+        _tagServiceMock.Setup(t => t.GetTagsForTrackAsync(It.IsAny<int>())).ReturnsAsync(Result.Success(new List<Tags>()));
+        _configServiceMock.Setup(c => c.LoadConfigurationAsync()).ReturnsAsync(new Configuration());
 
         _vm = new NowPlayingViewModel(
             _playbackMock.Object,
             _audioServiceMock.Object,
+            _tagServiceMock.Object,
+            _configServiceMock.Object,
             action => action(),
             func => func());
     }
@@ -38,7 +47,7 @@ public class NowPlayingViewModelTests
     {
         _playbackMock.Setup(p => p.GetCurrentTrackAsync())
             .ReturnsAsync(Result.Failure<Track?>("No track"));
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(new List<QueueItem>()));
         await _vm.LoadAsync();
     }
@@ -56,7 +65,7 @@ public class NowPlayingViewModelTests
     public void Constructor_ThrowsOnNullPlaybackController()
     {
         var act = () => new NowPlayingViewModel(
-            null!, _audioServiceMock.Object, action => action(), func => func());
+            null!, _audioServiceMock.Object, _tagServiceMock.Object, _configServiceMock.Object, action => action(), func => func());
         act.Should().Throw<ArgumentNullException>();
     }
 
@@ -64,7 +73,15 @@ public class NowPlayingViewModelTests
     public void Constructor_ThrowsOnNullAudioService()
     {
         var act = () => new NowPlayingViewModel(
-            _playbackMock.Object, null!, action => action(), func => func());
+            _playbackMock.Object, null!, _tagServiceMock.Object, _configServiceMock.Object, action => action(), func => func());
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void Constructor_ThrowsOnNullConfigService()
+    {
+        var act = () => new NowPlayingViewModel(
+            _playbackMock.Object, _audioServiceMock.Object, _tagServiceMock.Object, null!, action => action(), func => func());
         act.Should().Throw<ArgumentNullException>();
     }
 
@@ -72,7 +89,7 @@ public class NowPlayingViewModelTests
     public void Constructor_ThrowsOnNullDispatchToUI()
     {
         var act = () => new NowPlayingViewModel(
-            _playbackMock.Object, _audioServiceMock.Object, null!, func => func());
+            _playbackMock.Object, _audioServiceMock.Object, _tagServiceMock.Object, _configServiceMock.Object, null!, func => func());
         act.Should().Throw<ArgumentNullException>();
     }
 
@@ -80,7 +97,7 @@ public class NowPlayingViewModelTests
     public void Constructor_ThrowsOnNullDispatchToUIAsync()
     {
         var act = () => new NowPlayingViewModel(
-            _playbackMock.Object, _audioServiceMock.Object, action => action(), null!);
+            _playbackMock.Object, _audioServiceMock.Object, _tagServiceMock.Object, _configServiceMock.Object, action => action(), null!);
         act.Should().Throw<ArgumentNullException>();
     }
 
@@ -97,7 +114,7 @@ public class NowPlayingViewModelTests
             .ReturnsAsync(Result.Success<Track?>(track));
         _playbackMock.Setup(p => p.IsShuffled).Returns(true);
         _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.All);
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(new List<QueueItem>()));
         _playerMock.Setup(p => p.State).Returns(PlaybackState.Playing);
         _playerMock.Setup(p => p.Position).Returns(TimeSpan.FromSeconds(30));
@@ -110,7 +127,7 @@ public class NowPlayingViewModelTests
         _vm.TrackAlbum.Should().Be("Test Album");
         _vm.PlaybackState.Should().Be(PlaybackState.Playing);
         _vm.IsShuffled.Should().BeTrue();
-        _vm.RepeatModeText.Should().Be("Repeat: All");
+        _vm.RepeatModeText.Should().Be("🔁 All");
     }
 
     [Fact]
@@ -118,7 +135,7 @@ public class NowPlayingViewModelTests
     {
         _playbackMock.Setup(p => p.GetCurrentTrackAsync())
             .ReturnsAsync(Result.Failure<Track?>("No track"));
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(new List<QueueItem>()));
 
         await _vm.LoadAsync();
@@ -134,7 +151,7 @@ public class NowPlayingViewModelTests
         var track = new Track { Title = null, Artist = null, Album = null };
         _playbackMock.Setup(p => p.GetCurrentTrackAsync())
             .ReturnsAsync(Result.Success<Track?>(track));
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(new List<QueueItem>()));
 
         await _vm.LoadAsync();
@@ -154,7 +171,7 @@ public class NowPlayingViewModelTests
         };
         _playbackMock.Setup(p => p.GetCurrentTrackAsync())
             .ReturnsAsync(Result.Failure<Track?>("No track"));
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(items));
 
         await _vm.LoadAsync();
@@ -216,7 +233,7 @@ public class NowPlayingViewModelTests
         _vm.ToggleRepeatCommand.Execute(null);
 
         _playbackMock.Verify(p => p.ToggleRepeatMode(), Times.Once);
-        _vm.RepeatModeText.Should().Be("Repeat: One");
+        _vm.RepeatModeText.Should().Be("🔂 One");
     }
 
     [Fact]
@@ -297,7 +314,7 @@ public class NowPlayingViewModelTests
             Artist = new Artist { Name = "New Artist" },
             Album = new Album { Title = "New Album" }
         };
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(new List<QueueItem>()));
 
         _audioServiceMock.Raise(a => a.TrackChanged += null,
@@ -314,7 +331,7 @@ public class NowPlayingViewModelTests
     [Fact]
     public async Task TrackChanged_Event_WithNull_ShowsDefaults()
     {
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(new List<QueueItem>()));
 
         _audioServiceMock.Raise(a => a.TrackChanged += null,
@@ -401,7 +418,7 @@ public class NowPlayingViewModelTests
         var raised = new List<string>();
         _vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName!);
 
-        _playbackMock.Setup(p => p.GetQueueItemsAsync(true))
+        _playbackMock.Setup(p => p.GetQueueItemsAsync(It.IsAny<bool>()))
             .ReturnsAsync(Result.Success(new List<QueueItem>()));
 
         _audioServiceMock.Raise(a => a.TrackChanged += null,
@@ -430,15 +447,15 @@ public class NowPlayingViewModelTests
 
         _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.None);
         _vm.ToggleRepeatCommand.Execute(null);
-        _vm.RepeatModeText.Should().Be("Repeat: Off");
+        _vm.RepeatModeText.Should().Be("🔁 Off");
 
         _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.One);
         _vm.ToggleRepeatCommand.Execute(null);
-        _vm.RepeatModeText.Should().Be("Repeat: One");
+        _vm.RepeatModeText.Should().Be("🔂 One");
 
         _playbackMock.Setup(p => p.RepeatMode).Returns(RepeatMode.All);
         _vm.ToggleRepeatCommand.Execute(null);
-        _vm.RepeatModeText.Should().Be("Repeat: All");
+        _vm.RepeatModeText.Should().Be("🔁 All");
     }
 
     [Fact]

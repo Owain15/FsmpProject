@@ -12,4 +12,5 @@ public interface ITagRepository
     Task<IEnumerable<Tags>> GetTagsForArtistAsync(int artistId);
     Task AddAsync(Tags tag);
     void Remove(Tags tag);
+    Task<bool> IsTagInUseAsync(int tagId);
 }

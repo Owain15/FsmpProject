@@ -46,4 +46,15 @@ public class TagRepository : Repository<Tags>, ITagRepository
             .FirstOrDefaultAsync(a => a.ArtistId == artistId);
         return artist?.Tags ?? new List<Tags>();
     }
+
+    public async Task<bool> IsTagInUseAsync(int tagId)
+    {
+        if (await Context.Set<Track>().AnyAsync(t => t.Tags.Any(tag => tag.TagId == tagId)))
+            return true;
+        if (await Context.Set<Album>().AnyAsync(a => a.Tags.Any(tag => tag.TagId == tagId)))
+            return true;
+        if (await Context.Set<Artist>().AnyAsync(a => a.Tags.Any(tag => tag.TagId == tagId)))
+            return true;
+        return false;
+    }
 }

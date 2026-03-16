@@ -229,11 +229,61 @@ public class TagServiceTests
         var track = new Track { TrackId = 1, Title = "T", FilePath = "f", FileHash = "h", Tags = new List<Tags> { tag } };
         _trackRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(track);
         _tagRepoMock.Setup(r => r.GetTagsForTrackAsync(1)).ReturnsAsync(new List<Tags> { tag });
+        // Tag ID 1 is a seed tag, so no orphan cleanup expected
+        _tagRepoMock.Setup(r => r.IsTagInUseAsync(1)).ReturnsAsync(false);
 
         var result = await _service.RemoveTagFromTrackAsync(1, 1);
 
         result.IsSuccess.Should().BeTrue();
-        _saveMock.Verify(s => s(), Times.Once);
+        // Seed tag should NOT be deleted even if orphaned
+        _tagRepoMock.Verify(r => r.Remove(It.IsAny<Tags>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RemoveTagFromTrackAsync_DeletesOrphanedNonSeedTag()
+    {
+        var tag = new Tags { TagId = 10, Name = "Custom" };
+        var track = new Track { TrackId = 1, Title = "T", FilePath = "f", FileHash = "h", Tags = new List<Tags> { tag } };
+        _trackRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(track);
+        _tagRepoMock.Setup(r => r.GetTagsForTrackAsync(1)).ReturnsAsync(new List<Tags> { tag });
+        _tagRepoMock.Setup(r => r.IsTagInUseAsync(10)).ReturnsAsync(false);
+        _tagRepoMock.Setup(r => r.GetByIdAsync(10)).ReturnsAsync(tag);
+
+        var result = await _service.RemoveTagFromTrackAsync(1, 10);
+
+        result.IsSuccess.Should().BeTrue();
+        _tagRepoMock.Verify(r => r.Remove(tag), Times.Once);
+        _saveMock.Verify(s => s(), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task RemoveTagFromTrackAsync_KeepsTagStillInUse()
+    {
+        var tag = new Tags { TagId = 10, Name = "Custom" };
+        var track = new Track { TrackId = 1, Title = "T", FilePath = "f", FileHash = "h", Tags = new List<Tags> { tag } };
+        _trackRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(track);
+        _tagRepoMock.Setup(r => r.GetTagsForTrackAsync(1)).ReturnsAsync(new List<Tags> { tag });
+        _tagRepoMock.Setup(r => r.IsTagInUseAsync(10)).ReturnsAsync(true);
+
+        var result = await _service.RemoveTagFromTrackAsync(1, 10);
+
+        result.IsSuccess.Should().BeTrue();
+        _tagRepoMock.Verify(r => r.Remove(It.IsAny<Tags>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RemoveTagFromTrackAsync_KeepsOrphanedSeedTag()
+    {
+        var tag = new Tags { TagId = 3, Name = "Classical" };
+        var track = new Track { TrackId = 1, Title = "T", FilePath = "f", FileHash = "h", Tags = new List<Tags> { tag } };
+        _trackRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(track);
+        _tagRepoMock.Setup(r => r.GetTagsForTrackAsync(1)).ReturnsAsync(new List<Tags> { tag });
+        _tagRepoMock.Setup(r => r.IsTagInUseAsync(3)).ReturnsAsync(false);
+
+        var result = await _service.RemoveTagFromTrackAsync(1, 3);
+
+        result.IsSuccess.Should().BeTrue();
+        _tagRepoMock.Verify(r => r.Remove(It.IsAny<Tags>()), Times.Never);
     }
 
     // AddTagToAlbumAsync

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:FSMP.MAUI.Converters"
              x:Class="FSMP.MAUI.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -13,6 +14,8 @@
                     <Color x:Key="Black">Black</Color>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <conv:InvertBoolConverter x:Key="InvertBoolConverter" />
+            <conv:TagCheckboxColorConverter x:Key="TagCheckboxColorConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

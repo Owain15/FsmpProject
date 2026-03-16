@@ -12,4 +12,5 @@ public class Configuration
     public bool RememberLastPlayed { get; set; } = true;
     public string? LastPlayedTrackPath { get; set; }
     public string Theme { get; set; } = "Light";
+    public bool AllowUnsaveFromTagList { get; set; } = false;
 }

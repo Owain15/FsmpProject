@@ -8,17 +8,19 @@
              x:DataType="vm:NowPlayingViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Now Playing">
-    <Grid x:Name="RootGrid" ColumnDefinitions="*,Auto">
+    <Grid x:Name="RootGrid" ColumnDefinitions="*,Auto,Auto">
 
         <!-- Column 0: Player (fixed layout, no scroll) -->
         <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*,Auto">
 
             <!-- Row 0: Header -->
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="16,10">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Padding="16,10">
                 <Label Text="Now Playing" FontSize="24" FontAttributes="Bold"
                        TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
                 <Button x:Name="QueueToggleButton" Grid.Column="1" Text="&#x2630; Queue"
                         Clicked="OnToggleQueue" Padding="8,4" VerticalOptions="Center" />
+                <Button x:Name="TagsToggleButton" Grid.Column="2" Text="&#x1F3F7; Tags"
+                        Clicked="OnToggleTags" Padding="8,4" VerticalOptions="Center" />
             </Grid>
 
             <!-- Row 1: Track display -->
@@ -40,7 +42,7 @@
             </Grid>
 
             <!-- Row 3: Footer controls -->
-            <Grid Grid.Row="3" Padding="16,10" RowDefinitions="Auto,Auto,Auto,Auto"
+            <Grid Grid.Row="3" Padding="16,10" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                   RowSpacing="8">
 
                 <!-- Row 0: Playback state -->
@@ -54,28 +56,33 @@
                         DragStarted="OnSeekStarted"
                         DragCompleted="OnSeekCompleted" />
 
-                <!-- Row 2: Time+Volume (left) | Transport buttons (center) -->
-                <VerticalStackLayout Grid.Row="2" Spacing="8" VerticalOptions="Center" HorizontalOptions="Start">
-                    <HorizontalStackLayout Spacing="0">
+                <!-- Row 2: Time (left) | Volume (right) -->
+                <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                    <HorizontalStackLayout Spacing="0" VerticalOptions="Center">
                         <Label Text="{Binding PositionText}" FontSize="12" />
                         <Label Text=" / " FontSize="12" />
                         <Label Text="{Binding DurationText}" FontSize="12" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout Spacing="8">
-                        <Label Text="Volume" VerticalOptions="Center" />
-                        <Slider Minimum="0" Maximum="1" Value="{Binding Volume}" WidthRequest="150" />
+                    <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                        <Label Text="🔊" VerticalOptions="Center" FontSize="16">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnVolumeToggle" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Slider x:Name="VolumeSlider" Minimum="0" Maximum="1" Value="{Binding Volume}" WidthRequest="150" IsVisible="False" />
                     </HorizontalStackLayout>
-                </VerticalStackLayout>
+                </Grid>
 
-                <HorizontalStackLayout Grid.Row="2" Spacing="16" HorizontalOptions="Center" VerticalOptions="Center">
+                <!-- Row 3: Transport buttons (centered) -->
+                <HorizontalStackLayout Grid.Row="3" Spacing="16" HorizontalOptions="Center" VerticalOptions="Center">
                     <c:IconButton Icon="⏮" Label="Prev" Command="{Binding PreviousCommand}" ButtonWidthRequest="90" />
                     <c:IconButton Icon="⏯" Command="{Binding PlayPauseCommand}" ButtonWidthRequest="60" />
                     <c:IconButton Icon="⏭" Label="Next" Command="{Binding NextCommand}" ButtonWidthRequest="90" />
                     <c:IconButton Icon="⏹" Label="Stop" Command="{Binding StopCommand}" ButtonWidthRequest="90" />
                 </HorizontalStackLayout>
 
-                <!-- Row 3: Repeat/Shuffle centered under transport -->
-                <Grid Grid.Row="3">
+                <!-- Row 4: Repeat/Shuffle centered under transport -->
+                <Grid Grid.Row="4">
                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
                         <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="140" />
                         <Button Text="{Binding IsShuffled, StringFormat='🔀 Shuffle: {0}'}"
@@ -126,8 +133,139 @@
             </Grid>
         </Border>
 
+        <!-- Column 2: Tags sidebar (hidden by default) -->
+        <Border x:Name="TagsSidebar" Grid.Column="2" IsVisible="False"
+                WidthRequest="280"
+                BackgroundColor="{DynamicResource ThemeBackground}"
+                Stroke="{DynamicResource ThemeText}" StrokeThickness="0.5"
+                Padding="0">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <!-- Sidebar header -->
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="12,8">
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="0">
+                        <Label Text="Tags" FontSize="20" FontAttributes="Bold"
+                               TextColor="{DynamicResource ThemeText}" />
+                        <HorizontalStackLayout Spacing="4">
+                            <Label Text="{Binding TrackTitle}" FontSize="14"
+                                   TextColor="Gray" />
+                            <Label Text="," FontSize="14" TextColor="Gray" />
+                            <Label Text="{Binding TrackArtist}" FontSize="14"
+                                   TextColor="Gray" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="&#x2715;" Clicked="OnToggleTags"
+                            BackgroundColor="Transparent" FontSize="18"
+                            TextColor="{DynamicResource ThemeText}"
+                            WidthRequest="40" HeightRequest="40" Padding="0" />
+                </Grid>
+
+                <!-- Filter entry + toggle button -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="12,4,12,0" ColumnSpacing="4">
+                    <Entry Text="{Binding TagFilter}" Placeholder="Filter or add tag..."
+                           TextColor="{DynamicResource ThemeText}" />
+                    <Button Grid.Column="1" Text="&#x2630;"
+                            Command="{Binding ToggleTagViewCommand}"
+                            Padding="8,4" FontSize="14" WidthRequest="44" />
+                </Grid>
+
+                <!-- Current Tags view (default) -->
+                <ScrollView Grid.Row="2" IsVisible="{Binding IsTagListMode, Converter={StaticResource InvertBoolConverter}}">
+                    <VerticalStackLayout Padding="12,8,12,12" Spacing="8">
+
+                        <Label Text="On this track" FontSize="13" FontAttributes="Bold"
+                               TextColor="Gray" />
+                        <CollectionView ItemsSource="{Binding TrackTags}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:Tags">
+                                    <Grid ColumnDefinitions="*,Auto" Padding="4,2">
+                                        <Label Text="{Binding Name}" VerticalOptions="Center"
+                                               TextColor="{DynamicResource ThemeText}" />
+                                        <Button Grid.Column="1" Text="&#x1F5D1;" Padding="4,2"
+                                                FontSize="12" BackgroundColor="Transparent"
+                                                TextColor="Gray"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NowPlayingViewModel}}, Path=RemoveTagFromTrackCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Create new tag button -->
+                        <Button Text="{Binding TagFilter, StringFormat='Create &quot;{0}&quot;'}"
+                                IsVisible="{Binding ShowCreateNew}"
+                                Command="{Binding CreateAndAddTagCommand}"
+                                Padding="8,4" HorizontalOptions="Start" />
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <!-- Tag List view -->
+                <Grid Grid.Row="2" IsVisible="{Binding IsTagListMode}" RowDefinitions="Auto,*"
+                      Padding="12,8,12,12">
+                    <!-- Header: Tag List + Apply -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="0,0,0,8">
+                        <Label Text="Tag List" FontSize="13" FontAttributes="Bold"
+                               TextColor="Gray" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="Apply"
+                                Command="{Binding ApplyPendingTagsCommand}"
+                                IsEnabled="{Binding HasPendingChanges}"
+                                Padding="8,4" FontSize="12" />
+                    </Grid>
+
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding TagListItems}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:TagListItem">
+                                <Grid ColumnDefinitions="30,*,Auto" Padding="4,2" ColumnSpacing="4">
+                                    <!-- Checkbox indicator -->
+                                    <BoxView WidthRequest="18" HeightRequest="18" CornerRadius="3"
+                                             HorizontalOptions="Center" VerticalOptions="Center">
+                                        <BoxView.Color>
+                                            <MultiBinding Converter="{StaticResource TagCheckboxColorConverter}">
+                                                <Binding Path="IsSaved" />
+                                                <Binding Path="IsPendingChange" />
+                                            </MultiBinding>
+                                        </BoxView.Color>
+                                        <BoxView.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NowPlayingViewModel}}, Path=TogglePendingCommand}"
+                                                CommandParameter="{Binding}" />
+                                        </BoxView.GestureRecognizers>
+                                    </BoxView>
+
+                                    <!-- Tag name -->
+                                    <Label Grid.Column="1" Text="{Binding Tag.Name}"
+                                           VerticalOptions="Center"
+                                           TextColor="{DynamicResource ThemeText}" />
+
+                                    <!-- Bin button (visible when saved) -->
+                                    <Button Grid.Column="2" Text="&#x1F5D1;" Padding="4,2" FontSize="12"
+                                            BackgroundColor="Transparent" TextColor="Gray"
+                                            IsVisible="{Binding IsSaved}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NowPlayingViewModel}}, Path=QuickRemoveTagCommand}"
+                                            CommandParameter="{Binding}" />
+
+                                    <!-- Add button (visible when not saved) -->
+                                    <Button Grid.Column="2" Text="＋" Padding="4,2" FontSize="12"
+                                            BackgroundColor="Transparent" TextColor="Gray"
+                                            IsVisible="{Binding IsSaved, Converter={StaticResource InvertBoolConverter}}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NowPlayingViewModel}}, Path=QuickAddTagCommand}"
+                                            CommandParameter="{Binding}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Create new tag button -->
+                    <Button Grid.Row="1" Text="{Binding TagFilter, StringFormat='Create &quot;{0}&quot;'}"
+                            IsVisible="{Binding ShowCreateNew}"
+                            Command="{Binding CreateAndAddTagCommand}"
+                            Padding="8,4" HorizontalOptions="Start" VerticalOptions="End" />
+                </Grid>
+            </Grid>
+        </Border>
+
         <!-- Loading overlay -->
-        <Grid x:Name="LoadingOverlay" Grid.ColumnSpan="2" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
+        <Grid x:Name="LoadingOverlay" Grid.ColumnSpan="3" IsVisible="True" BackgroundColor="#80000000" ZIndex="100">
             <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
                 <ActivityIndicator IsRunning="True" Color="White" />
                 <Label x:Name="StatusLabel" Text="Starting..." TextColor="White" FontSize="14"

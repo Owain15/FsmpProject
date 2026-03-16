@@ -12,6 +12,8 @@ public class NowPlayingViewModel : INotifyPropertyChanged
 {
     private readonly IPlaybackController _playbackController;
     private readonly IAudioService _audioService;
+    private readonly ITagService _tagService;
+    private readonly IConfigurationService _configService;
     private readonly Action<Action> _dispatchToUI;
     private readonly Func<Func<Task>, Task> _dispatchToUIAsync;
 
@@ -26,19 +28,34 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     private bool _isShuffled;
     private bool _subscribed;
     private bool _isSeeking;
+    private int? _currentTrackId;
+    private string _tagFilter = string.Empty;
+    private bool _showCreateNew;
+    private bool _isTagListMode;
+    private bool _allowUnsaveFromTagList;
+    private bool _hasPendingChanges;
+    private List<Tags> _trackTagsBacking = new();
+    private List<Tags> _allTagsBacking = new();
 
     public NowPlayingViewModel(
         IPlaybackController playbackController,
         IAudioService audioService,
+        ITagService tagService,
+        IConfigurationService configService,
         Action<Action> dispatchToUI,
         Func<Func<Task>, Task> dispatchToUIAsync)
     {
         _playbackController = playbackController ?? throw new ArgumentNullException(nameof(playbackController));
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
+        _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
+        _configService = configService ?? throw new ArgumentNullException(nameof(configService));
         _dispatchToUI = dispatchToUI ?? throw new ArgumentNullException(nameof(dispatchToUI));
         _dispatchToUIAsync = dispatchToUIAsync ?? throw new ArgumentNullException(nameof(dispatchToUIAsync));
 
         QueueItems = new ObservableCollection<QueueItem>();
+        TrackTags = new ObservableCollection<Tags>();
+        AllTags = new ObservableCollection<Tags>();
+        TagListItems = new ObservableCollection<TagListItem>();
 
         PlayPauseCommand = new AsyncRelayCommand(OnPlayPause);
         NextCommand = new AsyncRelayCommand(OnNext);
@@ -47,6 +64,14 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         ToggleRepeatCommand = new RelayCommand(OnToggleRepeat);
         ToggleShuffleCommand = new RelayCommand(OnToggleShuffle);
         JumpToCommand = new AsyncRelayCommand<QueueItem>(OnJumpTo);
+        AddTagToTrackCommand = new AsyncRelayCommand<Tags>(OnAddTagToTrack);
+        RemoveTagFromTrackCommand = new AsyncRelayCommand<Tags>(OnRemoveTagFromTrack);
+        CreateAndAddTagCommand = new AsyncRelayCommand(OnCreateAndAddTag);
+        ToggleTagViewCommand = new RelayCommand(OnToggleTagView);
+        TogglePendingCommand = new RelayCommand<TagListItem>(OnTogglePending);
+        QuickAddTagCommand = new AsyncRelayCommand<TagListItem>(OnQuickAddTag);
+        QuickRemoveTagCommand = new AsyncRelayCommand<TagListItem>(OnQuickRemoveTag);
+        ApplyPendingTagsCommand = new AsyncRelayCommand(OnApplyPendingTags);
     }
 
     public string TrackTitle
@@ -148,6 +173,43 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     }
 
     public ObservableCollection<QueueItem> QueueItems { get; }
+    public ObservableCollection<Tags> TrackTags { get; }
+    public ObservableCollection<Tags> AllTags { get; }
+    public ObservableCollection<TagListItem> TagListItems { get; }
+
+    public bool IsTagListMode
+    {
+        get => _isTagListMode;
+        private set => SetProperty(ref _isTagListMode, value);
+    }
+
+    public bool AllowUnsaveFromTagList
+    {
+        get => _allowUnsaveFromTagList;
+        private set => SetProperty(ref _allowUnsaveFromTagList, value);
+    }
+
+    public bool HasPendingChanges
+    {
+        get => _hasPendingChanges;
+        private set => SetProperty(ref _hasPendingChanges, value);
+    }
+
+    public string TagFilter
+    {
+        get => _tagFilter;
+        set
+        {
+            if (SetProperty(ref _tagFilter, value))
+                ApplyTagFilter();
+        }
+    }
+
+    public bool ShowCreateNew
+    {
+        get => _showCreateNew;
+        private set => SetProperty(ref _showCreateNew, value);
+    }
 
     public ICommand PlayPauseCommand { get; }
     public ICommand NextCommand { get; }
@@ -156,6 +218,14 @@ public class NowPlayingViewModel : INotifyPropertyChanged
     public ICommand ToggleRepeatCommand { get; }
     public ICommand ToggleShuffleCommand { get; }
     public ICommand JumpToCommand { get; }
+    public ICommand AddTagToTrackCommand { get; }
+    public ICommand RemoveTagFromTrackCommand { get; }
+    public ICommand CreateAndAddTagCommand { get; }
+    public ICommand ToggleTagViewCommand { get; }
+    public ICommand TogglePendingCommand { get; }
+    public ICommand QuickAddTagCommand { get; }
+    public ICommand QuickRemoveTagCommand { get; }
+    public ICommand ApplyPendingTagsCommand { get; }
 
     public async Task LoadAsync()
     {
@@ -169,12 +239,14 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         if (trackResult.IsSuccess && trackResult.Value is not null)
         {
             var track = trackResult.Value;
+            _currentTrackId = track.TrackId;
             TrackTitle = track.Title ?? "Unknown Title";
             TrackArtist = track.Artist?.Name ?? "Unknown Artist";
             TrackAlbum = track.Album?.Title ?? "Unknown Album";
         }
         else
         {
+            _currentTrackId = null;
             TrackTitle = "No track loaded";
             TrackArtist = string.Empty;
             TrackAlbum = string.Empty;
@@ -187,7 +259,15 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         UpdateRepeatModeText();
         IsShuffled = _playbackController.IsShuffled;
 
+        try
+        {
+            var config = await _configService.LoadConfigurationAsync();
+            AllowUnsaveFromTagList = config.AllowUnsaveFromTagList;
+        }
+        catch { /* non-fatal */ }
+
         await RefreshQueueAsync();
+        await RefreshTagsAsync();
     }
 
     private void SubscribeToEvents()
@@ -220,18 +300,21 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         {
             if (e.NewTrack is not null)
             {
+                _currentTrackId = e.NewTrack.TrackId;
                 TrackTitle = e.NewTrack.Title ?? "Unknown Title";
                 TrackArtist = e.NewTrack.Artist?.Name ?? "Unknown Artist";
                 TrackAlbum = e.NewTrack.Album?.Title ?? "Unknown Album";
             }
             else
             {
+                _currentTrackId = null;
                 TrackTitle = "No track loaded";
                 TrackArtist = string.Empty;
                 TrackAlbum = string.Empty;
             }
 
             await RefreshQueueAsync();
+            await RefreshTagsAsync();
         });
     }
 
@@ -278,6 +361,170 @@ public class NowPlayingViewModel : INotifyPropertyChanged
             RepeatMode.All => "🔁 All",
             _ => "🔁 Off"
         };
+    }
+
+    public async Task RefreshTagsAsync()
+    {
+        if (_currentTrackId is null)
+        {
+            _trackTagsBacking.Clear();
+            _allTagsBacking.Clear();
+            ApplyTagFilter();
+            return;
+        }
+
+        var trackTagsResult = await _tagService.GetTagsForTrackAsync(_currentTrackId.Value);
+        _trackTagsBacking = trackTagsResult.IsSuccess
+            ? new List<Tags>(trackTagsResult.Value!)
+            : new List<Tags>();
+
+        var allTagsResult = await _tagService.GetAllTagsAsync();
+        if (allTagsResult.IsSuccess)
+        {
+            var assignedIds = new HashSet<int>(_trackTagsBacking.Select(t => t.TagId));
+            _allTagsBacking = allTagsResult.Value!
+                .Where(t => !assignedIds.Contains(t.TagId))
+                .ToList();
+        }
+        else
+        {
+            _allTagsBacking = new List<Tags>();
+        }
+
+        ApplyTagFilter();
+    }
+
+    private void ApplyTagFilter()
+    {
+        TrackTags.Clear();
+        AllTags.Clear();
+
+        var filter = _tagFilter?.Trim() ?? string.Empty;
+
+        foreach (var tag in _trackTagsBacking)
+        {
+            if (filter.Length == 0 || tag.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                TrackTags.Add(tag);
+        }
+
+        foreach (var tag in _allTagsBacking)
+        {
+            if (filter.Length == 0 || tag.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                AllTags.Add(tag);
+        }
+
+        ShowCreateNew = filter.Length > 0 &&
+            !_trackTagsBacking.Any(t => t.Name.Equals(filter, StringComparison.OrdinalIgnoreCase)) &&
+            !_allTagsBacking.Any(t => t.Name.Equals(filter, StringComparison.OrdinalIgnoreCase));
+
+        if (_isTagListMode)
+            RebuildTagListItems();
+    }
+
+    private async Task OnAddTagToTrack(Tags? tag)
+    {
+        if (tag is null || _currentTrackId is null) return;
+        await _tagService.AddTagToTrackAsync(_currentTrackId.Value, tag.TagId);
+        await RefreshTagsAsync();
+    }
+
+    private async Task OnRemoveTagFromTrack(Tags? tag)
+    {
+        if (tag is null || _currentTrackId is null) return;
+        await _tagService.RemoveTagFromTrackAsync(_currentTrackId.Value, tag.TagId);
+        await RefreshTagsAsync();
+    }
+
+    private async Task OnCreateAndAddTag()
+    {
+        if (string.IsNullOrWhiteSpace(TagFilter) || _currentTrackId is null) return;
+        var createResult = await _tagService.CreateTagAsync(TagFilter.Trim());
+        if (createResult.IsSuccess)
+        {
+            await _tagService.AddTagToTrackAsync(_currentTrackId.Value, createResult.Value!.TagId);
+            TagFilter = string.Empty;
+            await RefreshTagsAsync();
+        }
+    }
+
+    private void OnToggleTagView()
+    {
+        IsTagListMode = !IsTagListMode;
+        if (IsTagListMode)
+            RebuildTagListItems();
+    }
+
+    private void OnTogglePending(TagListItem? item)
+    {
+        if (item is null) return;
+        if (item.IsSaved && !AllowUnsaveFromTagList) return;
+        item.IsPendingChange = !item.IsPendingChange;
+    }
+
+    private async Task OnQuickAddTag(TagListItem? item)
+    {
+        if (item is null || _currentTrackId is null || item.IsSaved) return;
+        await _tagService.AddTagToTrackAsync(_currentTrackId.Value, item.Tag.TagId);
+        await RefreshTagsAsync();
+    }
+
+    private async Task OnQuickRemoveTag(TagListItem? item)
+    {
+        if (item is null || _currentTrackId is null || !item.IsSaved) return;
+        await _tagService.RemoveTagFromTrackAsync(_currentTrackId.Value, item.Tag.TagId);
+        await RefreshTagsAsync();
+    }
+
+    private async Task OnApplyPendingTags()
+    {
+        if (_currentTrackId is null) return;
+
+        foreach (var item in TagListItems.Where(i => i.IsPendingChange).ToList())
+        {
+            if (item.IsSaved)
+                await _tagService.RemoveTagFromTrackAsync(_currentTrackId.Value, item.Tag.TagId);
+            else
+                await _tagService.AddTagToTrackAsync(_currentTrackId.Value, item.Tag.TagId);
+        }
+
+        await RefreshTagsAsync();
+    }
+
+    private void RebuildTagListItems()
+    {
+        foreach (var old in TagListItems)
+            old.PropertyChanged -= OnTagListItemPropertyChanged;
+
+        TagListItems.Clear();
+        var filter = _tagFilter?.Trim() ?? string.Empty;
+
+        foreach (var tag in _trackTagsBacking)
+        {
+            if (filter.Length == 0 || tag.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                TagListItems.Add(new TagListItem { Tag = tag, IsSaved = true });
+        }
+
+        foreach (var tag in _allTagsBacking)
+        {
+            if (filter.Length == 0 || tag.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                TagListItems.Add(new TagListItem { Tag = tag, IsSaved = false });
+        }
+
+        foreach (var item in TagListItems)
+            item.PropertyChanged += OnTagListItemPropertyChanged;
+
+        UpdateHasPendingChanges();
+    }
+
+    private void OnTagListItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TagListItem.IsPendingChange))
+            UpdateHasPendingChanges();
+    }
+
+    private void UpdateHasPendingChanges()
+    {
+        HasPendingChanges = TagListItems.Any(i => i.IsPendingChange);
     }
 
     public void UnsubscribeFromEvents()
@@ -335,5 +582,14 @@ public class NowPlayingViewModel : INotifyPropertyChanged
         public event EventHandler? CanExecuteChanged;
         public bool CanExecute(object? parameter) => true;
         public void Execute(object? parameter) => _execute();
+    }
+
+    private sealed class RelayCommand<T> : ICommand
+    {
+        private readonly Action<T?> _execute;
+        public RelayCommand(Action<T?> execute) => _execute = execute;
+        public event EventHandler? CanExecuteChanged;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => _execute(parameter is T t ? t : default);
     }
 }

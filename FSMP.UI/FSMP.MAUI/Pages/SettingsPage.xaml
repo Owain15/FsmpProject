@@ -68,6 +68,13 @@
                         SelectedItem="{Binding SelectedTheme}"
                         FontSize="16" />
 
+                <!-- Allow unsave from Tag List -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Allow unsave from Tag List" FontSize="16" VerticalOptions="Center"
+                           TextColor="{DynamicResource ThemeText}" />
+                    <Switch Grid.Column="1" IsToggled="{Binding AllowUnsaveFromTagList}" />
+                </Grid>
+
                 <!-- Save -->
                 <c:IconButton Icon="💾" Label="Save" Command="{Binding SaveCommand}"
                         HorizontalOptions="Start" />

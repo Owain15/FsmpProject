@@ -5,6 +5,7 @@ namespace FSMP.Core.Services;
 
 public class TagService : ITagService
 {
+    private static readonly HashSet<int> SeedTagIds = new() { 1, 2, 3, 4, 5 };
     private readonly ITagRepository _tagRepository;
     private readonly ITrackRepository _trackRepository;
     private readonly IAlbumRepository _albumRepository;
@@ -157,6 +158,18 @@ public class TagService : ITagService
 
             track.Tags.Remove(tagToRemove);
             await _saveAsync();
+
+            // Clean up orphaned non-seed tags
+            if (!SeedTagIds.Contains(tagId) && !await _tagRepository.IsTagInUseAsync(tagId))
+            {
+                var tag = await _tagRepository.GetByIdAsync(tagId);
+                if (tag != null)
+                {
+                    _tagRepository.Remove(tag);
+                    await _saveAsync();
+                }
+            }
+
             return Result.Success();
         }
         catch (Exception ex)
