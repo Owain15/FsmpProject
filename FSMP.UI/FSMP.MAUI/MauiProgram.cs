@@ -122,6 +122,7 @@ public static class MauiProgram
         services.AddTransient<SettingsPage>();
         services.AddTransient<PlaylistsPage>();
         services.AddTransient<PlaylistDetailPage>();
+        services.AddTransient<CustomThemePage>();
 
         // ViewModels
         services.AddTransient<NowPlayingViewModel>();
@@ -139,6 +140,9 @@ public static class MauiProgram
             new Core.ViewModels.PlaylistsViewModel(
                 sp.GetRequiredService<IPlaylistManager>(),
                 MainThread.BeginInvokeOnMainThread));
+        services.AddTransient<ViewModels.CustomThemeViewModel>(sp =>
+            new ViewModels.CustomThemeViewModel(
+                sp.GetRequiredService<IConfigurationService>()));
         services.AddTransient<Core.ViewModels.PlaylistDetailViewModel>(sp =>
             new Core.ViewModels.PlaylistDetailViewModel(
                 sp.GetRequiredService<IPlaylistManager>(),

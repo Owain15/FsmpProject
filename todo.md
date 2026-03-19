@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete | -- | -- |
 
-**Overall coverage**: 93.4% | **Tests**: 1050 passing, 17 pre-existing NowPlayingViewModel failures | **Build**: Passing
+**Overall coverage**: 93.4% | **Tests**: 1092 passing | **Build**: Passing (Windows + Android)
 
 ---
 
@@ -135,11 +135,15 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 
 ### Android Support
 
-**Status**: Deferred — waiting until MAUI works on Windows
+**Status**: Android-ready — build compiles, needs device/emulator verification
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| Platform.Android project setup | Create project, configure LibVLCSharp Android | Not started |
+| Platform.Android project setup | Create project, configure LibVLCSharp Android | Done |
+| Android build verification | `build-android.cmd` compiles successfully | Done |
+| Solution build fix | MAUI csproj restricts to Windows TFM during solution build | Done |
+| Coverlet config update | Include all testable projects in coverage | Done |
+| Cross-platform config tests | Android-style path handling verified | Done |
 | ExoPlayer FFmpeg for WMA | Real-time WMA decoding on Android | Not started |
 | Android-specific features | Permissions, background playback, lock screen | Not started |
 | Android testing | Device/emulator verification | Not started |

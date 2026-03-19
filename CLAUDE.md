@@ -400,6 +400,8 @@ dotnet build FSMP.MAUI\FSMP.MAUI.csproj ^
   -p:AndroidPackageFormat=apk
 ```
 
+**IMPORTANT**: After modifying any `.xaml` file in the MAUI project, do a full **Solution Rebuild** (not just Build) to ensure XAML changes are picked up. This is a known .NET MAUI incremental build limitation.
+
 ### Key Design Decisions
 
 1. **.NET MAUI over Xamarin**: MAUI is the official successor, .NET 10.0 compatible

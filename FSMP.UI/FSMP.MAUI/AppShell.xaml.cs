@@ -6,5 +6,6 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         Routing.RegisterRoute("playlistDetail", typeof(Pages.PlaylistDetailPage));
+        Routing.RegisterRoute("customTheme", typeof(Pages.CustomThemePage));
     }
 }

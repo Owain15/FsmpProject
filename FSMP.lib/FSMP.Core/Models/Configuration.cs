@@ -13,4 +13,12 @@ public class Configuration
     public string? LastPlayedTrackPath { get; set; }
     public string Theme { get; set; } = "Light";
     public bool AllowUnsaveFromTagList { get; set; } = false;
+    public Dictionary<string, string>? CustomThemeColors { get; set; }
+    public List<NamedCustomTheme> SavedCustomThemes { get; set; } = new();
+}
+
+public class NamedCustomTheme
+{
+    public string Name { get; set; } = string.Empty;
+    public Dictionary<string, string> Colors { get; set; } = new();
 }

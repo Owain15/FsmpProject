@@ -8,7 +8,7 @@
           <Exclude>[xunit.*]*,[*.Tests]*</Exclude>
           <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
           <ExcludeByFile>**/Migrations/**/*.cs</ExcludeByFile>
-          <Include>[FsmpLibrary]*,[FsmpDataAcsses]*</Include>
+          <Include>[FsmpLibrary]*,[FsmpDataAcsses]*,[FSMP.Core]*,[FSMP.Platform.Windows]*,[FSMO]*,[FsmpConsole]*</Include>
           <SingleHit>false</SingleHit>
           <UseSourceLink>true</UseSourceLink>
           <IncludeTestAssembly>false</IncludeTestAssembly>

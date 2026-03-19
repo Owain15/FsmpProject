@@ -59,7 +59,34 @@ public partial class SettingsPage : ContentPage
     private void OnThemePickerChanged(object? sender, EventArgs e)
     {
         if (ThemePicker.SelectedItem is string theme)
-            ThemeManager.ApplyTheme(theme);
+        {
+            if (theme == "Custom")
+                _ = ApplyCustomThemeFromConfigAsync();
+            else
+                ThemeManager.ApplyTheme(theme);
+        }
+    }
+
+    private async Task ApplyCustomThemeFromConfigAsync()
+    {
+        try
+        {
+            var configService = _scope.ServiceProvider.GetRequiredService<Core.Interfaces.IConfigurationService>();
+            var config = await configService.LoadConfigurationAsync();
+            if (config.CustomThemeColors is not null && config.CustomThemeColors.Count > 0)
+                ThemeManager.ApplyCustomTheme(config.CustomThemeColors);
+            else
+                ThemeManager.ApplyTheme("Light");
+        }
+        catch (Exception ex)
+        {
+            App.Log($"Failed to apply custom theme: {ex}");
+        }
+    }
+
+    private async void OnCustomizeThemeClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("customTheme");
     }
 
     protected override void OnDisappearing()

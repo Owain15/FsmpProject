@@ -60,7 +60,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         private set => SetProperty(ref _statusMessage, value);
     }
 
-    public IReadOnlyList<string> AvailableThemes { get; } = new[] { "Light", "Dark", "Light Blue" };
+    public IReadOnlyList<string> AvailableThemes { get; } = new[] { "Light", "Dark", "Light Blue", "Custom" };
 
     public string SelectedTheme
     {

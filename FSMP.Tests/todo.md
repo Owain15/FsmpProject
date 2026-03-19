@@ -57,9 +57,10 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `SettingsViewModelTests.cs` -- Load config, add/remove paths, scan, save, property change (11 tests)
 - `PlaylistsViewModelTests.cs` -- Load playlists, create, delete, load into queue, error handling (8 tests)
 
-**Core/** (2 files, 45 tests):
+**Core/** (3 files, 54 tests):
 - `ActivePlaylistServiceTests.cs` -- RepeatMode, shuffle, queue navigation
 - `ActivePlaylistServiceStateTests.cs` -- GetState/RestoreState round-trips (8 tests)
+- `PlatformConfigTests.cs` -- Android/Windows path formats, serialization, custom themes (9 tests)
 
 **Integration/** (1 file, 12 tests):
 - `EndToEndTests.cs` -- Full-stack E2E workflows with real SQLite
@@ -69,7 +70,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete | **Tests**: 1042 passing | **Overall Coverage**: 93.4%
+**Status**: Complete | **Tests**: 1092 passing | **Overall Coverage**: 93.4%
 
 | Project | Coverage |
 |---------|----------|
@@ -132,5 +133,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete — 1042 tests, 93.4% coverage
-**Next Action**: Android platform tests when ready
+**Status**: Complete — 1092 tests, 93.4% coverage
+**Next Action**: Android device/emulator testing when available

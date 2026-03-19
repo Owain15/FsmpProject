@@ -1,0 +1,3 @@
+@echo off
+echo Building FSMP.MAUI for Android...
+dotnet build FSMP.UI\FSMP.MAUI\FSMP.MAUI.csproj -f:net10.0-android36.0 -c:Debug

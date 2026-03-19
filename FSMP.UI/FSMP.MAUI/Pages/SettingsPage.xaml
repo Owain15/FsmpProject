@@ -68,6 +68,12 @@
                         SelectedItem="{Binding SelectedTheme}"
                         FontSize="16" />
 
+                <Button Text="Customize Theme..."
+                        FontSize="14" HorizontalOptions="Start" Padding="16,8"
+                        BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                        TextColor="{DynamicResource ThemeButtonText}"
+                        Clicked="OnCustomizeThemeClicked" />
+
                 <!-- Allow unsave from Tag List -->
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Text="Allow unsave from Tag List" FontSize="16" VerticalOptions="Center"

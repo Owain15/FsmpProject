@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>net10.0-windows10.0.19041.0;net10.0-android36.0</TargetFrameworks>
+    <!-- When building from the solution, only build the Windows TFM.
+         Use build-android.cmd or -f:net10.0-android36.0 for the Android target. -->
+    <TargetFrameworks Condition="'$(SolutionPath)' != '' And '$(TargetFramework)' == ''">net10.0-windows10.0.19041.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RootNamespace>FSMP.MAUI</RootNamespace>
     <UseMaui>true</UseMaui>
