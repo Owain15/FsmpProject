@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete | -- | -- |
 
-**Overall coverage**: 93.4% | **Tests**: 1092 passing | **Build**: Passing (Windows + Android)
+**Overall coverage**: 94.1% | **Tests**: 1114 passing | **Build**: Passing (Windows + Android)
 
 ---
 
@@ -144,6 +144,8 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 | Solution build fix | MAUI csproj restricts to Windows TFM during solution build | Done |
 | Coverlet config update | Include all testable projects in coverage | Done |
 | Cross-platform config tests | Android-style path handling verified | Done |
+| MAUI DI wiring tests | ServiceRegistrationTests verifying shared container | Done |
+| Theme data contract tests | ThemeManagerTests verifying theme model round-trips | Done |
 | ExoPlayer FFmpeg for WMA | Real-time WMA decoding on Android | Not started |
 | Android-specific features | Permissions, background playback, lock screen | Not started |
 | Android testing | Device/emulator verification | Not started |
@@ -216,7 +218,8 @@ LibVlcAudioPlayer refactored with IMediaPlayerAdapter. Coverage 65.74% → 86.26
 ## Build & Test Quick Reference
 
 ```batch
-build.cmd                    # Build console solution (MSBuild for COM interop)
+build.cmd                    # Build console + MAUI solution (MSBuild for COM interop)
+build-android.cmd            # Build MAUI for Android target
 test.cmd                     # Run all tests
 test-with-coverage.cmd       # Run tests with coverage report
 ```

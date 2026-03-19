@@ -62,6 +62,10 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 - `ActivePlaylistServiceStateTests.cs` -- GetState/RestoreState round-trips (8 tests)
 - `PlatformConfigTests.cs` -- Android/Windows path formats, serialization, custom themes (9 tests)
 
+**MAUI/** (2 files, 22 tests):
+- `ServiceRegistrationTests.cs` -- DI container wiring verification: singletons, scoped services, repositories, orchestration (11 tests)
+- `ThemeManagerTests.cs` -- Theme data contracts, Configuration theme properties, color key validation, round-trip serialization (11 tests)
+
 **Integration/** (1 file, 12 tests):
 - `EndToEndTests.cs` -- Full-stack E2E workflows with real SQLite
 
@@ -70,7 +74,7 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete | **Tests**: 1092 passing | **Overall Coverage**: 93.4%
+**Status**: Complete | **Tests**: 1114 passing | **Overall Coverage**: 94.1%
 
 | Project | Coverage |
 |---------|----------|
@@ -133,5 +137,5 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete — 1092 tests, 93.4% coverage
+**Status**: Complete — 1114 tests, 94.1% coverage
 **Next Action**: Android device/emulator testing when available

@@ -16,3 +16,11 @@ Test suite for the FSMP solution — unit tests, integration tests, and test hel
 ## How It Fits In
 
 Testing Layer — references FSMP.Core, FSMP.Platform.Windows, FsmpDataAcsses, FSMO, and FsmpConsole. No production project depends on this project.
+
+## Test Coverage
+
+**1114 tests** | **94.1% line coverage** | **81.8% branch coverage**
+
+Test directories: Models, Services, Repositories, Database, UI, Audio, ViewModels, Core, MAUI, FSMO, Integration, ErrorHandling, TestHelpers.
+
+See [todo.md](todo.md) for a full breakdown by directory.

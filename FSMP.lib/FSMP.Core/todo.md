@@ -35,7 +35,7 @@ Cross-platform business logic for playlist management, active playback queue, an
 
 ## Current Status
 
-**Status**: Complete | **Coverage**: 88.1% | **Tests**: 45+ passing
+**Status**: Complete | **Coverage**: 88.1% | **Tests**: 54+ passing (Core) + 22 MAUI DI/theme tests
 
 All cross-platform interfaces, models, services, ViewModels, and orchestration layer are implemented. Used by both Console and MAUI apps.
 

@@ -94,6 +94,11 @@ Always build and test with `-p:Platform=ARM64` on this device. The `PROCESSOR_AR
 
 # Clean build artifacts
 "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Clean -p:Platform=ARM64
+
+# Build MAUI for Android target
+build-android.cmd
+# Or manually:
+dotnet build FSMP.UI\FSMP.MAUI\FSMP.MAUI.csproj -f:net10.0-android36.0 -c:Debug
 ```
 
 ### Testing
@@ -290,19 +295,19 @@ All UI code (Console and MAUI) must follow these four principles:
 
 ## Project Status
 
-- **Stage**: Active development - implementing data storage and metadata features
-- **Working Features**: Console UI, WAV/WMA/MP3 playback, directory scanning, test infrastructure
-- **Testing**: xUnit configured with 80% coverage requirement
+- **Stage**: Feature-complete — Console + MAUI apps working, Android build compiles
+- **Working Features**: Console UI, MAUI UI (Windows), WAV/WMA/MP3 playback, directory scanning, library browsing, playlists, tags, themes, queue persistence, FSMO file organizer
+- **Testing**: 1114 tests, 94.1% line coverage, 81.8% branch coverage
+- **Platforms**: Windows (running), Android (builds, needs device testing)
 - **CI/CD**: Not configured
-- **In Progress**: Data access layer with EF Core, multi-location library support, metadata editing
 
 ---
 
-## 🌐 PLANNED: Cross-Platform Migration (Windows + Android)
+## 🌐 Cross-Platform Migration (Windows + Android)
 
-**Status**: Planning complete, implementation not yet started
+**Status**: Core migration complete — MAUI runs on Windows, Android build compiles, Android device testing pending
 **Plan Document**: `.claude/plans/elegant-honking-locket.md`
-**Tracking**: See "CROSS-PLATFORM MIGRATION PROJECT" section in [todo.md](todo.md)
+**Tracking**: See "Android Support" section in [todo.md](todo.md)
 
 ### Migration Overview
 
@@ -412,17 +417,22 @@ dotnet build FSMP.MAUI\FSMP.MAUI.csproj ^
 
 ### Success Criteria
 
-- MAUI app runs on Windows 10/11 and Android 11+
-- All formats play on Windows (WAV, WMA, MP3)
-- All formats play on Android (WAV, MP3, WMA via ExoPlayer FFmpeg)
-- WMA files play WITHOUT creating transcoded copies
-- Library scanning works on both platforms
-- Database and config are cross-platform compatible
-- Console app updated to use new architecture
-- **Test coverage remains ≥ 80%**
-- Build commands documented for both platforms
-- User documentation includes Android guide
+- [x] MAUI app runs on Windows 10/11 ~~and Android 11+~~ (Android needs device testing)
+- [x] All formats play on Windows (WAV, WMA, MP3)
+- [ ] All formats play on Android (WAV, MP3, WMA via ExoPlayer FFmpeg)
+- [x] WMA files play WITHOUT creating transcoded copies
+- [x] Library scanning works on ~~both platforms~~ Windows (Android needs device testing)
+- [x] Database and config are cross-platform compatible
+- [x] Console app updated to use new architecture
+- [x] **Test coverage remains ≥ 80%** (94.1% line, 81.8% branch)
+- [x] Build commands documented for both platforms
+- [ ] User documentation includes Android guide
 
 ### Current Implementation Status
 
-**⚠️ IMPORTANT**: The cross-platform migration has NOT been implemented yet. The current codebase remains Windows-only. All information in this section describes planned changes. Refer to [todo.md](todo.md) for implementation progress.
+**Status**: The cross-platform architecture migration is largely complete:
+- FSMP.Core, FSMP.Platform.Windows, FSMP.Platform.Android projects created and building
+- FSMP.MAUI runs on Windows with full functionality (library, playback, playlists, tags, themes)
+- Android build compiles successfully (`build-android.cmd`)
+- Console app updated to use new architecture
+- **Remaining**: Android device/emulator testing, ExoPlayer FFmpeg for WMA on Android, Android-specific features (permissions, background playback, lock screen controls)
