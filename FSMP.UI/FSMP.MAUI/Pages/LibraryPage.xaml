@@ -8,7 +8,7 @@
              x:Class="FSMP.MAUI.Pages.LibraryPage"
              x:DataType="vm:LibraryBrowseViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
-             Title="Library">
+             Title="{Binding PageTitle}">
 
     <ContentPage.Resources>
         <sel:LibraryItemTemplateSelector x:Key="ItemSelector">
@@ -63,20 +63,21 @@
         </sel:LibraryItemTemplateSelector>
     </ContentPage.Resources>
 
-    <Grid>
-        <VerticalStackLayout Padding="16" Spacing="8">
+    <Grid RowDefinitions="Auto,*">
 
-            <!-- Title -->
-            <Label Text="{Binding PageTitle}" FontSize="24" FontAttributes="Bold"
-                   TextColor="{DynamicResource ThemeText}" />
+        <!-- Top nav bar -->
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Library" HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+
+        <Grid Grid.Row="1">
+        <VerticalStackLayout Padding="16" Spacing="8">
 
             <!-- Actions -->
             <HorizontalStackLayout Spacing="8">
-                <c:IconButton Icon="▶" Label="All" Command="{Binding PlayAllCommand}" ButtonWidthRequest="100" />
+                <c:IconButton Icon="▶" Label="All" Command="{Binding PlayAllCommand}" />
                 <c:IconButton Icon="←" Label="Back" Command="{Binding GoBackCommand}"
-                        IsVisible="{Binding CanGoBack}" ButtonWidthRequest="90" />
+                        IsVisible="{Binding CanGoBack}" />
                 <c:IconButton Icon="✕" Label="Filter" Command="{Binding ClearTagFilterCommand}"
-                        IsVisible="{Binding HasTagFilter}" ButtonWidthRequest="100" />
+                        IsVisible="{Binding HasTagFilter}" />
             </HorizontalStackLayout>
 
             <!-- Tag filter chips -->
@@ -113,5 +114,9 @@
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
+        </Grid>
+
+        <!-- Nav menu overlay -->
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
     </Grid>
 </ContentPage>

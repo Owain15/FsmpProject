@@ -29,6 +29,11 @@ public partial class CustomThemePage : ContentPage
         await _viewModel.LoadAsync();
     }
 
+    private async void OnBackClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
+
     private async void OnCancelClicked(object? sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("..");

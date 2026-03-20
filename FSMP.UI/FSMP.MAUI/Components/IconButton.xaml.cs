@@ -4,10 +4,11 @@ namespace FSMP.MAUI.Components;
 
 public partial class IconButton : ContentView
 {
-    /// <summary>
-    /// Window width below which the label text is hidden, showing icon only.
-    /// </summary>
+    /// <summary>Window width below which the label text is hidden (icon only).</summary>
     private const double CompactThreshold = 600;
+
+    /// <summary>Window width below which buttons shrink padding and font.</summary>
+    private const double ShrinkThreshold = 400;
 
     public static readonly BindableProperty IconProperty =
         BindableProperty.Create(nameof(Icon), typeof(string), typeof(IconButton), string.Empty, propertyChanged: OnVisualPropertyChanged);
@@ -28,6 +29,7 @@ public partial class IconButton : ContentView
         BindableProperty.Create(nameof(ButtonTextColor), typeof(Color), typeof(IconButton), null, propertyChanged: OnTextColorChanged);
 
     private bool _isCompact;
+    private bool _isShrunk;
     private Window? _trackedWindow;
 
     public string Icon
@@ -69,7 +71,7 @@ public partial class IconButton : ContentView
     public IconButton()
     {
         InitializeComponent();
-        UpdateText();
+        UpdateAppearance();
     }
 
     protected override void OnHandlerChanged()
@@ -107,17 +109,20 @@ public partial class IconButton : ContentView
     private void EvaluateCompact(double windowWidth)
     {
         var compact = windowWidth > 0 && windowWidth < CompactThreshold;
-        if (compact != _isCompact)
-        {
-            _isCompact = compact;
-            UpdateText();
-        }
+        var shrunk = windowWidth > 0 && windowWidth < ShrinkThreshold;
+
+        var changed = compact != _isCompact || shrunk != _isShrunk;
+        _isCompact = compact;
+        _isShrunk = shrunk;
+
+        if (changed)
+            UpdateAppearance();
     }
 
     private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is IconButton btn)
-            btn.UpdateText();
+            btn.UpdateAppearance();
     }
 
     private static void OnButtonWidthChanged(BindableObject bindable, object oldValue, object newValue)
@@ -132,12 +137,25 @@ public partial class IconButton : ContentView
             btn.InnerButton.TextColor = color;
     }
 
-    private void UpdateText()
+    private void UpdateAppearance()
     {
+        // Text: drop label when compact
         if (_isCompact || string.IsNullOrEmpty(Label))
             InnerButton.Text = Icon;
         else
             InnerButton.Text = $"{Icon} {Label}";
+
+        // Shrink padding and font at very narrow widths
+        if (_isShrunk)
+        {
+            InnerButton.Padding = new Thickness(4, 2);
+            InnerButton.FontSize = 12;
+        }
+        else
+        {
+            InnerButton.Padding = new Thickness(8, 4);
+            InnerButton.FontSize = 14;
+        }
     }
 
     private void OnClicked(object? sender, EventArgs e)

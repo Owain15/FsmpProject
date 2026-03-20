@@ -8,39 +8,51 @@
              x:DataType="vm:NowPlayingViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Now Playing">
-    <Grid x:Name="RootGrid" ColumnDefinitions="*,Auto,Auto">
+    <Grid x:Name="RootGrid" RowDefinitions="Auto,*">
+
+        <!-- Row 0: Top nav bar -->
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="NowPlaying" HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+
+        <!-- Row 1: Main content -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto">
 
         <!-- Column 0: Player (fixed layout, no scroll) -->
-        <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*,Auto">
+        <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*,Auto" IsClippedToBounds="True">
 
-            <!-- Row 0: Header -->
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Padding="16,10">
-                <Label Text="Now Playing" FontSize="24" FontAttributes="Bold"
-                       TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
-                <Button x:Name="QueueToggleButton" Grid.Column="1" Text="&#x2630; Queue"
+            <!-- Row 0: Header buttons -->
+            <HorizontalStackLayout Grid.Row="0" Spacing="8" Padding="16,6" HorizontalOptions="End">
+                <Button x:Name="QueueToggleButton" Text="&#x2630; Queue"
                         Clicked="OnToggleQueue" Padding="8,4" VerticalOptions="Center"
                         BackgroundColor="{DynamicResource ThemeBackground}"
                         TextColor="{DynamicResource ThemeText}"
                         BorderColor="{DynamicResource ThemeBorder}"
                         BorderWidth="1" />
-                <Button x:Name="TagsToggleButton" Grid.Column="2" Text="&#x1F3F7; Tags"
+                <Button x:Name="TagsToggleButton" Text="&#x1F3F7; Tags"
                         Clicked="OnToggleTags" Padding="8,4" VerticalOptions="Center"
                         BackgroundColor="{DynamicResource ThemeBackground}"
                         TextColor="{DynamicResource ThemeText}"
                         BorderColor="{DynamicResource ThemeBorder}"
                         BorderWidth="1" />
-            </Grid>
+            </HorizontalStackLayout>
 
             <!-- Row 1: Track display -->
-            <VerticalStackLayout Grid.Row="1" Padding="16,0" Spacing="2">
-                <Label Text="{Binding TrackTitle}" FontSize="22" FontAttributes="Bold"
-                       TextColor="{DynamicResource ThemeText}" />
-                <HorizontalStackLayout Spacing="8">
-                    <Label Text="{Binding TrackArtist}" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
-                    <Label Text="·" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
-                    <Label Text="{Binding TrackAlbum}" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}" />
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto" RowSpacing="2" Padding="16,0">
+                <Label Grid.Row="0" Text="{Binding TrackTitle}" FontSize="22" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}"
+                       LineBreakMode="TailTruncation" MaxLines="1"
+                       HorizontalOptions="Fill" />
+                <Label Grid.Row="1" FontSize="14" TextColor="{DynamicResource ThemeTextSecondary}"
+                       LineBreakMode="TailTruncation" MaxLines="1"
+                       HorizontalOptions="Fill">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="{Binding TrackArtist}" />
+                            <Span Text=" · " />
+                            <Span Text="{Binding TrackAlbum}" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </Grid>
 
             <!-- Row 2: Album art placeholder (flexible, absorbs resize) -->
             <Grid x:Name="AlbumArtArea" Grid.Row="2" Padding="16">
@@ -83,26 +95,26 @@
 
                 <!-- Row 3: Transport buttons (centered) -->
                 <HorizontalStackLayout Grid.Row="3" Spacing="16" HorizontalOptions="Center" VerticalOptions="Center">
-                    <c:IconButton Icon="⏮" Label="Prev" Command="{Binding PreviousCommand}" ButtonWidthRequest="90" />
-                    <c:IconButton Icon="⏯" Command="{Binding PlayPauseCommand}" ButtonWidthRequest="60" />
-                    <c:IconButton Icon="⏭" Label="Next" Command="{Binding NextCommand}" ButtonWidthRequest="90" />
-                    <c:IconButton Icon="⏹" Label="Stop" Command="{Binding StopCommand}" ButtonWidthRequest="90" />
+                    <c:IconButton Icon="⏮" Label="Prev" Command="{Binding PreviousCommand}" />
+                    <c:IconButton Icon="⏯" Command="{Binding PlayPauseCommand}" />
+                    <c:IconButton Icon="⏭" Label="Next" Command="{Binding NextCommand}" />
+                    <c:IconButton Icon="⏹" Label="Stop" Command="{Binding StopCommand}" />
                 </HorizontalStackLayout>
 
                 <!-- Row 4: Repeat/Shuffle centered under transport -->
                 <Grid Grid.Row="4">
                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}" WidthRequest="140"
+                        <Button Text="{Binding RepeatModeText}" Command="{Binding ToggleRepeatCommand}"
                                 BackgroundColor="{DynamicResource ThemeBackground}"
                                 TextColor="{DynamicResource ThemeText}"
                                 BorderColor="{DynamicResource ThemeBorder}"
-                                BorderWidth="1" />
+                                BorderWidth="1" Padding="8,4" />
                         <Button Text="{Binding IsShuffled, StringFormat='🔀 Shuffle: {0}'}"
-                                Command="{Binding ToggleShuffleCommand}" WidthRequest="140"
+                                Command="{Binding ToggleShuffleCommand}"
                                 BackgroundColor="{DynamicResource ThemeBackground}"
                                 TextColor="{DynamicResource ThemeText}"
                                 BorderColor="{DynamicResource ThemeBorder}"
-                                BorderWidth="1" />
+                                BorderWidth="1" Padding="8,4" />
                     </HorizontalStackLayout>
                 </Grid>
             </Grid>
@@ -304,5 +316,10 @@
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
+
+        </Grid>
+
+        <!-- Nav menu overlay (for hamburger menu) -->
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
     </Grid>
 </ContentPage>

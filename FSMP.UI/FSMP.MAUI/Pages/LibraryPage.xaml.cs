@@ -78,4 +78,10 @@ public partial class LibraryPage : ContentPage
         App.InitializationComplete -= OnInitComplete;
         base.OnDisappearing();
     }
+
+    private void OnHamburgerClicked(object? sender, EventArgs e)
+    {
+        NavOverlay.CurrentRoute = "Library";
+        NavOverlay.Toggle();
+    }
 }

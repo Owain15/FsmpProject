@@ -5,12 +5,23 @@
              x:Class="FSMP.MAUI.Pages.CustomThemePage"
              x:DataType="vm:CustomThemeViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
+             Shell.NavBarIsVisible="False"
              Title="Custom Theme">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
 
-        <!-- Row 0: Mini App Card Preview -->
-        <Border Grid.Row="0" Padding="0" Margin="8,4,8,0"
+        <!-- Row 0: Header with back button -->
+        <Grid Grid.Row="0" Padding="8,8,8,0" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Button Text="← Back" FontSize="14" Padding="10,4"
+                    BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                    TextColor="{DynamicResource ThemeButtonText}"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1" Text="Custom Theme" FontSize="24" FontAttributes="Bold"
+                   TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Row 1: Mini App Card Preview -->
+        <Border Grid.Row="1" Padding="0" Margin="8,4,8,0"
                 BackgroundColor="{Binding PreviewColors[ThemeBackground]}"
                 Stroke="{Binding PreviewColors[ThemeBorder]}" StrokeThickness="1"
                 StrokeShape="RoundRectangle 8">
@@ -121,8 +132,8 @@
             </VerticalStackLayout>
         </Border>
 
-        <!-- Row 1: Middle — Variables list + Color picker -->
-        <Grid Grid.Row="1" Margin="8,4,8,0">
+        <!-- Row 2: Middle — Variables list + Color picker -->
+        <Grid Grid.Row="2" Margin="8,4,8,0">
 
             <!-- Wide layout: side-by-side -->
             <Grid IsVisible="{Binding IsWideLayout}" ColumnDefinitions="*,300" ColumnSpacing="8">
@@ -303,8 +314,8 @@
             </Grid>
         </Grid>
 
-        <!-- Row 2: Footer -->
-        <Grid Grid.Row="2" Padding="8" RowDefinitions="Auto,Auto" RowSpacing="6"
+        <!-- Row 3: Footer -->
+        <Grid Grid.Row="3" Padding="8" RowDefinitions="Auto,Auto" RowSpacing="6"
               BackgroundColor="{DynamicResource ThemeCardBackground}">
 
             <!-- Load dropdown + delete -->

@@ -21,4 +21,10 @@ public partial class SettingsPage : ContentPage
 
     private async void OnAboutTapped(object? sender, EventArgs e)
         => await Shell.Current.GoToAsync("settingsAbout");
+
+    private void OnHamburgerClicked(object? sender, EventArgs e)
+    {
+        NavOverlay.CurrentRoute = "Settings";
+        NavOverlay.Toggle();
+    }
 }

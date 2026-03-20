@@ -7,8 +7,19 @@
              x:Class="FSMP.MAUI.Pages.PlaylistDetailPage"
              x:DataType="vm:PlaylistDetailViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
+             Shell.NavBarIsVisible="False"
              Title="Edit Playlist">
     <VerticalStackLayout Padding="16" Spacing="12">
+
+        <!-- Header with back button -->
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Button Text="← Back" FontSize="14" Padding="10,4"
+                    BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                    TextColor="{DynamicResource ThemeButtonText}"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1" Text="Edit Playlist" FontSize="24" FontAttributes="Bold"
+                   TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
+        </Grid>
 
         <!-- Rename -->
         <Label Text="Playlist Name" FontSize="14" FontAttributes="Bold"

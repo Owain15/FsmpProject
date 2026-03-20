@@ -8,11 +8,13 @@
              x:DataType="vm:PlaylistsViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Playlists">
-    <Grid>
-        <VerticalStackLayout Padding="16" Spacing="12">
+    <Grid RowDefinitions="Auto,*">
 
-            <Label Text="Playlists" FontSize="24" FontAttributes="Bold"
-                   TextColor="{DynamicResource ThemeText}" />
+        <!-- Top nav bar -->
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Playlists" HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+
+        <Grid Grid.Row="1">
+        <VerticalStackLayout Padding="16" Spacing="12">
 
             <!-- Create new playlist -->
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
@@ -62,5 +64,9 @@
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
+        </Grid>
+
+        <!-- Nav menu overlay -->
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
     </Grid>
 </ContentPage>

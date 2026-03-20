@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FSMP.MAUI.Components.NavMenuOverlay"
+             IsVisible="False"
+             ZIndex="200">
+    <Grid>
+        <!-- Backdrop -->
+        <BoxView Color="#80000000">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBackdropTapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- Menu panel -->
+        <Border x:Name="MenuPanel"
+                StrokeShape="RoundRectangle 0,0,8,8"
+                BackgroundColor="{DynamicResource ThemeSurface}"
+                Stroke="{DynamicResource ThemeBorder}"
+                Padding="0"
+                HorizontalOptions="Start" VerticalOptions="Start"
+                Margin="0,0,0,0"
+                WidthRequest="220">
+            <VerticalStackLayout Spacing="0">
+                <Button x:Name="BtnNowPlaying" Text="♫  Now Playing"
+                        Clicked="OnNavItemClicked" ClassId="NowPlaying"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource ThemeText}"
+                        FontSize="16" HorizontalOptions="Fill"
+                        Padding="16,12" />
+                <Button x:Name="BtnLibrary" Text="📚  Library"
+                        Clicked="OnNavItemClicked" ClassId="Library"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource ThemeText}"
+                        FontSize="16" HorizontalOptions="Fill"
+                        Padding="16,12" />
+                <Button x:Name="BtnPlaylists" Text="📋  Playlists"
+                        Clicked="OnNavItemClicked" ClassId="Playlists"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource ThemeText}"
+                        FontSize="16" HorizontalOptions="Fill"
+                        Padding="16,12" />
+                <Button x:Name="BtnSettings" Text="⚙  Settings"
+                        Clicked="OnNavItemClicked" ClassId="Settings"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource ThemeText}"
+                        FontSize="16" HorizontalOptions="Fill"
+                        Padding="16,12" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>

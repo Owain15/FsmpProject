@@ -123,6 +123,16 @@ public partial class NowPlayingPage : ContentPage
             ApplyTagsLayout();
         }
 
+        // Adjust sidebar widths proportionally when in wide layout
+        if (_isWideLayout && Width > 0)
+        {
+            var maxSidebarWidth = Width * 0.35;
+            if (_isQueueVisible)
+                QueueSidebar.WidthRequest = Math.Min(300, maxSidebarWidth);
+            if (_isTagsVisible)
+                TagsSidebar.WidthRequest = Math.Min(280, maxSidebarWidth);
+        }
+
         // Hide album art area when too small
         if (AlbumArtArea.Height >= 0)
         {
@@ -147,6 +157,8 @@ public partial class NowPlayingPage : ContentPage
             Grid.SetColumn(QueueSidebar, 1);
             Grid.SetColumnSpan(QueueSidebar, 1);
             QueueSidebar.ZIndex = 0;
+            var maxW = Width > 0 ? Width * 0.35 : 300;
+            QueueSidebar.WidthRequest = Math.Min(300, maxW);
         }
         else
         {
@@ -155,6 +167,12 @@ public partial class NowPlayingPage : ContentPage
             QueueSidebar.ZIndex = 50;
             QueueSidebar.WidthRequest = -1;
         }
+    }
+
+    private void OnHamburgerClicked(object? sender, EventArgs e)
+    {
+        NavOverlay.CurrentRoute = "NowPlaying";
+        NavOverlay.Toggle();
     }
 
     private void ApplyTagsLayout()
@@ -174,6 +192,8 @@ public partial class NowPlayingPage : ContentPage
             Grid.SetColumn(TagsSidebar, 2);
             Grid.SetColumnSpan(TagsSidebar, 1);
             TagsSidebar.ZIndex = 0;
+            var maxW = Width > 0 ? Width * 0.35 : 280;
+            TagsSidebar.WidthRequest = Math.Min(280, maxW);
         }
         else
         {

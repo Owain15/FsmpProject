@@ -3,20 +3,25 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:pages="clr-namespace:FSMP.MAUI.Pages"
        x:Class="FSMP.MAUI.AppShell"
+       Shell.NavBarIsVisible="False"
        Title="FSMP Music Player">
 
     <TabBar>
         <ShellContent
             Title="Now Playing"
+            Route="NowPlaying"
             ContentTemplate="{DataTemplate pages:NowPlayingPage}" />
         <ShellContent
             Title="Library"
+            Route="Library"
             ContentTemplate="{DataTemplate pages:LibraryPage}" />
         <ShellContent
             Title="Playlists"
+            Route="Playlists"
             ContentTemplate="{DataTemplate pages:PlaylistsPage}" />
         <ShellContent
             Title="Settings"
+            Route="Settings"
             ContentTemplate="{DataTemplate pages:SettingsPage}" />
     </TabBar>
 

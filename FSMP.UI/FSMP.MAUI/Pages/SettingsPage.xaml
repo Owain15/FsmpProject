@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
              x:Class="FSMP.MAUI.Pages.SettingsPage"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Settings">
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Top nav bar -->
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Settings" HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+
+        <Grid Grid.Row="1">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="8">
 
-            <Label Text="Settings" FontSize="24" FontAttributes="Bold"
-                   TextColor="{DynamicResource ThemeText}" Margin="0,0,0,8" />
 
             <Border StrokeShape="RoundRectangle 8"
                     Stroke="{DynamicResource ThemeBorder}"
@@ -92,4 +97,9 @@
 
         </VerticalStackLayout>
     </ScrollView>
+        </Grid>
+
+        <!-- Nav menu overlay -->
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
+    </Grid>
 </ContentPage>
