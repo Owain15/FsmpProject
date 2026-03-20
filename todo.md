@@ -4,15 +4,23 @@
 
 | Project | Description | Status | Coverage | Todo |
 |---------|-------------|--------|----------|------|
-| FSMP.Core | Cross-platform business logic | Complete | 88.1% | [todo](FSMP.lib/FSMP.Core/todo.md) |
-| FSMP.Platform.Windows | Windows audio (LibVLC) | Complete | 83.4% | -- |
-| FsmpDataAcsses | EF Core data access layer | Complete | 98.5% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
-| FsmpConsole | Console UI application | Complete | 89.2% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
-| FSMO | File System Music Organizer | Complete | 96.3% | [todo](FSMP.lib/FSMO/todo.md) |
+| FSMP.Core | Cross-platform business logic | Complete | 85.2% | [todo](FSMP.lib/FSMP.Core/todo.md) |
+| FSMP.Platform.Windows | Windows audio (LibVLC) | Complete | 80.1% | -- |
+| FsmpDataAcsses | EF Core data access layer | Complete | 97.8% | [todo](FSMP.db/entity/FsmpDataAcsses/todo.md) |
+| FsmpConsole | Console UI application | Complete | 87.3% | [todo](FSMP.UI/FSMP.UI.Console/FsmpConsole/todo.md) |
+| FSMO | File System Music Organizer | Complete | 95.1% | [todo](FSMP.lib/FSMO/todo.md) |
 | FSMP.Tests | Test suite | Complete | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete | -- | -- |
 
-**Overall coverage**: 94.1% | **Tests**: 1114 passing | **Build**: Passing (Windows + Android)
+**Overall coverage**: 89.4% line / 75.3% branch | **Tests**: 1113/1114 passing (1 failing) | **Build**: Passing (Windows + Android)
+
+### Test Verification Status
+
+| Architecture | Last Verified | Result |
+|---|---|---|
+| x64 (native) | 2026-03-20 | 1113/1114 passing — `ConfigurationServiceTests.GetDefaultConfiguration_ShouldReturnValidDefaults` failing |
+| ARM64 (native) | Unknown | Not yet verified natively (runs under x64 emulation on dev machine) |
+| Android | Not started | Awaiting device/emulator |
 
 ---
 

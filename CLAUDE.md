@@ -79,17 +79,23 @@ Each project has a clear responsibility boundary. **Do not add functionality to 
 
 ### Device Architecture
 
-**Current dev machine**: ARM64 (Qualcomm Snapdragon, Windows 11 on ARM)
+This solution targets **3 build architectures**:
 
-Always build and test with `-p:Platform=ARM64` on this device. The `PROCESSOR_ARCHITECTURE` env var may report `AMD64` due to x64 emulation — ignore it; the native architecture is ARM64.
+| Architecture | Use case | Build flag |
+|---|---|---|
+| ARM64 | ARM64 Windows dev machines (e.g. Qualcomm Snapdragon) | `-p:Platform=ARM64` |
+| x64 | Native x64 Windows machines and CI | `-p:Platform=x64` |
+| Android | Android devices/emulators via MAUI | `dotnet build -f net10.0-android36.0` |
+
+**Note**: On ARM64 machines, `PROCESSOR_ARCHITECTURE` may report `AMD64` due to x64 emulation — check actual hardware and use `-p:Platform=ARM64` for native builds. ARM64 tests run under x64 emulation by default, which can mask native bugs; verify on native ARM64 hardware when possible.
 
 ### Building
 
 ```bash
-# Build the solution (ARM64 — use this on current dev machine)
+# Build the solution (ARM64)
 "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Build -p:Configuration=Debug -p:Platform=ARM64 -v:minimal
 
-# Build for x64 (CI or x64 machines)
+# Build the solution (x64)
 "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "FSMP.UI/FSMP.UI.Console/FsmpConsole/FsmpConsole.slnx" -t:Build -p:Configuration=Debug -p:Platform=x64 -v:minimal
 
 # Clean build artifacts
@@ -106,15 +112,17 @@ dotnet build FSMP.UI\FSMP.MAUI\FSMP.MAUI.csproj -f:net10.0-android36.0 -c:Debug
 **IMPORTANT**: Run tests from the built DLL matching the build platform. Do NOT use `dotnet test` with `--no-build` and a csproj — it may pick the wrong architecture's output.
 
 ```bash
-# Run tests (ARM64 — use this on current dev machine)
-dotnet test "FSMP.Tests/bin/ARM64/Debug/net10.0/FSMP.Tests.dll"
+# Run tests (ARM64)
+dotnet test "FSMP.Tests/bin/ARM64/Debug/net10.0-windows/FSMP.Tests.dll"
 
 # Run tests (x64)
-dotnet test "FSMP.Tests/bin/x64/Debug/net10.0/FSMP.Tests.dll"
+dotnet test "FSMP.Tests/bin/x64/Debug/net10.0-windows/FSMP.Tests.dll"
 
 # Run tests with code coverage
 test-with-coverage.cmd
 ```
+
+**Per-architecture test verification is required** — each architecture must be independently verified because ARM64 tests running under x64 emulation can mask native bugs, and Android requires separate device/emulator runs.
 
 **Test Requirements**:
 - Minimum 80% code coverage required

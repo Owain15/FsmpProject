@@ -74,15 +74,26 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Current Status
 
-**Status**: Complete | **Tests**: 1114 passing | **Overall Coverage**: 94.1%
+**Status**: 1 failing test | **Tests**: 1113/1114 passing | **Overall Coverage**: 89.4% line / 75.3% branch
+**Last run**: 2026-03-20 on x64 (native)
 
 | Project | Coverage |
 |---------|----------|
-| FsmpConsole | 89.2% |
-| FsmpDataAcsses | 98.5% |
-| FSMP.Core | 88.1% |
-| FSMP.Platform.Windows | 83.4% |
-| FSMO | 96.3% |
+| FsmpConsole | 87.3% |
+| FsmpDataAcsses | 97.8% |
+| FSMP.Core | 85.2% |
+| FSMP.Platform.Windows | 80.1% |
+| FSMO | 95.1% |
+
+**Known failing test**: `ConfigurationServiceTests.GetDefaultConfiguration_ShouldReturnValidDefaults` — needs investigation.
+
+### Architecture Verification Status
+
+| Architecture | Last Verified | Result |
+|---|---|---|
+| x64 (native) | 2026-03-20 | 1113/1114 passing |
+| ARM64 (native) | Unknown | Not yet verified natively |
+| Android | Not started | Awaiting device/emulator |
 
 ---
 
@@ -137,5 +148,6 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Progress Summary
 
-**Status**: Complete — 1114 tests, 94.1% coverage
-**Next Action**: Android device/emulator testing when available
+**Status**: 1113/1114 passing — 1 failing (`ConfigurationServiceTests.GetDefaultConfiguration_ShouldReturnValidDefaults`)
+**Coverage**: 89.4% line / 75.3% branch (x64 run, 2026-03-20)
+**Next Action**: Fix failing test; Android device/emulator testing when available
