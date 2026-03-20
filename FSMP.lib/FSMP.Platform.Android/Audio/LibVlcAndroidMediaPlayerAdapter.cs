@@ -28,8 +28,16 @@ public class LibVlcAndroidMediaPlayerAdapter : IMediaPlayerAdapter
         {
             if (!_coreInitialized)
             {
-                LibVLCSharp.Shared.Core.Initialize();
-                _coreInitialized = true;
+                try
+                {
+                    LibVLCSharp.Shared.Core.Initialize();
+                    _coreInitialized = true;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"LibVLC init failed: {ex}");
+                    throw;
+                }
             }
         }
     }

@@ -23,11 +23,10 @@ public class ConfigurationService : IConfigurationService
 
     public Configuration GetDefaultConfiguration()
     {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         return new Configuration
         {
             LibraryPaths = new List<string>(),
-            DatabasePath = Path.Combine(appData, "FSMP", "fsmp.db"),
+            DatabasePath = string.Empty,   // caller provides actual path via DI
             AutoScanOnStartup = true,
             DefaultVolume = 75,
             RememberLastPlayed = true,

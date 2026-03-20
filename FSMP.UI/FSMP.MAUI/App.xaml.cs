@@ -9,7 +9,12 @@ namespace FSMP.MAUI;
 public partial class App : Application
 {
     private static readonly string LogPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP", "maui-debug.log");
+#if ANDROID
+        FileSystem.AppDataDirectory,
+#else
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP"),
+#endif
+        "maui-debug.log");
 
     public static IServiceProvider Services { get; private set; } = null!;
 
@@ -77,8 +82,13 @@ public partial class App : Application
             UpdateStatus("Migrating database...");
 
             // Clear stale SQLite lock files that persist after force-kill
-            var dbPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP", "fsmp.db");
+            var appDataBase =
+#if ANDROID
+                FileSystem.AppDataDirectory;
+#else
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP");
+#endif
+            var dbPath = Path.Combine(appDataBase, "fsmp.db");
             foreach (var ext in new[] { "-wal", "-shm" })
             {
                 var lockFile = dbPath + ext;
