@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using FSMP.Core.Interfaces;
@@ -32,6 +33,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         RemovePathCommand = new AsyncRelayCommand<string>(OnRemovePath);
         ScanCommand = new AsyncRelayCommand(OnScan);
         SaveCommand = new AsyncRelayCommand(OnSave);
+        ResetToDefaultsCommand = new AsyncRelayCommand(OnResetToDefaults);
     }
 
     public ObservableCollection<string> LibraryPaths { get; }
@@ -74,10 +76,13 @@ public class SettingsViewModel : INotifyPropertyChanged
         set => SetProperty(ref _allowUnsaveFromTagList, value);
     }
 
+    public string AppVersion { get; } = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "1.0.0";
+
     public ICommand AddPathCommand { get; }
     public ICommand RemovePathCommand { get; }
     public ICommand ScanCommand { get; }
     public ICommand SaveCommand { get; }
+    public ICommand ResetToDefaultsCommand { get; }
 
     public async Task LoadAsync()
     {
@@ -133,6 +138,22 @@ public class SettingsViewModel : INotifyPropertyChanged
         }
 
         IsBusy = false;
+    }
+
+    private async Task OnResetToDefaults()
+    {
+        var defaults = new Configuration();
+        _config = defaults;
+        _dispatchToUI(() =>
+        {
+            LibraryPaths.Clear();
+            AutoScanOnStartup = defaults.AutoScanOnStartup;
+            DefaultVolume = defaults.DefaultVolume;
+            SelectedTheme = defaults.Theme;
+            AllowUnsaveFromTagList = defaults.AllowUnsaveFromTagList;
+        });
+        await _configService.SaveConfigurationAsync(defaults);
+        StatusMessage = "Settings reset to defaults.";
     }
 
     private async Task OnSave()

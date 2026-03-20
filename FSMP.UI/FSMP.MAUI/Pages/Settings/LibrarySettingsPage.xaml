@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
+             x:Class="FSMP.MAUI.Pages.Settings.LibrarySettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
+             Title="Library"
+             Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Library" FontSize="24" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
+                <Button Grid.Column="1" Text="← Back" FontSize="14" Padding="12,6"
+                        BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                        TextColor="{DynamicResource ThemeButtonText}"
+                        Clicked="OnBackClicked" />
+            </Grid>
+
+            <CollectionView ItemsSource="{Binding LibraryPaths}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Grid Padding="4" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding .}" FontSize="14" VerticalOptions="Center" TextColor="{DynamicResource ThemeText}" />
+                            <c:IconButton Grid.Column="1" Icon="✕"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=RemovePathCommand}"
+                                    CommandParameter="{Binding .}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <Label Text="No library paths configured." TextColor="{DynamicResource ThemeTextSecondary}" />
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry x:Name="NewPathEntry" Placeholder="Enter folder path" FontSize="14" />
+                <c:IconButton Grid.Column="1" Icon="＋" Label="Add"
+                        Command="{Binding AddPathCommand}"
+                        CommandParameter="{Binding Source={x:Reference NewPathEntry}, Path=Text}" />
+            </Grid>
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <c:IconButton Icon="🔍" Label="Scan" Command="{Binding ScanCommand}" />
+                <Label Grid.Column="1" Text="{Binding StatusMessage}" FontSize="14"
+                       VerticalOptions="Center" TextColor="{DynamicResource ThemeTextSecondary}" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Auto-scan on startup" FontSize="16" VerticalOptions="Center"
+                       TextColor="{DynamicResource ThemeText}" />
+                <Switch Grid.Column="1" IsToggled="{Binding AutoScanOnStartup}" />
+            </Grid>
+
+            <c:IconButton Icon="💾" Label="Save" Command="{Binding SaveCommand}"
+                    HorizontalOptions="Start" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

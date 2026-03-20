@@ -1,98 +1,24 @@
-using FSMP.Core.ViewModels;
-using FSMP.MAUI.Helpers;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace FSMP.MAUI.Pages;
 
 public partial class SettingsPage : ContentPage
 {
-    private readonly SettingsViewModel _viewModel;
-    private readonly IServiceScope _scope;
-
     public SettingsPage()
     {
-        _scope = App.Services.CreateScope();
-        _viewModel = _scope.ServiceProvider.GetRequiredService<SettingsViewModel>();
         InitializeComponent();
-        BindingContext = _viewModel;
-        ThemePicker.SelectedIndexChanged += OnThemePickerChanged;
-        Unloaded += (_, _) => _scope.Dispose();
     }
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        if (App.IsInitialized)
-        {
-            LoadingOverlay.IsVisible = false;
-            await LoadDataAsync();
-            return;
-        }
-        StatusLabel.Text = App.InitStatusMessage;
-        App.InitializationStatusChanged += OnStatusChanged;
-        App.InitializationComplete += OnInitComplete;
-    }
+    private async void OnLibraryTapped(object? sender, EventArgs e)
+        => await Shell.Current.GoToAsync("settingsLibrary");
 
-    private async Task LoadDataAsync()
-    {
-        try
-        {
-            await _viewModel.LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            App.Log($"SettingsPage.OnAppearing error: {ex}");
-        }
-    }
+    private async void OnPlaybackTapped(object? sender, EventArgs e)
+        => await Shell.Current.GoToAsync("settingsPlayback");
 
-    private void OnStatusChanged()
-        => MainThread.BeginInvokeOnMainThread(() => StatusLabel.Text = App.InitStatusMessage);
+    private async void OnAppearanceTapped(object? sender, EventArgs e)
+        => await Shell.Current.GoToAsync("settingsAppearance");
 
-    private async void OnInitComplete()
-    {
-        App.InitializationStatusChanged -= OnStatusChanged;
-        App.InitializationComplete -= OnInitComplete;
-        MainThread.BeginInvokeOnMainThread(() => LoadingOverlay.IsVisible = false);
-        await LoadDataAsync();
-    }
+    private async void OnBehaviorTapped(object? sender, EventArgs e)
+        => await Shell.Current.GoToAsync("settingsBehavior");
 
-    private void OnThemePickerChanged(object? sender, EventArgs e)
-    {
-        if (ThemePicker.SelectedItem is string theme)
-        {
-            if (theme == "Custom")
-                _ = ApplyCustomThemeFromConfigAsync();
-            else
-                ThemeManager.ApplyTheme(theme);
-        }
-    }
-
-    private async Task ApplyCustomThemeFromConfigAsync()
-    {
-        try
-        {
-            var configService = _scope.ServiceProvider.GetRequiredService<Core.Interfaces.IConfigurationService>();
-            var config = await configService.LoadConfigurationAsync();
-            if (config.CustomThemeColors is not null && config.CustomThemeColors.Count > 0)
-                ThemeManager.ApplyCustomTheme(config.CustomThemeColors);
-            else
-                ThemeManager.ApplyTheme("Light");
-        }
-        catch (Exception ex)
-        {
-            App.Log($"Failed to apply custom theme: {ex}");
-        }
-    }
-
-    private async void OnCustomizeThemeClicked(object? sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("customTheme");
-    }
-
-    protected override void OnDisappearing()
-    {
-        App.InitializationStatusChanged -= OnStatusChanged;
-        App.InitializationComplete -= OnInitComplete;
-        base.OnDisappearing();
-    }
+    private async void OnAboutTapped(object? sender, EventArgs e)
+        => await Shell.Current.GoToAsync("settingsAbout");
 }

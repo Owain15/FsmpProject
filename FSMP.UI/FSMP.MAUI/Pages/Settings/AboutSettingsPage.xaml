@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
+             x:Class="FSMP.MAUI.Pages.Settings.AboutSettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
+             Title="About"
+             Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="About" FontSize="24" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
+                <Button Grid.Column="1" Text="← Back" FontSize="14" Padding="12,6"
+                        BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                        TextColor="{DynamicResource ThemeButtonText}"
+                        Clicked="OnBackClicked" />
+            </Grid>
+
+            <Label Text="{Binding AppVersion, StringFormat='Version {0}'}" FontSize="14"
+                   TextColor="{DynamicResource ThemeTextSecondary}" />
+            <Button Text="Reset to Defaults"
+                    FontSize="14" HorizontalOptions="Start" Padding="16,8"
+                    BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                    TextColor="{DynamicResource ThemeButtonText}"
+                    Command="{Binding ResetToDefaultsCommand}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
