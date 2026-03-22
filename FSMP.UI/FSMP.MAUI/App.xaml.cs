@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FSMP.Core;
 using FSMP.Core.Interfaces;
 using FSMP.MAUI.Helpers;
@@ -73,48 +74,64 @@ public partial class App : Application
         // Guard against duplicate calls (MAUI can construct App twice)
         if (Interlocked.Exchange(ref _initStarted, 1) == 1) return;
 
+        var totalSw = Stopwatch.StartNew();
+
         try
         {
-            UpdateStatus("Initializing audio engine...");
-            var audioFactory = Services.GetRequiredService<IAudioPlayerFactory>();
-            await audioFactory.InitializeAsync();
+            // --- Audio init + DB migration in parallel ---
+            UpdateStatus("Initializing...");
 
-            UpdateStatus("Migrating database...");
+            var audioTask = Task.Run(async () =>
+            {
+                var sw = Stopwatch.StartNew();
+                var audioFactory = Services.GetRequiredService<IAudioPlayerFactory>();
+                await audioFactory.InitializeAsync();
+                Log($"Audio engine init: {sw.ElapsedMilliseconds}ms");
+            });
 
-            // Clear stale SQLite lock files that persist after force-kill
-            var appDataBase =
+            var dbTask = Task.Run(async () =>
+            {
+                var sw = Stopwatch.StartNew();
+
+                // Clear stale SQLite lock files that persist after force-kill
+                var appDataBase =
 #if ANDROID
-                FileSystem.AppDataDirectory;
+                    FileSystem.AppDataDirectory;
 #else
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP");
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FSMP");
 #endif
-            var dbPath = Path.Combine(appDataBase, "fsmp.db");
-            foreach (var ext in new[] { "-wal", "-shm" })
-            {
-                var lockFile = dbPath + ext;
-                if (File.Exists(lockFile))
+                var dbPath = Path.Combine(appDataBase, "fsmp.db");
+                foreach (var ext in new[] { "-wal", "-shm" })
                 {
-                    Log($"Removing stale lock file: {lockFile}");
-                    try { File.Delete(lockFile); } catch (Exception ex) { Log($"Could not delete {lockFile}: {ex.Message}"); }
+                    var lockFile = dbPath + ext;
+                    if (File.Exists(lockFile))
+                    {
+                        Log($"Removing stale lock file: {lockFile}");
+                        try { File.Delete(lockFile); } catch (Exception ex) { Log($"Could not delete {lockFile}: {ex.Message}"); }
+                    }
                 }
-            }
 
-            // Run migration with a 15-second timeout to avoid hanging indefinitely
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-            try
-            {
-                cts.Token.Register(() => Log("Migration timeout triggered — cancelling"));
-                using var scope = Services.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<FsmpDbContext>();
-                await Task.Run(() => context.Database.Migrate(), cts.Token);
-                Log("Database migration done");
-            }
-            catch (OperationCanceledException)
-            {
-                Log("Database migration timed out after 15 seconds");
-                UpdateStatus("Migration timed out — continuing without database");
-            }
+                // Run migration with a 15-second timeout to avoid hanging indefinitely
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                try
+                {
+                    cts.Token.Register(() => Log("Migration timeout triggered — cancelling"));
+                    using var scope = Services.CreateScope();
+                    var context = scope.ServiceProvider.GetRequiredService<FsmpDbContext>();
+                    await Task.Run(() => context.Database.Migrate(), cts.Token);
+                    Log($"Database migration: {sw.ElapsedMilliseconds}ms");
+                }
+                catch (OperationCanceledException)
+                {
+                    Log($"Database migration timed out after {sw.ElapsedMilliseconds}ms");
+                    UpdateStatus("Migration timed out — continuing without database");
+                }
+            });
 
+            await Task.WhenAll(audioTask, dbTask);
+
+            // --- Session restore (depends on DB being ready) ---
+            var stepSw = Stopwatch.StartNew();
             UpdateStatus("Restoring session...");
             try
             {
@@ -131,8 +148,10 @@ public partial class App : Application
             {
                 Log($"Failed to restore session (non-fatal): {ex.Message}");
             }
+            Log($"Session restore: {stepSw.ElapsedMilliseconds}ms");
 
             // Apply saved theme
+            stepSw.Restart();
             try
             {
                 var configService = Services.GetRequiredService<IConfigurationService>();
@@ -145,15 +164,17 @@ public partial class App : Application
                 Log($"Failed to apply theme (non-fatal): {ex.Message}");
                 MainThread.BeginInvokeOnMainThread(() => ThemeManager.ApplyTheme("Light"));
             }
+            Log($"Theme apply: {stepSw.ElapsedMilliseconds}ms");
 
+            Log($"Total startup: {totalSw.ElapsedMilliseconds}ms");
             UpdateStatus("Ready");
             IsInitialized = true;
             MainThread.BeginInvokeOnMainThread(() => InitializationComplete?.Invoke());
         }
         catch (Exception ex)
         {
+            Log($"Init failed after {totalSw.ElapsedMilliseconds}ms: {ex}");
             UpdateStatus($"Error: {ex.Message}");
-            Log($"Init failed: {ex}");
             // App still usable — pages handle missing data gracefully
             IsInitialized = true;
             MainThread.BeginInvokeOnMainThread(() => InitializationComplete?.Invoke());

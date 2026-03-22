@@ -19,21 +19,21 @@ public class LibVlcAndroidAudioPlayerFactory : IAudioPlayerFactory
         _adapterFactory = adapterFactory;
     }
 
-    public Task<bool> InitializeAsync()
+    public async Task<bool> InitializeAsync()
     {
         if (_adapterFactory != null)
-            return Task.FromResult(true);
+            return true;
 
         try
         {
-            LibVlcAndroidMediaPlayerAdapter.EnsureCoreInitialized();
-            return Task.FromResult(true);
+            await Task.Run(LibVlcAndroidMediaPlayerAdapter.EnsureCoreInitialized);
+            return true;
         }
         catch (Exception ex)
         {
             _initFailed = true;
             _initError = ex.Message;
-            return Task.FromResult(false);
+            return false;
         }
     }
 

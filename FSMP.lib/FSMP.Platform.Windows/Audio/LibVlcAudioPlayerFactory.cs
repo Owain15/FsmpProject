@@ -26,24 +26,24 @@ public class LibVlcAudioPlayerFactory : IAudioPlayerFactory
     }
 
     /// <inheritdoc/>
-    public Task<bool> InitializeAsync()
+    public async Task<bool> InitializeAsync()
     {
         if (_adapterFactory != null)
         {
             // Custom adapter — no native init needed
-            return Task.FromResult(true);
+            return true;
         }
 
         try
         {
-            LibVlcMediaPlayerAdapter.EnsureCoreInitialized();
-            return Task.FromResult(true);
+            await Task.Run(LibVlcMediaPlayerAdapter.EnsureCoreInitialized);
+            return true;
         }
         catch (Exception ex)
         {
             _initFailed = true;
             _initError = ex.Message;
-            return Task.FromResult(false);
+            return false;
         }
     }
 

@@ -60,25 +60,24 @@ public partial class TopNavBar : ContentView
 
     private void HighlightActiveNav()
     {
-        var highlightColor = Colors.DodgerBlue;
-        if (Application.Current?.Resources.TryGetValue("ThemeHighlight", out var res) == true && res is Color h)
-            highlightColor = h;
+        var primaryColor = Colors.DodgerBlue;
+        if (Application.Current?.Resources.TryGetValue("ThemePrimary", out var res) == true && res is Color h)
+            primaryColor = h;
 
-        // Get default text color from theme
-        Color textColor = Colors.White;
-        if (Application.Current?.Resources.TryGetValue("ThemeText", out var textRes) == true && textRes is Color tc)
-            textColor = tc;
+        Color secondaryText = Colors.Gray;
+        if (Application.Current?.Resources.TryGetValue("ThemeTextSecondary", out var textRes) == true && textRes is Color tc)
+            secondaryText = tc;
 
         foreach (var (route, label) in _navLabels)
         {
             var isActive = route == CurrentRoute;
             label.FontAttributes = isActive ? FontAttributes.Bold : FontAttributes.None;
-            label.TextColor = isActive ? highlightColor : textColor;
+            label.TextColor = isActive ? primaryColor : secondaryText;
         }
 
         foreach (var (route, indicator) in _indicators)
         {
-            indicator.Color = route == CurrentRoute ? highlightColor : Colors.Transparent;
+            indicator.Color = route == CurrentRoute ? primaryColor : Colors.Transparent;
         }
     }
 
