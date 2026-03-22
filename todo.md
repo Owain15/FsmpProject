@@ -12,7 +12,7 @@
 | FSMP.Tests | Test suite | Complete | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete | -- | -- |
 
-**Overall coverage**: 89.4% line / 75.3% branch | **Tests**: 1113/1114 passing (1 failing) | **Build**: Passing (Windows + Android)
+**Overall coverage**: 89.4% line / 75.3% branch | **Tests**: 1125/1125 passing | **Build**: Passing (Windows + Android)
 
 ### Test Verification Status
 
@@ -146,8 +146,8 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 
 | # | Feature | Status |
 |---|---------|--------|
-| 1 | Configuration model — new properties | Not started |
-| 2 | SettingsViewModel — new properties & scan selected | Not started |
+| 1 | Configuration model — new properties | Done |
+| 2 | SettingsViewModel — new properties & scan selected | Done |
 | 3 | FSMO dry-run preview | Not started |
 | 4 | IFileOrganizerService + implementation | Not started |
 | 5 | FileOrganizerViewModel | Not started |

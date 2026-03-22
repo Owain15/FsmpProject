@@ -190,4 +190,141 @@ public class SettingsViewModelTests
         _vm.DefaultVolume = 50;
         raised.Should().BeTrue();
     }
+
+    [Fact]
+    public async Task LoadAsync_PopulatesNewProperties()
+    {
+        var config = new Configuration
+        {
+            LibraryPaths = new List<string>(),
+            ResumeSession = false,
+            AutoPlayOnStartup = true,
+            TextSize = "Large",
+            DoubleClickAction = "AddToQueue",
+            DefaultSortOrder = "Title",
+            DefaultOrganizeMode = "Move",
+            DefaultDuplicateStrategy = "Overwrite",
+            UnknownArtistName = "No Artist",
+            UnknownAlbumName = "No Album"
+        };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(config));
+
+        await _vm.LoadAsync();
+
+        _vm.ResumeSession.Should().BeFalse();
+        _vm.AutoPlayOnStartup.Should().BeTrue();
+        _vm.TextSize.Should().Be("Large");
+        _vm.DoubleClickAction.Should().Be("AddToQueue");
+        _vm.DefaultSortOrder.Should().Be("Title");
+        _vm.DefaultOrganizeMode.Should().Be("Move");
+        _vm.DefaultDuplicateStrategy.Should().Be("Overwrite");
+        _vm.UnknownArtistName.Should().Be("No Artist");
+        _vm.UnknownAlbumName.Should().Be("No Album");
+    }
+
+    [Fact]
+    public async Task SaveCommand_PersistsNewProperties()
+    {
+        var config = new Configuration();
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(config));
+        await _vm.LoadAsync();
+
+        _vm.ResumeSession = false;
+        _vm.AutoPlayOnStartup = true;
+        _vm.TextSize = "Small";
+        _vm.DoubleClickAction = "PlayNext";
+        _vm.DefaultSortOrder = "Album";
+
+        _vm.SaveCommand.Execute(null);
+        await Task.Delay(50);
+
+        _configServiceMock.Verify(c => c.SaveConfigurationAsync(
+            It.Is<Configuration>(cfg =>
+                cfg.ResumeSession == false &&
+                cfg.AutoPlayOnStartup == true &&
+                cfg.TextSize == "Small" &&
+                cfg.DoubleClickAction == "PlayNext" &&
+                cfg.DefaultSortOrder == "Album")),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetToDefaults_ResetsNewProperties()
+    {
+        var config = new Configuration
+        {
+            ResumeSession = false,
+            AutoPlayOnStartup = true,
+            TextSize = "Large",
+            DoubleClickAction = "AddToQueue",
+            DefaultSortOrder = "Title"
+        };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(config));
+        await _vm.LoadAsync();
+
+        _vm.ResetToDefaultsCommand.Execute(null);
+        await Task.Delay(50);
+
+        _vm.ResumeSession.Should().BeTrue();
+        _vm.AutoPlayOnStartup.Should().BeFalse();
+        _vm.TextSize.Should().Be("Medium");
+        _vm.DoubleClickAction.Should().Be("PlayNow");
+        _vm.DefaultSortOrder.Should().Be("Artist");
+    }
+
+    [Fact]
+    public async Task ScanSelectedCommand_ScansSelectedPaths()
+    {
+        var scanResult = new ScanResult { TracksAdded = 5, TracksUpdated = 0, TracksRemoved = 0 };
+        _libraryManagerMock.Setup(m => m.ScanSelectedLibrariesAsync(It.IsAny<IReadOnlyList<string>>()))
+            .ReturnsAsync(Result.Success(scanResult));
+
+        _vm.SelectedScanPaths.Add(@"C:\Music");
+        _vm.ScanSelectedCommand.Execute(null);
+        await Task.Delay(50);
+
+        _libraryManagerMock.Verify(m => m.ScanSelectedLibrariesAsync(
+            It.Is<IReadOnlyList<string>>(p => p.Count == 1 && p[0] == @"C:\Music")), Times.Once);
+        _vm.StatusMessage.Should().Contain("5 added");
+    }
+
+    [Fact]
+    public async Task ScanSelectedCommand_ShowsMessage_WhenNoPathsSelected()
+    {
+        _vm.ScanSelectedCommand.Execute(null);
+        await Task.Delay(50);
+
+        _vm.StatusMessage.Should().Contain("No paths selected");
+        _libraryManagerMock.Verify(m => m.ScanSelectedLibrariesAsync(It.IsAny<IReadOnlyList<string>>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(nameof(SettingsViewModel.ResumeSession))]
+    [InlineData(nameof(SettingsViewModel.AutoPlayOnStartup))]
+    [InlineData(nameof(SettingsViewModel.TextSize))]
+    [InlineData(nameof(SettingsViewModel.DoubleClickAction))]
+    [InlineData(nameof(SettingsViewModel.DefaultSortOrder))]
+    public void PropertyChanged_RaisedForNewProperties(string propertyName)
+    {
+        var raised = false;
+        _vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == propertyName)
+                raised = true;
+        };
+
+        switch (propertyName)
+        {
+            case nameof(SettingsViewModel.ResumeSession): _vm.ResumeSession = false; break;
+            case nameof(SettingsViewModel.AutoPlayOnStartup): _vm.AutoPlayOnStartup = true; break;
+            case nameof(SettingsViewModel.TextSize): _vm.TextSize = "Large"; break;
+            case nameof(SettingsViewModel.DoubleClickAction): _vm.DoubleClickAction = "AddToQueue"; break;
+            case nameof(SettingsViewModel.DefaultSortOrder): _vm.DefaultSortOrder = "Title"; break;
+        }
+
+        raised.Should().BeTrue();
+    }
 }

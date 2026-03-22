@@ -48,10 +48,10 @@ All cross-platform interfaces, models, services, ViewModels, and orchestration l
 
 ## Settings Enhancement
 
-- [ ] Add new config properties to Configuration.cs (FSMO defaults, playback, appearance, behavior)
-- [ ] Replace RememberLastPlayed with ResumeSession + AutoPlayOnStartup
-- [ ] Add new properties to SettingsViewModel (all new config fields)
-- [ ] Add ScanSelectedCommand to SettingsViewModel
+- [x] Add new config properties to Configuration.cs (FSMO defaults, playback, appearance, behavior)
+- [x] Replace RememberLastPlayed with ResumeSession + AutoPlayOnStartup
+- [x] Add new properties to SettingsViewModel (all new config fields)
+- [x] Add ScanSelectedCommand to SettingsViewModel
 - [ ] Create IFileOrganizerService interface
 - [ ] Create FileOrganizerService implementation (async wrapper for FSMO)
 - [ ] Create FileOrganizerViewModel (organize/compare/sync/reorganize with progress)

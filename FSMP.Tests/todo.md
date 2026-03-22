@@ -154,8 +154,8 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 
 ## Settings Enhancement Tests
 
-- [ ] Update ConfigurationServiceTests — new properties serialize/deserialize
-- [ ] Update SettingsViewModelTests — new properties load/save/bind
+- [x] Update ConfigurationServiceTests — new properties serialize/deserialize
+- [x] Update SettingsViewModelTests — new properties load/save/bind
 - [ ] Add FileOrganizerTests — Preview/dry-run tests
 - [ ] Create FileOrganizerServiceTests.cs — async wrapper tests
 - [ ] Create FileOrganizerViewModelTests.cs — ViewModel command tests

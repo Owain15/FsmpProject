@@ -16,7 +16,7 @@ public class ConfigurationTests
         config.DatabasePath.Should().BeEmpty();
         config.AutoScanOnStartup.Should().BeTrue();
         config.DefaultVolume.Should().Be(75);
-        config.RememberLastPlayed.Should().BeTrue();
+        config.ResumeSession.Should().BeTrue();
         config.LastPlayedTrackPath.Should().BeNull();
     }
 
@@ -31,7 +31,7 @@ public class ConfigurationTests
         config.DatabasePath = @"%AppData%\FSMP\fsmp.db";
         config.AutoScanOnStartup = false;
         config.DefaultVolume = 50;
-        config.RememberLastPlayed = false;
+        config.ResumeSession = false;
         config.LastPlayedTrackPath = @"C:\Music\song.mp3";
 
         // Assert
@@ -41,7 +41,7 @@ public class ConfigurationTests
         config.DatabasePath.Should().Be(@"%AppData%\FSMP\fsmp.db");
         config.AutoScanOnStartup.Should().BeFalse();
         config.DefaultVolume.Should().Be(50);
-        config.RememberLastPlayed.Should().BeFalse();
+        config.ResumeSession.Should().BeFalse();
         config.LastPlayedTrackPath.Should().Be(@"C:\Music\song.mp3");
     }
 
@@ -144,13 +144,13 @@ public class ConfigurationTests
     }
 
     [Fact]
-    public void Configuration_RememberLastPlayed_ShouldDefaultToTrue()
+    public void Configuration_ResumeSession_ShouldDefaultToTrue()
     {
         // Arrange & Act
         var config = new Configuration();
 
         // Assert
-        config.RememberLastPlayed.Should().BeTrue();
+        config.ResumeSession.Should().BeTrue();
     }
 
     [Fact]

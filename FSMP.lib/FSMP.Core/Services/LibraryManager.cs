@@ -74,4 +74,20 @@ public class LibraryManager : ILibraryManager
             return Result.Failure<ScanResult>($"Error scanning libraries: {ex.Message}");
         }
     }
+
+    public async Task<Result<ScanResult>> ScanSelectedLibrariesAsync(IReadOnlyList<string> paths)
+    {
+        try
+        {
+            if (paths.Count == 0)
+                return Result.Failure<ScanResult>("No paths selected for scanning.");
+
+            var result = await _scanService.ScanAllLibrariesAsync(paths.ToList());
+            return Result.Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<ScanResult>($"Error scanning selected libraries: {ex.Message}");
+        }
+    }
 }

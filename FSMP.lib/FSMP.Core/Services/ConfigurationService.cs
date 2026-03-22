@@ -29,7 +29,7 @@ public class ConfigurationService : IConfigurationService
             DatabasePath = string.Empty,   // caller provides actual path via DI
             AutoScanOnStartup = true,
             DefaultVolume = 75,
-            RememberLastPlayed = true,
+            ResumeSession = true,
             LastPlayedTrackPath = null
         };
     }

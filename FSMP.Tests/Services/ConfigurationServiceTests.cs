@@ -34,11 +34,49 @@ public class ConfigurationServiceTests : IDisposable
 
         config.Should().NotBeNull();
         config.LibraryPaths.Should().BeEmpty();
-        config.DatabasePath.Should().Contain("FSMP").And.EndWith("fsmp.db");
+        config.DatabasePath.Should().BeEmpty("caller provides actual path via DI");
         config.AutoScanOnStartup.Should().BeTrue();
         config.DefaultVolume.Should().Be(75);
         config.ResumeSession.Should().BeTrue();
         config.LastPlayedTrackPath.Should().BeNull();
+        config.AutoPlayOnStartup.Should().BeFalse();
+        config.TextSize.Should().Be("Medium");
+        config.DoubleClickAction.Should().Be("PlayNow");
+        config.DefaultSortOrder.Should().Be("Artist");
+        config.DefaultOrganizeMode.Should().Be("Copy");
+        config.DefaultDuplicateStrategy.Should().Be("Skip");
+        config.UnknownArtistName.Should().Be("Unknown Artist");
+        config.UnknownAlbumName.Should().Be("Unknown Album");
+    }
+
+    [Fact]
+    public async Task SaveAndLoad_ShouldRoundTrip_NewProperties()
+    {
+        var config = new Configuration
+        {
+            ResumeSession = false,
+            AutoPlayOnStartup = true,
+            TextSize = "Large",
+            DoubleClickAction = "AddToQueue",
+            DefaultSortOrder = "Title",
+            DefaultOrganizeMode = "Move",
+            DefaultDuplicateStrategy = "Overwrite",
+            UnknownArtistName = "No Artist",
+            UnknownAlbumName = "No Album"
+        };
+
+        await _service.SaveConfigurationAsync(config);
+        var loaded = await _service.LoadConfigurationAsync();
+
+        loaded.ResumeSession.Should().BeFalse();
+        loaded.AutoPlayOnStartup.Should().BeTrue();
+        loaded.TextSize.Should().Be("Large");
+        loaded.DoubleClickAction.Should().Be("AddToQueue");
+        loaded.DefaultSortOrder.Should().Be("Title");
+        loaded.DefaultOrganizeMode.Should().Be("Move");
+        loaded.DefaultDuplicateStrategy.Should().Be("Overwrite");
+        loaded.UnknownArtistName.Should().Be("No Artist");
+        loaded.UnknownAlbumName.Should().Be("No Album");
     }
 
     [Fact]
@@ -62,7 +100,7 @@ public class ConfigurationServiceTests : IDisposable
             DatabasePath = @"C:\data\fsmp.db",
             AutoScanOnStartup = false,
             DefaultVolume = 50,
-            RememberLastPlayed = false,
+            ResumeSession = false,
             LastPlayedTrackPath = @"C:\Music\song.mp3"
         };
 
@@ -85,7 +123,7 @@ public class ConfigurationServiceTests : IDisposable
             DatabasePath = @"C:\db\fsmp.db",
             AutoScanOnStartup = false,
             DefaultVolume = 90,
-            RememberLastPlayed = true,
+            ResumeSession = true,
             LastPlayedTrackPath = @"C:\MyMusic\track.wav"
         };
         await _service.SaveConfigurationAsync(original);
@@ -96,7 +134,7 @@ public class ConfigurationServiceTests : IDisposable
         loaded.DatabasePath.Should().Be(@"C:\db\fsmp.db");
         loaded.AutoScanOnStartup.Should().BeFalse();
         loaded.DefaultVolume.Should().Be(90);
-        loaded.RememberLastPlayed.Should().BeTrue();
+        loaded.ResumeSession.Should().BeTrue();
         loaded.LastPlayedTrackPath.Should().Be(@"C:\MyMusic\track.wav");
     }
 

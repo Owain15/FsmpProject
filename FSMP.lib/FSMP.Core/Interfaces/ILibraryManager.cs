@@ -8,4 +8,5 @@ public interface ILibraryManager
     Task<Result> AddLibraryPathAsync(string path);
     Task<Result> RemoveLibraryPathAsync(string path);
     Task<Result<ScanResult>> ScanAllLibrariesAsync();
+    Task<Result<ScanResult>> ScanSelectedLibrariesAsync(IReadOnlyList<string> paths);
 }

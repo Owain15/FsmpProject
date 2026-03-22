@@ -20,6 +20,15 @@ public class SettingsViewModel : INotifyPropertyChanged
     private string _statusMessage = string.Empty;
     private string _selectedTheme = "Light";
     private bool _allowUnsaveFromTagList;
+    private bool _resumeSession = true;
+    private bool _autoPlayOnStartup;
+    private string _textSize = "Medium";
+    private string _doubleClickAction = "PlayNow";
+    private string _defaultSortOrder = "Artist";
+    private string _defaultOrganizeMode = "Copy";
+    private string _defaultDuplicateStrategy = "Skip";
+    private string _unknownArtistName = "Unknown Artist";
+    private string _unknownAlbumName = "Unknown Album";
     private Configuration? _config;
 
     public SettingsViewModel(ILibraryManager libraryManager, IConfigurationService configService, Action<Action> dispatchToUI)
@@ -32,6 +41,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         AddPathCommand = new AsyncRelayCommand<string>(OnAddPath);
         RemovePathCommand = new AsyncRelayCommand<string>(OnRemovePath);
         ScanCommand = new AsyncRelayCommand(OnScan);
+        ScanSelectedCommand = new AsyncRelayCommand(OnScanSelected);
         SaveCommand = new AsyncRelayCommand(OnSave);
         ResetToDefaultsCommand = new AsyncRelayCommand(OnResetToDefaults);
     }
@@ -76,11 +86,74 @@ public class SettingsViewModel : INotifyPropertyChanged
         set => SetProperty(ref _allowUnsaveFromTagList, value);
     }
 
+    public bool ResumeSession
+    {
+        get => _resumeSession;
+        set => SetProperty(ref _resumeSession, value);
+    }
+
+    public bool AutoPlayOnStartup
+    {
+        get => _autoPlayOnStartup;
+        set => SetProperty(ref _autoPlayOnStartup, value);
+    }
+
+    public string TextSize
+    {
+        get => _textSize;
+        set => SetProperty(ref _textSize, value);
+    }
+
+    public IReadOnlyList<string> AvailableTextSizes { get; } = new[] { "Small", "Medium", "Large", "Extra Large" };
+
+    public string DoubleClickAction
+    {
+        get => _doubleClickAction;
+        set => SetProperty(ref _doubleClickAction, value);
+    }
+
+    public IReadOnlyList<string> AvailableDoubleClickActions { get; } = new[] { "PlayNow", "AddToQueue", "PlayNext" };
+
+    public string DefaultSortOrder
+    {
+        get => _defaultSortOrder;
+        set => SetProperty(ref _defaultSortOrder, value);
+    }
+
+    public IReadOnlyList<string> AvailableSortOrders { get; } = new[] { "Artist", "Album", "Title", "DateAdded" };
+
+    public string DefaultOrganizeMode
+    {
+        get => _defaultOrganizeMode;
+        set => SetProperty(ref _defaultOrganizeMode, value);
+    }
+
+    public string DefaultDuplicateStrategy
+    {
+        get => _defaultDuplicateStrategy;
+        set => SetProperty(ref _defaultDuplicateStrategy, value);
+    }
+
+    public string UnknownArtistName
+    {
+        get => _unknownArtistName;
+        set => SetProperty(ref _unknownArtistName, value);
+    }
+
+    public string UnknownAlbumName
+    {
+        get => _unknownAlbumName;
+        set => SetProperty(ref _unknownAlbumName, value);
+    }
+
+    public ObservableCollection<string> SelectedScanPaths { get; } = new();
+
     public string AppVersion { get; } = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "1.0.0";
 
     public ICommand AddPathCommand { get; }
     public ICommand RemovePathCommand { get; }
     public ICommand ScanCommand { get; }
+    public ICommand ScanSelectedCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
 
@@ -99,6 +172,15 @@ public class SettingsViewModel : INotifyPropertyChanged
                 DefaultVolume = _config.DefaultVolume;
                 SelectedTheme = _config.Theme;
                 AllowUnsaveFromTagList = _config.AllowUnsaveFromTagList;
+                ResumeSession = _config.ResumeSession;
+                AutoPlayOnStartup = _config.AutoPlayOnStartup;
+                TextSize = _config.TextSize;
+                DoubleClickAction = _config.DoubleClickAction;
+                DefaultSortOrder = _config.DefaultSortOrder;
+                DefaultOrganizeMode = _config.DefaultOrganizeMode;
+                DefaultDuplicateStrategy = _config.DefaultDuplicateStrategy;
+                UnknownArtistName = _config.UnknownArtistName;
+                UnknownAlbumName = _config.UnknownAlbumName;
             });
         }
     }
@@ -140,6 +222,31 @@ public class SettingsViewModel : INotifyPropertyChanged
         IsBusy = false;
     }
 
+    private async Task OnScanSelected()
+    {
+        if (SelectedScanPaths.Count == 0)
+        {
+            StatusMessage = "No paths selected for scanning.";
+            return;
+        }
+
+        IsBusy = true;
+        StatusMessage = $"Scanning {SelectedScanPaths.Count} selected path(s)...";
+
+        var result = await _libraryManager.ScanSelectedLibrariesAsync(SelectedScanPaths.ToList());
+        if (result.IsSuccess && result.Value is not null)
+        {
+            var scan = result.Value;
+            StatusMessage = $"Scan complete: {scan.TracksAdded} added, {scan.TracksUpdated} updated, {scan.TracksRemoved} removed";
+        }
+        else
+        {
+            StatusMessage = $"Scan failed: {result.ErrorMessage}";
+        }
+
+        IsBusy = false;
+    }
+
     private async Task OnResetToDefaults()
     {
         var defaults = new Configuration();
@@ -151,6 +258,15 @@ public class SettingsViewModel : INotifyPropertyChanged
             DefaultVolume = defaults.DefaultVolume;
             SelectedTheme = defaults.Theme;
             AllowUnsaveFromTagList = defaults.AllowUnsaveFromTagList;
+            ResumeSession = defaults.ResumeSession;
+            AutoPlayOnStartup = defaults.AutoPlayOnStartup;
+            TextSize = defaults.TextSize;
+            DoubleClickAction = defaults.DoubleClickAction;
+            DefaultSortOrder = defaults.DefaultSortOrder;
+            DefaultOrganizeMode = defaults.DefaultOrganizeMode;
+            DefaultDuplicateStrategy = defaults.DefaultDuplicateStrategy;
+            UnknownArtistName = defaults.UnknownArtistName;
+            UnknownAlbumName = defaults.UnknownAlbumName;
         });
         await _configService.SaveConfigurationAsync(defaults);
         StatusMessage = "Settings reset to defaults.";
@@ -165,6 +281,15 @@ public class SettingsViewModel : INotifyPropertyChanged
         _config.DefaultVolume = DefaultVolume;
         _config.Theme = SelectedTheme;
         _config.AllowUnsaveFromTagList = AllowUnsaveFromTagList;
+        _config.ResumeSession = ResumeSession;
+        _config.AutoPlayOnStartup = AutoPlayOnStartup;
+        _config.TextSize = TextSize;
+        _config.DoubleClickAction = DoubleClickAction;
+        _config.DefaultSortOrder = DefaultSortOrder;
+        _config.DefaultOrganizeMode = DefaultOrganizeMode;
+        _config.DefaultDuplicateStrategy = DefaultDuplicateStrategy;
+        _config.UnknownArtistName = UnknownArtistName;
+        _config.UnknownAlbumName = UnknownAlbumName;
         await _configService.SaveConfigurationAsync(_config);
         StatusMessage = "Settings saved.";
     }
