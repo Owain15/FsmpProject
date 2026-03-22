@@ -151,3 +151,11 @@ Comprehensive test project covering all FSMP solution projects using xUnit, Moq,
 **Status**: 1113/1114 passing — 1 failing (`ConfigurationServiceTests.GetDefaultConfiguration_ShouldReturnValidDefaults`)
 **Coverage**: 89.4% line / 75.3% branch (x64 run, 2026-03-20)
 **Next Action**: Fix failing test; Android device/emulator testing when available
+
+## Settings Enhancement Tests
+
+- [ ] Update ConfigurationServiceTests — new properties serialize/deserialize
+- [ ] Update SettingsViewModelTests — new properties load/save/bind
+- [ ] Add FileOrganizerTests — Preview/dry-run tests
+- [ ] Create FileOrganizerServiceTests.cs — async wrapper tests
+- [ ] Create FileOrganizerViewModelTests.cs — ViewModel command tests

@@ -264,4 +264,9 @@
 
 **Completed Slices**: 11 / 11
 **Status**: All slices complete — FSMO feature is fully implemented and tested
-**Next Action**: None (feature complete)
+
+## Settings Integration
+
+- [ ] Add OrganizePreview.cs model (PlannedOperation: SourcePath, DestinationPath, Action)
+- [ ] Add FileOrganizer.Preview() method — dry-run without modifying files
+- [ ] Add Preview tests to FileOrganizerTests.cs

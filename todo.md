@@ -139,6 +139,30 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 
 ---
 
+### Settings Enhancement
+
+**Status**: Not started
+**Goal**: Enrich all 5 MAUI Settings sections with useful settings, integrate FSMO into Library Settings
+
+| # | Feature | Status |
+|---|---------|--------|
+| 1 | Configuration model — new properties | Not started |
+| 2 | SettingsViewModel — new properties & scan selected | Not started |
+| 3 | FSMO dry-run preview | Not started |
+| 4 | IFileOrganizerService + implementation | Not started |
+| 5 | FileOrganizerViewModel | Not started |
+| 6 | Library Settings UI — scan all/selected + FSMO navigation | Not started |
+| 7 | Organize Music Page | Not started |
+| 8 | Compare & Sync Page | Not started |
+| 9 | Reorganize Library Page | Not started |
+| 10 | Playback Settings — resume session + auto-play | Not started |
+| 11 | Appearance Settings — text size | Not started |
+| 12 | Behavior Settings — double-click + sort order + reset | Not started |
+| 13 | About Settings — library stats (readonly) | Not started |
+| 14 | DI registration | Not started |
+
+---
+
 ## Deferred Work
 
 ### Android Support

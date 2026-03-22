@@ -45,3 +45,13 @@ All cross-platform interfaces, models, services, ViewModels, and orchestration l
 - [x] MAUI ViewModels — NowPlaying, LibraryBrowse, Settings, Playlists
 - [x] MAUI Session Restore — GetState/RestoreState, IQueueStateRepository DI, deadlock fix
 - [x] Tag Management — ITagService, ITagRepository, tag filtering in ILibraryBrowser
+
+## Settings Enhancement
+
+- [ ] Add new config properties to Configuration.cs (FSMO defaults, playback, appearance, behavior)
+- [ ] Replace RememberLastPlayed with ResumeSession + AutoPlayOnStartup
+- [ ] Add new properties to SettingsViewModel (all new config fields)
+- [ ] Add ScanSelectedCommand to SettingsViewModel
+- [ ] Create IFileOrganizerService interface
+- [ ] Create FileOrganizerService implementation (async wrapper for FSMO)
+- [ ] Create FileOrganizerViewModel (organize/compare/sync/reorganize with progress)

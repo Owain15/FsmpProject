@@ -37,7 +37,7 @@ public class ConfigurationServiceTests : IDisposable
         config.DatabasePath.Should().Contain("FSMP").And.EndWith("fsmp.db");
         config.AutoScanOnStartup.Should().BeTrue();
         config.DefaultVolume.Should().Be(75);
-        config.RememberLastPlayed.Should().BeTrue();
+        config.ResumeSession.Should().BeTrue();
         config.LastPlayedTrackPath.Should().BeNull();
     }
 
