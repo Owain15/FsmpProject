@@ -26,4 +26,30 @@ public partial class AboutSettingsPage : ContentPage
 
     private async void OnBackClicked(object? sender, EventArgs e)
         => await Shell.Current.GoToAsync("..");
+
+    private void OnHamburgerClicked(object? sender, EventArgs e)
+    {
+        NavOverlay.CurrentRoute = "Settings";
+        NavOverlay.Toggle();
+    }
+
+    private void OnDirectoriesDataTapped(object? sender, TappedEventArgs e)
+    {
+        _viewModel.ToggleDirectoriesDataCommand.Execute(null);
+        DirectoriesDataHeader.Text = _viewModel.IsDirectoriesDataExpanded
+            ? "Directories Data \u25BC"
+            : "Directories Data \u25B6";
+    }
+
+    private void OnToggleAllDirectoriesClicked(object? sender, EventArgs e)
+    {
+        _viewModel.ToggleAllDirectoriesCommand.Execute(null);
+        ToggleAllButton.Text = _viewModel.AreAllDirectoriesExpanded ? "Collapse All" : "Expand All";
+    }
+
+    private void OnDirectoryTapped(object? sender, TappedEventArgs e)
+    {
+        if (e.Parameter is SettingsViewModel.DirectoryStatsItem item)
+            _viewModel.ToggleDirectoryCommand.Execute(item);
+    }
 }

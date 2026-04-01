@@ -26,4 +26,10 @@ public partial class BehaviorSettingsPage : ContentPage
 
     private async void OnBackClicked(object? sender, EventArgs e)
         => await Shell.Current.GoToAsync("..");
+
+    private void OnHamburgerClicked(object? sender, EventArgs e)
+    {
+        NavOverlay.CurrentRoute = "Settings";
+        NavOverlay.Toggle();
+    }
 }

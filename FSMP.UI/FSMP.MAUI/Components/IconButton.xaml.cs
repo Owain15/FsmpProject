@@ -25,6 +25,9 @@ public partial class IconButton : ContentView
     public static readonly BindableProperty ButtonWidthRequestProperty =
         BindableProperty.Create(nameof(ButtonWidthRequest), typeof(double), typeof(IconButton), -1.0, propertyChanged: OnButtonWidthChanged);
 
+    public static readonly BindableProperty CompactLabelProperty =
+        BindableProperty.Create(nameof(CompactLabel), typeof(string), typeof(IconButton), string.Empty, propertyChanged: OnVisualPropertyChanged);
+
     public static readonly BindableProperty ButtonTextColorProperty =
         BindableProperty.Create(nameof(ButtonTextColor), typeof(Color), typeof(IconButton), null, propertyChanged: OnTextColorChanged);
 
@@ -60,6 +63,12 @@ public partial class IconButton : ContentView
     {
         get => (double)GetValue(ButtonWidthRequestProperty);
         set => SetValue(ButtonWidthRequestProperty, value);
+    }
+
+    public string CompactLabel
+    {
+        get => (string)GetValue(CompactLabelProperty);
+        set => SetValue(CompactLabelProperty, value);
     }
 
     public Color ButtonTextColor
@@ -141,7 +150,7 @@ public partial class IconButton : ContentView
     {
         // Text: drop label when compact
         if (_isCompact || string.IsNullOrEmpty(Label))
-            InnerButton.Text = Icon;
+            InnerButton.Text = string.IsNullOrEmpty(CompactLabel) ? Icon : $"{Icon} {CompactLabel}";
         else
             InnerButton.Text = $"{Icon} {Label}";
 
@@ -155,6 +164,16 @@ public partial class IconButton : ContentView
         {
             InnerButton.Padding = new Thickness(8, 4);
             InnerButton.FontSize = 14;
+        }
+    }
+
+    protected override void OnPropertyChanged(string? propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+        if (propertyName == nameof(IsEnabled))
+        {
+            InnerButton.IsEnabled = IsEnabled;
+            InnerButton.Opacity = IsEnabled ? 1.0 : 0.4;
         }
     }
 

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
+             x:Class="FSMP.MAUI.Pages.Settings.ManageDirectoriesPage"
+             x:DataType="vm:SettingsViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
+             Title="Manage Directories"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*">
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Settings"
+                     HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Button Text="← Back" FontSize="{DynamicResource TextSizeBody}" Padding="12,6"
+                        HorizontalOptions="End"
+                        BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                        TextColor="{DynamicResource ThemeButtonText}"
+                        Clicked="OnBackClicked" />
+
+                <!-- Add new path (at top) -->
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Entry x:Name="NewPathEntry" Placeholder="Enter folder path" FontSize="{DynamicResource TextSizeBody}" />
+                    <c:IconButton Grid.Column="1" Icon="＋" Label="Add"
+                            Command="{Binding AddPathCommand}"
+                            CommandParameter="{Binding Source={x:Reference NewPathEntry}, Path=Text}" />
+                </Grid>
+
+                <!-- Directory list -->
+                <CollectionView ItemsSource="{Binding LibraryPaths}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SettingsViewModel+DirectoryItem">
+                            <Grid Padding="4" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
+                                <!-- Display mode -->
+                                <Label Text="{Binding Path}" FontSize="{DynamicResource TextSizeBody}" VerticalOptions="Center"
+                                       TextColor="{DynamicResource ThemeText}"
+                                       IsVisible="{Binding IsNotEditing}" />
+                                <c:IconButton Grid.Column="1" Icon="✏️"
+                                        IsVisible="{Binding IsNotEditing}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=EditPathCommand}"
+                                        CommandParameter="{Binding .}" />
+                                <c:IconButton Grid.Column="2" Icon="✕"
+                                        IsVisible="{Binding IsNotEditing}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=RemovePathCommand}"
+                                        CommandParameter="{Binding Path}" />
+
+                                <!-- Edit mode -->
+                                <Entry Text="{Binding EditText}" FontSize="{DynamicResource TextSizeBody}" VerticalOptions="Center"
+                                       IsVisible="{Binding IsEditing}" />
+                                <c:IconButton Grid.Column="1" Icon="✓"
+                                        IsVisible="{Binding IsEditing}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=ConfirmEditCommand}"
+                                        CommandParameter="{Binding .}" />
+                                <c:IconButton Grid.Column="2" Icon="✕"
+                                        IsVisible="{Binding IsEditing}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=CancelEditCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="16" Spacing="8" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Label Text="No directories configured." FontSize="{DynamicResource TextSizeTitle}" FontAttributes="Bold"
+                                   TextColor="{DynamicResource ThemeText}" HorizontalTextAlignment="Center" />
+                            <Label Text="Add a folder path above to get started."
+                                   FontSize="{DynamicResource TextSizeBody}" TextColor="{DynamicResource ThemeTextSecondary}"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
+    </Grid>
+</ContentPage>

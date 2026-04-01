@@ -7,27 +7,100 @@
              x:DataType="vm:SettingsViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="About"
-             Shell.NavBarIsVisible="False">
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12">
-
-            <Grid ColumnDefinitions="*,Auto">
-                <Label Text="About" FontSize="24" FontAttributes="Bold"
-                       TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="← Back" FontSize="14" Padding="12,6"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*">
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Settings"
+                     HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Button Text="← Back" FontSize="{DynamicResource TextSizeBody}" Padding="12,6"
+                        HorizontalOptions="End"
                         BackgroundColor="{DynamicResource ThemeButtonBackground}"
                         TextColor="{DynamicResource ThemeButtonText}"
                         Clicked="OnBackClicked" />
-            </Grid>
 
-            <Label Text="{Binding AppVersion, StringFormat='Version {0}'}" FontSize="14"
-                   TextColor="{DynamicResource ThemeTextSecondary}" />
-            <Button Text="Reset to Defaults"
-                    FontSize="14" HorizontalOptions="Start" Padding="16,8"
-                    BackgroundColor="{DynamicResource ThemeButtonBackground}"
-                    TextColor="{DynamicResource ThemeButtonText}"
-                    Command="{Binding ResetToDefaultsCommand}" />
+                <Label Text="{Binding AppVersion, StringFormat='Version {0}'}" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeTextSecondary}" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <BoxView HeightRequest="1" Color="{DynamicResource ThemeTextSecondary}" Opacity="0.3" Margin="0,8" />
+
+                <Label Text="Library Statistics" FontSize="{DynamicResource TextSizeTitle}" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}" />
+                <Label Text="{Binding LibraryPaths.Count, StringFormat='Library paths: {0}'}" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeTextSecondary}" />
+                <Label Text="{Binding TotalTrackCount, StringFormat='Total tracks: {0}'}" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeTextSecondary}" />
+                <Label Text="{Binding TotalAlbumCount, StringFormat='Total albums: {0}'}" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeTextSecondary}" />
+                <Label Text="{Binding TotalArtistCount, StringFormat='Total artists: {0}'}" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeTextSecondary}" />
+                <Label Text="{Binding StatusMessage}" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeTextSecondary}" />
+
+                <BoxView HeightRequest="1" Color="{DynamicResource ThemeTextSecondary}" Opacity="0.3" Margin="0,8" />
+
+                <!-- Directories Data Section -->
+                <VerticalStackLayout>
+                    <Label x:Name="DirectoriesDataHeader" Text="Directories Data ▶"
+                           FontSize="{DynamicResource TextSizeTitle}" FontAttributes="Bold"
+                           TextColor="{DynamicResource ThemeText}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDirectoriesDataTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <VerticalStackLayout IsVisible="{Binding IsDirectoriesDataExpanded}" Spacing="8" Padding="0,8,0,0">
+                        <Button x:Name="ToggleAllButton" Text="Expand All"
+                                FontSize="{DynamicResource TextSizeCaption}" Padding="12,4"
+                                HorizontalOptions="Start"
+                                BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                                TextColor="{DynamicResource ThemeButtonText}"
+                                Clicked="OnToggleAllDirectoriesClicked" />
+
+                        <ScrollView MaximumHeightRequest="300">
+                            <CollectionView ItemsSource="{Binding DirectoryStatsItems}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:SettingsViewModel+DirectoryStatsItem">
+                                        <VerticalStackLayout Padding="0,4" Spacing="4">
+                                            <Label Text="{Binding Path}" FontSize="{DynamicResource TextSizeBody}"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{DynamicResource ThemeText}">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Tapped="OnDirectoryTapped"
+                                                                          CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
+
+                                            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                                               IsVisible="{Binding IsLoading}"
+                                                               HeightRequest="20" HorizontalOptions="Start" />
+
+                                            <HorizontalStackLayout IsVisible="{Binding IsExpanded}" Spacing="16" Padding="16,0,0,0">
+                                                <Label FontSize="{DynamicResource TextSizeCaption}"
+                                                       TextColor="{DynamicResource ThemeTextSecondary}">
+                                                    <Label.Text>
+                                                        <MultiBinding StringFormat="Tracks: {0} | Albums: {1} | Artists: {2}">
+                                                            <Binding Path="TrackCount" />
+                                                            <Binding Path="AlbumCount" />
+                                                            <Binding Path="ArtistCount" />
+                                                        </MultiBinding>
+                                                    </Label.Text>
+                                                </Label>
+                                            </HorizontalStackLayout>
+
+                                            <BoxView HeightRequest="1" Color="{DynamicResource ThemeTextSecondary}"
+                                                     Opacity="0.15" />
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </ScrollView>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
+    </Grid>
 </ContentPage>

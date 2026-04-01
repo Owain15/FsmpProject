@@ -26,4 +26,16 @@ public partial class LibrarySettingsPage : ContentPage
 
     private async void OnBackClicked(object? sender, EventArgs e)
         => await Shell.Current.GoToAsync("..");
+
+    private async void OnManageDirectoriesClicked(object? sender, EventArgs e)
+        => await Shell.Current.GoToAsync("manageDirectories");
+
+    private async void OnScanLibraryClicked(object? sender, EventArgs e)
+        => await Shell.Current.GoToAsync("scanLibrary");
+
+    private void OnHamburgerClicked(object? sender, EventArgs e)
+    {
+        NavOverlay.CurrentRoute = "Settings";
+        NavOverlay.Toggle();
+    }
 }

@@ -26,6 +26,16 @@
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">30</SupportedOSPlatformVersion>
     <VlcWindowsX64Enabled>true</VlcWindowsX64Enabled>
+
+    <!-- Only include English satellite resources (saves ~3.9 MB of locale folders) -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <!-- Release build optimizations -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- Strip debug symbols from output -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -79,10 +89,26 @@
       <Link>libvlc\win-arm64\hrtfs\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\dependencies\libvlc\lua\**">
+    <Content Include="..\..\dependencies\libvlc\lua\**"
+             Exclude="..\..\dependencies\libvlc\lua\http\**">
       <Link>libvlc\win-arm64\lua\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <!-- Remove wrong-architecture VLC and unnecessary files after build/publish -->
+  <Target Name="CleanVlcExtras" AfterTargets="Build;Publish">
+    <!-- ARM64 build: remove x64 VLC (~100 MB) -->
+    <RemoveDir Directories="$(OutputPath)libvlc\win-x64" Condition="'$(Platform)' == 'ARM64'" />
+    <RemoveDir Directories="$(PublishDir)libvlc\win-x64" Condition="'$(Platform)' == 'ARM64'" />
+    <!-- x64 build: remove ARM64 VLC -->
+    <RemoveDir Directories="$(OutputPath)libvlc\win-arm64" Condition="'$(Platform)' == 'x64'" />
+    <RemoveDir Directories="$(PublishDir)libvlc\win-arm64" Condition="'$(Platform)' == 'x64'" />
+    <!-- Remove VLC lua/http web interface from NuGet-provided VLC -->
+    <RemoveDir Directories="$(OutputPath)libvlc\win-x64\lua\http" Condition="'$(Platform)' == 'x64'" />
+    <RemoveDir Directories="$(OutputPath)libvlc\win-arm64\lua\http" Condition="'$(Platform)' == 'ARM64'" />
+    <RemoveDir Directories="$(PublishDir)libvlc\win-x64\lua\http" Condition="'$(Platform)' == 'x64'" />
+    <RemoveDir Directories="$(PublishDir)libvlc\win-arm64\lua\http" Condition="'$(Platform)' == 'ARM64'" />
+  </Target>
 
 </Project>

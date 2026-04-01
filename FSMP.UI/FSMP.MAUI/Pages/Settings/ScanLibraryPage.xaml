@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FSMP.Core.ViewModels;assembly=FSMP.Core"
+             xmlns:c="clr-namespace:FSMP.MAUI.Components"
+             x:Class="FSMP.MAUI.Pages.Settings.ScanLibraryPage"
+             x:DataType="vm:SettingsViewModel"
+             BackgroundColor="{DynamicResource ThemeBackground}"
+             Title="Scan Library"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*">
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Settings"
+                     HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Button Text="← Back" FontSize="{DynamicResource TextSizeBody}" Padding="12,6"
+                        HorizontalOptions="End"
+                        BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                        TextColor="{DynamicResource ThemeButtonText}"
+                        Clicked="OnBackClicked" />
+
+                <!-- Status Message (fixed height to prevent layout shift) -->
+                <Label Text="{Binding StatusMessage}" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeTextSecondary}"
+                       HeightRequest="20" />
+
+                <!-- Scan All -->
+                <c:IconButton Icon="🔍" Label="Scan All" CompactLabel="All" Command="{Binding ScanCommand}"
+                              IsEnabled="{Binding CanScanAll}" HorizontalOptions="Start" />
+
+                <!-- Scan Selected -->
+                <c:IconButton Icon="🔍" Label="Scan Selected" Command="{Binding ScanSelectedCommand}"
+                              IsEnabled="{Binding CanScanSelected}" HorizontalOptions="Start" />
+
+                <!-- Select All / Deselect All -->
+                <Button Text="{Binding ToggleAllButtonText}" FontSize="{DynamicResource TextSizeBody}" Padding="12,6"
+                        HorizontalOptions="Start"
+                        BackgroundColor="{DynamicResource ThemeButtonBackground}"
+                        TextColor="{DynamicResource ThemeButtonText}"
+                        Command="{Binding ToggleAllScanPathsCommand}"
+                        IsVisible="{Binding HasLibraryPaths}"
+                        IsEnabled="{Binding IsNotBusy}" />
+
+                <!-- Directory checkboxes for selective scanning -->
+                <CollectionView ItemsSource="{Binding LibraryPaths}" SelectionMode="None"
+                                IsEnabled="{Binding IsNotBusy}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SettingsViewModel+DirectoryItem">
+                            <Grid Padding="4,2" ColumnDefinitions="Auto,*">
+                                <CheckBox VerticalOptions="Center"
+                                          IsChecked="{Binding IsSelectedForScan}"
+                                          CheckedChanged="OnScanCheckChanged" />
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                    <Label Text="{Binding Path}" FontSize="{DynamicResource TextSizeBody}"
+                                           TextColor="{DynamicResource ThemeText}" />
+                                    <Label FontSize="{DynamicResource TextSizeSmall}" IsVisible="{Binding HasScanResult}"
+                                           Text="{Binding ScanSummary}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding ScanFailed}" Value="True">
+                                                <Setter Property="TextColor" Value="Red" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding ScanSucceeded}" Value="True">
+                                                <Setter Property="TextColor" Value="Green" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    <CollectionView.EmptyView>
+                        <Label Text="No directories configured. Use 'Manage Directories' to add paths."
+                               TextColor="{DynamicResource ThemeTextSecondary}" FontSize="{DynamicResource TextSizeBody}" />
+                    </CollectionView.EmptyView>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
+    </Grid>
+</ContentPage>

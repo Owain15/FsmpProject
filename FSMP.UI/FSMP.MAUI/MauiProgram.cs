@@ -89,6 +89,7 @@ public static class MauiProgram
         // Interface mappings for services already registered as concrete types
         services.AddScoped<IMetadataService>(sp => sp.GetRequiredService<MetadataService>());
         services.AddScoped<ILibraryScanService>(sp => sp.GetRequiredService<LibraryScanService>());
+        services.AddScoped<ILibraryStatsService, LibraryStatsService>();
         services.AddScoped<IPlaylistService>(sp => sp.GetRequiredService<PlaylistService>());
         services.AddSingleton<IConfigurationService>(sp => sp.GetRequiredService<ConfigurationService>());
 
@@ -122,8 +123,6 @@ public static class MauiProgram
         services.AddTransient<SettingsPage>();
         services.AddTransient<PlaylistsPage>();
         services.AddTransient<PlaylistDetailPage>();
-        services.AddTransient<CustomThemePage>();
-
         // ViewModels
         services.AddTransient<NowPlayingViewModel>();
         services.AddTransient<Core.ViewModels.LibraryBrowseViewModel>(sp =>
@@ -135,14 +134,12 @@ public static class MauiProgram
             new Core.ViewModels.SettingsViewModel(
                 sp.GetRequiredService<ILibraryManager>(),
                 sp.GetRequiredService<IConfigurationService>(),
+                sp.GetRequiredService<ILibraryStatsService>(),
                 MainThread.BeginInvokeOnMainThread));
         services.AddTransient<Core.ViewModels.PlaylistsViewModel>(sp =>
             new Core.ViewModels.PlaylistsViewModel(
                 sp.GetRequiredService<IPlaylistManager>(),
                 MainThread.BeginInvokeOnMainThread));
-        services.AddTransient<ViewModels.CustomThemeViewModel>(sp =>
-            new ViewModels.CustomThemeViewModel(
-                sp.GetRequiredService<IConfigurationService>()));
         services.AddTransient<Core.ViewModels.PlaylistDetailViewModel>(sp =>
             new Core.ViewModels.PlaylistDetailViewModel(
                 sp.GetRequiredService<IPlaylistManager>(),

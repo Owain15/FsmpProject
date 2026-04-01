@@ -12,7 +12,8 @@
 | FSMP.Tests | Test suite | Complete | -- | [todo](FSMP.Tests/todo.md) |
 | FSMP.MAUI | MAUI UI (Windows) | Complete | -- | -- |
 
-**Overall coverage**: 89.4% line / 75.3% branch | **Tests**: 1125/1125 passing | **Build**: Passing (Windows + Android)
+**Overall coverage**: 89.4% line / 75.3% branch | **Tests**: 1166/1166 passing | **Build**: Passing (Windows + Android)
+**Last verified**: 2026-03-30
 
 ### Test Verification Status
 
@@ -137,29 +138,95 @@ The MAUI app has all UI pages and ViewModels wired up but has never been built o
 | 5 | Apply saved theme on app startup | Done |
 | 6 | Persist theme selection via config.json | Done |
 
+> **Note**: Custom Theme feature (CustomThemePage, CustomThemeViewModel) was removed as unsatisfactory. Rebuild planned for a future release.
+
 ---
 
 ### Settings Enhancement
 
-**Status**: Not started
-**Goal**: Enrich all 5 MAUI Settings sections with useful settings, integrate FSMO into Library Settings
+**Status**: In progress
+**Goal**: Enrich MAUI Settings sections with useful settings
+
+#### Completed Settings Pages
 
 | # | Feature | Status |
 |---|---------|--------|
 | 1 | Configuration model — new properties | Done |
 | 2 | SettingsViewModel — new properties & scan selected | Done |
-| 3 | FSMO dry-run preview | Not started |
-| 4 | IFileOrganizerService + implementation | Not started |
-| 5 | FileOrganizerViewModel | Not started |
-| 6 | Library Settings UI — scan all/selected + FSMO navigation | Not started |
-| 7 | Organize Music Page | Not started |
-| 8 | Compare & Sync Page | Not started |
-| 9 | Reorganize Library Page | Not started |
-| 10 | Playback Settings — resume session + auto-play | Not started |
-| 11 | Appearance Settings — text size | Not started |
-| 12 | Behavior Settings — double-click + sort order + reset | Not started |
-| 13 | About Settings — library stats (readonly) | Not started |
-| 14 | DI registration | Not started |
+| 3 | Playback Settings — resume session + auto-play | Done |
+| 4 | Appearance Settings — text size picker | Done |
+| 5 | Behavior Settings — double-click + sort order + reset (polished layout) | Done |
+| 6 | About Settings — library stats (readonly) | Done |
+| 7 | About Settings — Directories Data collapsible section (per-directory track/album/artist counts) | Done |
+
+> **Future**: Add duplicate count per directory (by FileHash) to Directories Data section.
+
+#### Directories Settings (formerly Library)
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Rename Library → Directories + restructure layout | Done |
+| 2 | Create ManageDirectoriesPage sub-page (add/remove paths) | Done |
+| 3 | Scan Selected with per-directory checkboxes + CanExecute | Done |
+| 4 | Update SettingsPage navigation label | Done |
+| 5 | Move scan controls to ScanLibraryPage sub-page | Done |
+| 6 | ManageDirectories: add at top, scrollable list, empty prompt | Done |
+| 7 | Inline edit for directory paths (DirectoryItem model) | Done |
+
+#### Appearance Settings Overhaul
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Remove custom theme code (CustomThemePage, CustomThemeViewModel, "Custom" option) | Done |
+| 2 | Polish AppearanceSettingsPage layout (section headers + descriptions) | Done |
+| 3 | Create TextSizeManager (DynamicResource dictionary swap pattern) | Done |
+| 4 | Replace hardcoded FontSize values with DynamicResource across all XAML | Done |
+| 5 | Wire TextSize runtime application + startup load | Done |
+| 6 | TextSizeManager tests | Done |
+
+### Responsive Layout — Phone & Desktop Screen Sizes
+
+**Status**: Complete
+**Goal**: Target phone (portrait, <600dp) and desktop (≥600dp) with responsive layout logic
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | ResponsiveHelper in FSMP.Core (IsPhone, breakpoint, art sizes) | Done |
+| 2 | Android portrait lock (MainActivity ScreenOrientation) | Done |
+| 3 | NowPlayingPage responsive (hide sidebar toggles, compact art on phone) | Done |
+| 4 | NavMenuOverlay phone-friendly (full width on phone) | Done |
+| 5 | ResponsiveHelperTests (14 tests) | Done |
+| 6 | ResponsiveLayoutTests (12 tests) | Done |
+| 7 | Fix FSMP.Tests NU1201 errors (remove incompatible Android/MAUI references) | Done |
+| 8 | CLAUDE.md Target Screen Sizes section | Done |
+
+---
+
+#### Future — Custom Theme Editor (Rebuild)
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Redesign custom theme editor | Not started |
+
+#### Future — FSMO Integration (High Priority)
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | FSMO dry-run preview | Not started |
+| 2 | IFileOrganizerService + implementation | Not started |
+| 3 | FileOrganizerViewModel | Not started |
+| 4 | Organize Music Page | Not started |
+| 5 | Compare & Sync Page | Not started |
+| 6 | Reorganize Library Page | Not started |
+| 7 | DI registration for FSMO services | Not started |
+
+#### Future — Organize Defaults
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Default organize mode (Copy/Move) setting | Not started |
+| 2 | Default duplicate strategy (Skip/Overwrite/Rename) setting | Not started |
+| 3 | Unknown artist/album name defaults | Not started |
 
 ---
 

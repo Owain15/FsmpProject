@@ -7,32 +7,40 @@
              x:DataType="vm:SettingsViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Appearance"
-             Shell.NavBarIsVisible="False">
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12">
-
-            <Grid ColumnDefinitions="*,Auto">
-                <Label Text="Appearance" FontSize="24" FontAttributes="Bold"
-                       TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="← Back" FontSize="14" Padding="12,6"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*">
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Settings"
+                     HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Button Text="← Back" FontSize="{DynamicResource TextSizeBody}" Padding="12,6"
+                        HorizontalOptions="End"
                         BackgroundColor="{DynamicResource ThemeButtonBackground}"
                         TextColor="{DynamicResource ThemeButtonText}"
                         Clicked="OnBackClicked" />
-            </Grid>
 
-            <Picker x:Name="ThemePicker"
-                    ItemsSource="{Binding AvailableThemes}"
-                    SelectedItem="{Binding SelectedTheme}"
-                    FontSize="16" />
-            <Button Text="Customize Theme..."
-                    FontSize="14" HorizontalOptions="Start" Padding="16,8"
-                    BackgroundColor="{DynamicResource ThemeButtonBackground}"
-                    TextColor="{DynamicResource ThemeButtonText}"
-                    Clicked="OnCustomizeThemeClicked" />
+                <!-- Theme section -->
+                <Label Text="Theme" FontSize="{DynamicResource TextSizeSubtitle}" TextColor="{DynamicResource ThemeText}" />
+                <Label Text="Choose your app colour scheme" FontSize="{DynamicResource TextSizeSmall}" TextColor="{DynamicResource ThemeTextSecondary}" />
+                <Picker x:Name="ThemePicker"
+                        ItemsSource="{Binding AvailableThemes}"
+                        SelectedItem="{Binding SelectedTheme}"
+                        FontSize="{DynamicResource TextSizeSubtitle}" />
 
-            <c:IconButton Icon="💾" Label="Save" Command="{Binding SaveCommand}"
-                    HorizontalOptions="Start" />
+                <BoxView HeightRequest="1" Color="{DynamicResource ThemeTextSecondary}" Opacity="0.3" Margin="0,8" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <!-- Text Size section -->
+                <Label Text="Text Size" FontSize="{DynamicResource TextSizeSubtitle}" TextColor="{DynamicResource ThemeText}" />
+                <Label Text="Adjust font size across the app" FontSize="{DynamicResource TextSizeSmall}" TextColor="{DynamicResource ThemeTextSecondary}" />
+                <Picker x:Name="TextSizePicker"
+                        ItemsSource="{Binding AvailableTextSizes}"
+                        SelectedItem="{Binding TextSize}"
+                        SelectedIndexChanged="OnTextSizePickerChanged"
+                        FontSize="{DynamicResource TextSizeSubtitle}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
+    </Grid>
 </ContentPage>

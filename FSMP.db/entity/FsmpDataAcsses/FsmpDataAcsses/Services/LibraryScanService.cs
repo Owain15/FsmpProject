@@ -41,10 +41,24 @@ public class LibraryScanService : ILibraryScanService
                 aggregate.TracksUpdated += result.TracksUpdated;
                 aggregate.TracksRemoved += result.TracksRemoved;
                 aggregate.Errors.AddRange(result.Errors);
+                aggregate.DirectoryResults.Add(new DirectoryScanResult
+                {
+                    Path = path,
+                    Success = true,
+                    TracksAdded = result.TracksAdded,
+                    TracksUpdated = result.TracksUpdated,
+                    TracksRemoved = result.TracksRemoved,
+                });
             }
             catch (Exception ex)
             {
                 aggregate.Errors.Add($"{path}: {ex.Message}");
+                aggregate.DirectoryResults.Add(new DirectoryScanResult
+                {
+                    Path = path,
+                    Success = false,
+                    ErrorMessage = ex.Message,
+                });
             }
         }
 

@@ -11,13 +11,15 @@ public class SettingsViewModelTests
 {
     private readonly Mock<ILibraryManager> _libraryManagerMock;
     private readonly Mock<IConfigurationService> _configServiceMock;
+    private readonly Mock<ILibraryStatsService> _libraryStatsServiceMock;
     private readonly SettingsViewModel _vm;
 
     public SettingsViewModelTests()
     {
         _libraryManagerMock = new Mock<ILibraryManager>();
         _configServiceMock = new Mock<IConfigurationService>();
-        _vm = new SettingsViewModel(_libraryManagerMock.Object, _configServiceMock.Object, action => action());
+        _libraryStatsServiceMock = new Mock<ILibraryStatsService>();
+        _vm = new SettingsViewModel(_libraryManagerMock.Object, _configServiceMock.Object, _libraryStatsServiceMock.Object, action => action());
     }
 
     [Fact]
@@ -34,7 +36,7 @@ public class SettingsViewModelTests
 
         await _vm.LoadAsync();
 
-        _vm.LibraryPaths.Should().BeEquivalentTo(new[] { @"C:\Music", @"D:\Music" });
+        _vm.LibraryPaths.Select(d => d.Path).Should().BeEquivalentTo(new[] { @"C:\Music", @"D:\Music" });
         _vm.AutoScanOnStartup.Should().BeFalse();
         _vm.DefaultVolume.Should().Be(50);
     }
@@ -57,7 +59,7 @@ public class SettingsViewModelTests
         await Task.Delay(50);
 
         _libraryManagerMock.Verify(m => m.AddLibraryPathAsync(@"D:\New"), Times.Once);
-        _vm.LibraryPaths.Should().Contain(@"D:\New");
+        _vm.LibraryPaths.Select(d => d.Path).Should().Contain(@"D:\New");
     }
 
     [Fact]
@@ -87,7 +89,7 @@ public class SettingsViewModelTests
         await Task.Delay(50);
 
         _libraryManagerMock.Verify(m => m.RemoveLibraryPathAsync(@"C:\Music"), Times.Once);
-        _vm.LibraryPaths.Should().NotContain(@"C:\Music");
+        _vm.LibraryPaths.Select(d => d.Path).Should().NotContain(@"C:\Music");
     }
 
     [Fact]
@@ -126,7 +128,7 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public async Task SaveCommand_PersistsConfig()
+    public async Task AutoSave_PersistsOnPropertyChange()
     {
         // First load so _config is populated
         var config = new Configuration
@@ -139,29 +141,27 @@ public class SettingsViewModelTests
             .ReturnsAsync(Result.Success(config));
         await _vm.LoadAsync();
 
-        _vm.AutoScanOnStartup = false;
-        _vm.DefaultVolume = 60;
+        _configServiceMock.Invocations.Clear();
 
-        _vm.SaveCommand.Execute(null);
+        _vm.AutoScanOnStartup = false;
         await Task.Delay(50);
 
         _configServiceMock.Verify(c => c.SaveConfigurationAsync(
-            It.Is<Configuration>(cfg => cfg.AutoScanOnStartup == false && cfg.DefaultVolume == 60)),
+            It.Is<Configuration>(cfg => cfg.AutoScanOnStartup == false)),
             Times.Once);
-        _vm.StatusMessage.Should().Contain("saved");
     }
 
     [Fact]
     public void Constructor_ThrowsOnNullLibraryManager()
     {
-        var act = () => new SettingsViewModel(null!, _configServiceMock.Object, action => action());
+        var act = () => new SettingsViewModel(null!, _configServiceMock.Object, _libraryStatsServiceMock.Object, action => action());
         act.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void Constructor_ThrowsOnNullConfigService()
     {
-        var act = () => new SettingsViewModel(_libraryManagerMock.Object, null!, action => action());
+        var act = () => new SettingsViewModel(_libraryManagerMock.Object, null!, _libraryStatsServiceMock.Object, action => action());
         act.Should().Throw<ArgumentNullException>();
     }
 
@@ -224,30 +224,40 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public async Task SaveCommand_PersistsNewProperties()
+    public async Task AutoSave_PersistsNewProperties()
     {
         var config = new Configuration();
         _libraryManagerMock.Setup(m => m.LoadConfigurationAsync())
             .ReturnsAsync(Result.Success(config));
         await _vm.LoadAsync();
 
-        _vm.ResumeSession = false;
-        _vm.AutoPlayOnStartup = true;
-        _vm.TextSize = "Small";
-        _vm.DoubleClickAction = "PlayNext";
-        _vm.DefaultSortOrder = "Album";
+        _configServiceMock.Invocations.Clear();
 
-        _vm.SaveCommand.Execute(null);
+        _vm.DefaultSortOrder = "Album";
         await Task.Delay(50);
 
         _configServiceMock.Verify(c => c.SaveConfigurationAsync(
-            It.Is<Configuration>(cfg =>
-                cfg.ResumeSession == false &&
-                cfg.AutoPlayOnStartup == true &&
-                cfg.TextSize == "Small" &&
-                cfg.DoubleClickAction == "PlayNext" &&
-                cfg.DefaultSortOrder == "Album")),
+            It.Is<Configuration>(cfg => cfg.DefaultSortOrder == "Album")),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task AutoSave_DoesNotFireDuringLoad()
+    {
+        var config = new Configuration
+        {
+            LibraryPaths = new List<string>(),
+            AutoScanOnStartup = false,
+            DefaultVolume = 50
+        };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(config));
+
+        await _vm.LoadAsync();
+        await Task.Delay(50);
+
+        // SaveConfigurationAsync should NOT have been called by auto-save during load
+        _configServiceMock.Verify(c => c.SaveConfigurationAsync(It.IsAny<Configuration>()), Times.Never);
     }
 
     [Fact]
@@ -276,6 +286,66 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public void ToggleAllScanPaths_SelectsAll_ThenDeselectsAll()
+    {
+        // Setup: load paths
+        var config = new Configuration
+        {
+            LibraryPaths = new List<string> { @"C:\Music", @"D:\Music" }
+        };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(config));
+        _vm.LoadAsync().GetAwaiter().GetResult();
+
+        // Select all
+        _vm.ToggleAllScanPathsCommand.Execute(null);
+
+        _vm.SelectedScanPaths.Should().BeEquivalentTo(new[] { @"C:\Music", @"D:\Music" });
+        _vm.AllScanPathsSelected.Should().BeTrue();
+        _vm.ToggleAllButtonText.Should().Be("Deselect All");
+        _vm.LibraryPaths.All(p => p.IsSelectedForScan).Should().BeTrue();
+
+        // Deselect all
+        _vm.ToggleAllScanPathsCommand.Execute(null);
+
+        _vm.SelectedScanPaths.Should().BeEmpty();
+        _vm.AllScanPathsSelected.Should().BeFalse();
+        _vm.ToggleAllButtonText.Should().Be("Select All");
+        _vm.LibraryPaths.All(p => !p.IsSelectedForScan).Should().BeTrue();
+    }
+
+    [Fact]
+    public void ToggleScanPath_SetsIsSelectedForScan()
+    {
+        var config = new Configuration
+        {
+            LibraryPaths = new List<string> { @"C:\Music" }
+        };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync())
+            .ReturnsAsync(Result.Success(config));
+        _vm.LoadAsync().GetAwaiter().GetResult();
+
+        _vm.ToggleScanPathCommand.Execute(@"C:\Music");
+        _vm.LibraryPaths[0].IsSelectedForScan.Should().BeTrue();
+
+        _vm.ToggleScanPathCommand.Execute(@"C:\Music");
+        _vm.LibraryPaths[0].IsSelectedForScan.Should().BeFalse();
+    }
+
+    [Fact]
+    public void HasStatusMessage_ReflectsStatusMessage()
+    {
+        _vm.HasStatusMessage.Should().BeFalse();
+
+        // Trigger a status message via scan with no paths
+        _vm.ScanSelectedCommand.Execute(null);
+        // Wait briefly for async
+        System.Threading.Thread.Sleep(50);
+
+        _vm.HasStatusMessage.Should().BeTrue();
+    }
+
+    [Fact]
     public async Task ScanSelectedCommand_ScansSelectedPaths()
     {
         var scanResult = new ScanResult { TracksAdded = 5, TracksUpdated = 0, TracksRemoved = 0 };
@@ -299,6 +369,103 @@ public class SettingsViewModelTests
 
         _vm.StatusMessage.Should().Contain("No paths selected");
         _libraryManagerMock.Verify(m => m.ScanSelectedLibrariesAsync(It.IsAny<IReadOnlyList<string>>()), Times.Never);
+    }
+
+    [Fact]
+    public void Constructor_ThrowsOnNullLibraryStatsService()
+    {
+        var act = () => new SettingsViewModel(_libraryManagerMock.Object, _configServiceMock.Object, null!, action => action());
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public async Task ToggleDirectoriesData_ExpandsAndPopulatesItems()
+    {
+        var config = new Configuration { LibraryPaths = new List<string> { @"C:\Music", @"D:\Music" } };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync()).ReturnsAsync(Result.Success(config));
+        await _vm.LoadAsync();
+
+        _vm.ToggleDirectoriesDataCommand.Execute(null);
+        await Task.Delay(50);
+
+        _vm.IsDirectoriesDataExpanded.Should().BeTrue();
+        _vm.DirectoryStatsItems.Should().HaveCount(2);
+        _vm.DirectoryStatsItems[0].Path.Should().Be(@"C:\Music");
+        _vm.DirectoryStatsItems[1].Path.Should().Be(@"D:\Music");
+    }
+
+    [Fact]
+    public async Task ToggleDirectoriesData_CollapsesOnSecondToggle()
+    {
+        var config = new Configuration { LibraryPaths = new List<string> { @"C:\Music" } };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync()).ReturnsAsync(Result.Success(config));
+        await _vm.LoadAsync();
+
+        _vm.ToggleDirectoriesDataCommand.Execute(null);
+        await Task.Delay(50);
+        _vm.ToggleDirectoriesDataCommand.Execute(null);
+        await Task.Delay(50);
+
+        _vm.IsDirectoriesDataExpanded.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ToggleDirectory_ExpandsAndLoadsStats()
+    {
+        var config = new Configuration { LibraryPaths = new List<string> { @"C:\Music" } };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync()).ReturnsAsync(Result.Success(config));
+        _libraryStatsServiceMock.Setup(s => s.GetDirectoryStatsAsync(@"C:\Music"))
+            .ReturnsAsync(new DirectoryStats(10, 3, 2));
+        await _vm.LoadAsync();
+
+        _vm.ToggleDirectoriesDataCommand.Execute(null);
+        await Task.Delay(50);
+
+        _vm.ToggleDirectoryCommand.Execute(_vm.DirectoryStatsItems[0]);
+        await Task.Delay(50);
+
+        _vm.DirectoryStatsItems[0].IsExpanded.Should().BeTrue();
+        _vm.DirectoryStatsItems[0].TrackCount.Should().Be(10);
+        _vm.DirectoryStatsItems[0].AlbumCount.Should().Be(3);
+        _vm.DirectoryStatsItems[0].ArtistCount.Should().Be(2);
+        _vm.DirectoryStatsItems[0].HasLoaded.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ToggleAllDirectories_ExpandsAndCollapsesAll()
+    {
+        var config = new Configuration { LibraryPaths = new List<string> { @"C:\Music", @"D:\Music" } };
+        _libraryManagerMock.Setup(m => m.LoadConfigurationAsync()).ReturnsAsync(Result.Success(config));
+        _libraryStatsServiceMock.Setup(s => s.GetDirectoryStatsAsync(It.IsAny<string>()))
+            .ReturnsAsync(new DirectoryStats(5, 2, 1));
+        await _vm.LoadAsync();
+
+        _vm.ToggleDirectoriesDataCommand.Execute(null);
+        await Task.Delay(50);
+
+        // Expand all
+        _vm.ToggleAllDirectoriesCommand.Execute(null);
+        await Task.Delay(50);
+
+        _vm.AreAllDirectoriesExpanded.Should().BeTrue();
+        _vm.DirectoryStatsItems.All(d => d.IsExpanded).Should().BeTrue();
+
+        // Collapse all
+        _vm.ToggleAllDirectoriesCommand.Execute(null);
+        await Task.Delay(50);
+
+        _vm.AreAllDirectoriesExpanded.Should().BeFalse();
+        _vm.DirectoryStatsItems.All(d => !d.IsExpanded).Should().BeTrue();
+    }
+
+    [Fact]
+    public void DirectoryStatsItem_ToggleExpanded_RaisesPropertyChanged()
+    {
+        var item = new SettingsViewModel.DirectoryStatsItem(@"C:\Music");
+        var raised = false;
+        item.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(SettingsViewModel.DirectoryStatsItem.IsExpanded)) raised = true; };
+        item.IsExpanded = true;
+        raised.Should().BeTrue();
     }
 
     [Theory]

@@ -7,28 +7,50 @@
              x:DataType="vm:SettingsViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Behavior"
-             Shell.NavBarIsVisible="False">
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12">
-
-            <Grid ColumnDefinitions="*,Auto">
-                <Label Text="Behavior" FontSize="24" FontAttributes="Bold"
-                       TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="← Back" FontSize="14" Padding="12,6"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*">
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Settings"
+                     HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Button Text="← Back" FontSize="{DynamicResource TextSizeBody}" Padding="12,6"
+                        HorizontalOptions="End"
                         BackgroundColor="{DynamicResource ThemeButtonBackground}"
                         TextColor="{DynamicResource ThemeButtonText}"
                         Clicked="OnBackClicked" />
-            </Grid>
 
-            <Grid ColumnDefinitions="*,Auto">
-                <Label Text="Allow unsave from Tag List" FontSize="16" VerticalOptions="Center"
+                <!-- Library Section -->
+                <Label Text="Library" FontSize="{DynamicResource TextSizeSubtitle}" FontAttributes="Bold"
                        TextColor="{DynamicResource ThemeText}" />
-                <Switch Grid.Column="1" IsToggled="{Binding AllowUnsaveFromTagList}" />
-            </Grid>
+                <Label Text="Default actions when browsing your library"
+                       FontSize="{DynamicResource TextSizeSmall}" TextColor="{DynamicResource ThemeTextSecondary}" />
 
-            <c:IconButton Icon="💾" Label="Save" Command="{Binding SaveCommand}"
-                    HorizontalOptions="Start" />
+                <Label Text="Double-click action" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeText}" />
+                <Picker ItemsSource="{Binding AvailableDoubleClickActions}"
+                        SelectedItem="{Binding DoubleClickAction}"
+                        FontSize="{DynamicResource TextSizeBody}" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <Label Text="Default sort order" FontSize="{DynamicResource TextSizeBody}"
+                       TextColor="{DynamicResource ThemeText}" />
+                <Picker ItemsSource="{Binding AvailableSortOrders}"
+                        SelectedItem="{Binding DefaultSortOrder}"
+                        FontSize="{DynamicResource TextSizeBody}" />
+
+                <BoxView HeightRequest="1" Color="{DynamicResource ThemeTextSecondary}" Opacity="0.3" Margin="0,8" />
+
+                <!-- Reset Section -->
+                <Label Text="Reset" FontSize="{DynamicResource TextSizeSubtitle}" FontAttributes="Bold"
+                       TextColor="{DynamicResource ThemeText}" />
+                <Label Text="Restore all settings to their original values"
+                       FontSize="{DynamicResource TextSizeSmall}" TextColor="{DynamicResource ThemeTextSecondary}" />
+
+                <c:IconButton Icon="🔄" Label="Reset to Defaults" Command="{Binding ResetToDefaultsCommand}"
+                        HorizontalOptions="Start" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
+    </Grid>
 </ContentPage>

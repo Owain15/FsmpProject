@@ -5,7 +5,7 @@
     <Button x:Name="InnerButton"
             Clicked="OnClicked"
             Padding="8,4"
-            FontSize="14"
+            FontSize="{DynamicResource TextSizeBody}"
             BackgroundColor="{DynamicResource ThemeBackground}"
             TextColor="{DynamicResource ThemeText}"
             BorderColor="{DynamicResource ThemeBorder}"

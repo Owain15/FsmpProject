@@ -29,34 +29,21 @@ public partial class AppearanceSettingsPage : ContentPage
     private void OnThemePickerChanged(object? sender, EventArgs e)
     {
         if (ThemePicker.SelectedItem is string theme)
-        {
-            if (theme == "Custom")
-                _ = ApplyCustomThemeFromConfigAsync();
-            else
-                ThemeManager.ApplyTheme(theme);
-        }
+            ThemeManager.ApplyTheme(theme);
     }
 
-    private async Task ApplyCustomThemeFromConfigAsync()
+    private void OnTextSizePickerChanged(object? sender, EventArgs e)
     {
-        try
-        {
-            var configService = _scope.ServiceProvider.GetRequiredService<Core.Interfaces.IConfigurationService>();
-            var config = await configService.LoadConfigurationAsync();
-            if (config.CustomThemeColors is not null && config.CustomThemeColors.Count > 0)
-                ThemeManager.ApplyCustomTheme(config.CustomThemeColors);
-            else
-                ThemeManager.ApplyTheme("Light");
-        }
-        catch (Exception ex)
-        {
-            App.Log($"Failed to apply custom theme: {ex}");
-        }
+        if (TextSizePicker.SelectedItem is string size)
+            TextSizeManager.ApplyTextSize(size);
     }
-
-    private async void OnCustomizeThemeClicked(object? sender, EventArgs e)
-        => await Shell.Current.GoToAsync("customTheme");
 
     private async void OnBackClicked(object? sender, EventArgs e)
         => await Shell.Current.GoToAsync("..");
+
+    private void OnHamburgerClicked(object? sender, EventArgs e)
+    {
+        NavOverlay.CurrentRoute = "Settings";
+        NavOverlay.Toggle();
+    }
 }

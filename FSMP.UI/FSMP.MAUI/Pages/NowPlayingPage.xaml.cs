@@ -1,4 +1,5 @@
 using FSMP.Core.Models;
+using FSMP.Core;
 using FSMP.MAUI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,7 @@ public partial class NowPlayingPage : ContentPage
     private bool _isQueueVisible;
     private bool _isTagsVisible;
     private bool _isWideLayout;
+    private bool _isPhoneLayout;
     private const double WideBreakpoint = 800;
     private const double AlbumArtMinHeight = 80;
 
@@ -115,13 +117,18 @@ public partial class NowPlayingPage : ContentPage
     private void OnPageSizeChanged(object? sender, EventArgs e)
     {
         var wasWide = _isWideLayout;
+        var wasPhone = _isPhoneLayout;
         _isWideLayout = Width >= WideBreakpoint;
+        _isPhoneLayout = ResponsiveHelper.IsPhone(Width);
 
         if (wasWide != _isWideLayout)
         {
             ApplyQueueLayout();
             ApplyTagsLayout();
         }
+
+        if (wasPhone != _isPhoneLayout)
+            ApplyPhoneLayout();
 
         // Adjust sidebar widths proportionally when in wide layout
         if (_isWideLayout && Width > 0)
@@ -137,6 +144,24 @@ public partial class NowPlayingPage : ContentPage
         if (AlbumArtArea.Height >= 0)
         {
             AlbumArtPlaceholder.IsVisible = AlbumArtArea.Height >= AlbumArtMinHeight;
+        }
+    }
+
+    private void ApplyPhoneLayout()
+    {
+        // On phone: hide sidebar toggle buttons (no room for sidebars), compact album art, hide volume slider
+        QueueToggleButton.IsVisible = !_isPhoneLayout;
+        TagsToggleButton.IsVisible = !_isPhoneLayout;
+        AlbumArtPlaceholder.WidthRequest = _isPhoneLayout ? ResponsiveHelper.AlbumArtPhone : ResponsiveHelper.AlbumArtDesktop;
+        AlbumArtPlaceholder.HeightRequest = _isPhoneLayout ? ResponsiveHelper.AlbumArtPhone : ResponsiveHelper.AlbumArtDesktop;
+
+        // Close sidebars if switching to phone
+        if (_isPhoneLayout)
+        {
+            _isQueueVisible = false;
+            _isTagsVisible = false;
+            ApplyQueueLayout();
+            ApplyTagsLayout();
         }
     }
 

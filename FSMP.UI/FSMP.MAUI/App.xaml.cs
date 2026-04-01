@@ -156,13 +156,21 @@ public partial class App : Application
             {
                 var configService = Services.GetRequiredService<IConfigurationService>();
                 var config = await configService.LoadConfigurationAsync();
-                MainThread.BeginInvokeOnMainThread(() => ThemeManager.ApplyTheme(config.Theme));
-                Log($"Theme applied: {config.Theme}");
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ThemeManager.ApplyTheme(config.Theme);
+                    TextSizeManager.ApplyTextSize(config.TextSize);
+                });
+                Log($"Theme applied: {config.Theme}, TextSize: {config.TextSize}");
             }
             catch (Exception ex)
             {
                 Log($"Failed to apply theme (non-fatal): {ex.Message}");
-                MainThread.BeginInvokeOnMainThread(() => ThemeManager.ApplyTheme("Light"));
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ThemeManager.ApplyTheme("Light");
+                    TextSizeManager.ApplyTextSize("Medium");
+                });
             }
             Log($"Theme apply: {stepSw.ElapsedMilliseconds}ms");
 

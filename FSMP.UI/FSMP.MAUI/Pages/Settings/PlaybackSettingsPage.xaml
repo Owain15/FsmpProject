@@ -7,26 +7,39 @@
              x:DataType="vm:SettingsViewModel"
              BackgroundColor="{DynamicResource ThemeBackground}"
              Title="Playback"
-             Shell.NavBarIsVisible="False">
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12">
-
-            <Grid ColumnDefinitions="*,Auto">
-                <Label Text="Playback" FontSize="24" FontAttributes="Bold"
-                       TextColor="{DynamicResource ThemeText}" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="← Back" FontSize="14" Padding="12,6"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    <Grid RowDefinitions="Auto,*">
+        <c:TopNavBar x:Name="TopNav" CurrentRoute="Settings"
+                     HamburgerClicked="OnHamburgerClicked" Grid.Row="0" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Button Text="← Back" FontSize="{DynamicResource TextSizeBody}" Padding="12,6"
+                        HorizontalOptions="End"
                         BackgroundColor="{DynamicResource ThemeButtonBackground}"
                         TextColor="{DynamicResource ThemeButtonText}"
                         Clicked="OnBackClicked" />
-            </Grid>
 
-            <Label Text="{Binding DefaultVolume, StringFormat='Default Volume: {0}%'}" FontSize="16"
-                   TextColor="{DynamicResource ThemeText}" />
-            <Slider Minimum="0" Maximum="100" Value="{Binding DefaultVolume}" />
+                <Label Text="{Binding DefaultVolume, StringFormat='Default Volume: {0}%'}" FontSize="{DynamicResource TextSizeSubtitle}"
+                       TextColor="{DynamicResource ThemeText}" />
+                <Slider Minimum="0" Maximum="100" Value="{Binding DefaultVolume}" />
 
-            <c:IconButton Icon="💾" Label="Save" Command="{Binding SaveCommand}"
-                    HorizontalOptions="Start" />
+                <BoxView HeightRequest="1" Color="{DynamicResource ThemeTextSecondary}" Opacity="0.3" Margin="0,8" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Resume session on startup" FontSize="{DynamicResource TextSizeSubtitle}" VerticalOptions="Center"
+                           TextColor="{DynamicResource ThemeText}" />
+                    <Switch Grid.Column="1" IsToggled="{Binding ResumeSession}" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Auto-play on startup" FontSize="{DynamicResource TextSizeSubtitle}" VerticalOptions="Center"
+                           TextColor="{DynamicResource ThemeText}" />
+                    <Switch Grid.Column="1" IsToggled="{Binding AutoPlayOnStartup}" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+        <c:NavMenuOverlay x:Name="NavOverlay" Grid.RowSpan="2" />
+    </Grid>
 </ContentPage>

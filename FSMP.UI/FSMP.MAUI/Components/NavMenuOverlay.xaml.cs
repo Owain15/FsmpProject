@@ -1,3 +1,5 @@
+using FSMP.Core;
+
 namespace FSMP.MAUI.Components;
 
 public partial class NavMenuOverlay : ContentView
@@ -16,6 +18,17 @@ public partial class NavMenuOverlay : ContentView
             ["Playlists"] = BtnPlaylists,
             ["Settings"] = BtnSettings,
         };
+        SizeChanged += OnSizeChanged;
+    }
+
+    private void OnSizeChanged(object? sender, EventArgs e)
+    {
+        // On phone: full width menu. On desktop: fixed 220dp.
+        MenuPanel.WidthRequest = ResponsiveHelper.IsPhone(Width) ? -1 : 220;
+        if (ResponsiveHelper.IsPhone(Width))
+            MenuPanel.HorizontalOptions = LayoutOptions.Fill;
+        else
+            MenuPanel.HorizontalOptions = LayoutOptions.Start;
     }
 
     public void Toggle()

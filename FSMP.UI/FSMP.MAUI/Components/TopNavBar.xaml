@@ -7,7 +7,7 @@
         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Padding="16,12,16,8">
             <!-- Hamburger button (compact mode only) -->
             <Button x:Name="HamburgerBtn"
-                    Text="☰" FontSize="22"
+                    Text="☰" FontSize="{DynamicResource TextSizeHeading}"
                     BackgroundColor="Transparent"
                     TextColor="{DynamicResource ThemeText}"
                     Padding="8,4" MinimumWidthRequest="44"
@@ -18,7 +18,7 @@
             <!-- Page title -->
             <Label x:Name="PageTitleLabel"
                    Text="Now Playing"
-                   FontSize="22" FontAttributes="Bold"
+                   FontSize="{DynamicResource TextSizeHeading}" FontAttributes="Bold"
                    TextColor="{DynamicResource ThemeText}"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"
@@ -29,7 +29,7 @@
         <HorizontalStackLayout x:Name="NavButtonRow" Spacing="0" Padding="12,0,12,4">
             <!-- Now Playing tab -->
             <VerticalStackLayout Spacing="0">
-                <Label x:Name="NavNowPlaying" Text="Now Playing" FontSize="14"
+                <Label x:Name="NavNowPlaying" Text="Now Playing" FontSize="{DynamicResource TextSizeBody}"
                        TextColor="{DynamicResource ThemeText}" Padding="14,8"
                        HorizontalOptions="Center">
                     <Label.GestureRecognizers>
@@ -42,7 +42,7 @@
 
             <!-- Library tab -->
             <VerticalStackLayout Spacing="0">
-                <Label x:Name="NavLibrary" Text="Library" FontSize="14"
+                <Label x:Name="NavLibrary" Text="Library" FontSize="{DynamicResource TextSizeBody}"
                        TextColor="{DynamicResource ThemeText}" Padding="14,8"
                        HorizontalOptions="Center">
                     <Label.GestureRecognizers>
@@ -55,7 +55,7 @@
 
             <!-- Playlists tab -->
             <VerticalStackLayout Spacing="0">
-                <Label x:Name="NavPlaylists" Text="Playlists" FontSize="14"
+                <Label x:Name="NavPlaylists" Text="Playlists" FontSize="{DynamicResource TextSizeBody}"
                        TextColor="{DynamicResource ThemeText}" Padding="14,8"
                        HorizontalOptions="Center">
                     <Label.GestureRecognizers>
@@ -68,7 +68,7 @@
 
             <!-- Settings tab -->
             <VerticalStackLayout Spacing="0">
-                <Label x:Name="NavSettings" Text="Settings" FontSize="14"
+                <Label x:Name="NavSettings" Text="Settings" FontSize="{DynamicResource TextSizeBody}"
                        TextColor="{DynamicResource ThemeText}" Padding="14,8"
                        HorizontalOptions="Center">
                     <Label.GestureRecognizers>

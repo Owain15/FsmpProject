@@ -26,25 +26,25 @@
                         Clicked="OnNavItemClicked" ClassId="NowPlaying"
                         BackgroundColor="Transparent"
                         TextColor="{DynamicResource ThemeText}"
-                        FontSize="16" HorizontalOptions="Fill"
+                        FontSize="{DynamicResource TextSizeSubtitle}" HorizontalOptions="Fill"
                         Padding="16,12" />
                 <Button x:Name="BtnLibrary" Text="📚  Library"
                         Clicked="OnNavItemClicked" ClassId="Library"
                         BackgroundColor="Transparent"
                         TextColor="{DynamicResource ThemeText}"
-                        FontSize="16" HorizontalOptions="Fill"
+                        FontSize="{DynamicResource TextSizeSubtitle}" HorizontalOptions="Fill"
                         Padding="16,12" />
                 <Button x:Name="BtnPlaylists" Text="📋  Playlists"
                         Clicked="OnNavItemClicked" ClassId="Playlists"
                         BackgroundColor="Transparent"
                         TextColor="{DynamicResource ThemeText}"
-                        FontSize="16" HorizontalOptions="Fill"
+                        FontSize="{DynamicResource TextSizeSubtitle}" HorizontalOptions="Fill"
                         Padding="16,12" />
                 <Button x:Name="BtnSettings" Text="⚙  Settings"
                         Clicked="OnNavItemClicked" ClassId="Settings"
                         BackgroundColor="Transparent"
                         TextColor="{DynamicResource ThemeText}"
-                        FontSize="16" HorizontalOptions="Fill"
+                        FontSize="{DynamicResource TextSizeSubtitle}" HorizontalOptions="Fill"
                         Padding="16,12" />
             </VerticalStackLayout>
         </Border>

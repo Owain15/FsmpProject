@@ -16,6 +16,7 @@ public class PlaylistRepository : Repository<Playlist>
     {
         return await DbSet
             .Include(p => p.PlaylistTracks)
+                .ThenInclude(pt => pt.Track)
             .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
     }
 

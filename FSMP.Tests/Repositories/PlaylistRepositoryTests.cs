@@ -103,6 +103,11 @@ public class PlaylistRepositoryTests : IDisposable
         result.Should().NotBeNull();
         result!.Name.Should().Be("Road Trip");
         result.PlaylistTracks.Should().HaveCount(2);
+        result.PlaylistTracks.Should().AllSatisfy(pt =>
+        {
+            pt.Track.Should().NotBeNull();
+            pt.Track!.Title.Should().NotBeNullOrEmpty();
+        });
     }
 
     [Fact]

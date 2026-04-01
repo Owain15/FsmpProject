@@ -84,7 +84,10 @@ public partial class TopNavBar : ContentView
     private async void OnNavTabTapped(object? sender, TappedEventArgs e)
     {
         if (e.Parameter is string route)
+        {
+            // If tapping the already-active tab, navigate to its root (e.g., pops settings sub-pages)
             await Shell.Current.GoToAsync($"//{route}");
+        }
     }
 
     private void OnHamburgerClicked(object? sender, EventArgs e)

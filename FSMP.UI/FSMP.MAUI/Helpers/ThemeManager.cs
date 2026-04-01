@@ -4,7 +4,7 @@ namespace FSMP.MAUI.Helpers;
 
 public static class ThemeManager
 {
-    public static readonly IReadOnlyList<string> AvailableThemes = new[] { "Light", "Dark", "Light Blue", "Custom" };
+    public static readonly IReadOnlyList<string> AvailableThemes = new[] { "Light", "Dark", "Light Blue" };
 
     private static ResourceDictionary? _currentThemeDictionary;
 
@@ -124,46 +124,6 @@ public static class ThemeManager
     }
 
     /// <summary>
-    /// Applies a custom theme from a dictionary of hex color strings.
-    /// </summary>
-    public static void ApplyCustomTheme(Dictionary<string, string> colors)
-    {
-        var app = Application.Current;
-        if (app is null) return;
-
-        var newTheme = BuildCustomThemeDictionary(colors);
-
-        var mergedDictionaries = app.Resources.MergedDictionaries;
-
-        if (_currentThemeDictionary is not null)
-            mergedDictionaries.Remove(_currentThemeDictionary);
-
-        mergedDictionaries.Add(newTheme);
-        _currentThemeDictionary = newTheme;
-    }
-
-    /// <summary>
-    /// Builds a ResourceDictionary from user-defined hex colors, falling back to Light defaults.
-    /// </summary>
-    public static ResourceDictionary BuildCustomThemeDictionary(Dictionary<string, string> colors)
-    {
-        var dict = new ResourceDictionary();
-        foreach (var key in LightDefaults.Keys)
-        {
-            var hex = colors.TryGetValue(key, out var val) ? val : LightDefaults[key];
-            try
-            {
-                dict[key] = Color.FromArgb(hex);
-            }
-            catch
-            {
-                dict[key] = Color.FromArgb(LightDefaults[key]);
-            }
-        }
-        return dict;
-    }
-
-    /// <summary>
     /// Gets the default color dictionary for a given theme name.
     /// </summary>
     public static IReadOnlyDictionary<string, string> GetThemeDefaults(string themeName)
@@ -182,7 +142,6 @@ public static class ThemeManager
         {
             "Dark" => new DarkTheme(),
             "Light Blue" => new LightBlueTheme(),
-            "Custom" => null, // Custom theme is applied via ApplyCustomTheme
             _ => new LightTheme()
         };
     }

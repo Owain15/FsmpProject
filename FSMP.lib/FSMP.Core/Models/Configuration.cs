@@ -21,12 +21,4 @@ public class Configuration
     public string DefaultDuplicateStrategy { get; set; } = "Skip";
     public string UnknownArtistName { get; set; } = "Unknown Artist";
     public string UnknownAlbumName { get; set; } = "Unknown Album";
-    public Dictionary<string, string>? CustomThemeColors { get; set; }
-    public List<NamedCustomTheme> SavedCustomThemes { get; set; } = new();
-}
-
-public class NamedCustomTheme
-{
-    public string Name { get; set; } = string.Empty;
-    public Dictionary<string, string> Colors { get; set; } = new();
 }

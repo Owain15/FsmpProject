@@ -23,10 +23,10 @@
                     <TapGestureRecognizer Tapped="OnLibraryTapped" />
                 </Border.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Label Text="📁" FontSize="20" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Library" FontSize="16" VerticalOptions="Center"
+                    <Label Text="📁" FontSize="{DynamicResource TextSizeTitle}" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Directories" FontSize="{DynamicResource TextSizeSubtitle}" VerticalOptions="Center"
                            TextColor="{DynamicResource ThemeText}" Margin="12,0,0,0" />
-                    <Label Grid.Column="2" Text="›" FontSize="22"
+                    <Label Grid.Column="2" Text="›" FontSize="{DynamicResource TextSizeHeading}"
                            TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                 </Grid>
             </Border>
@@ -39,10 +39,10 @@
                     <TapGestureRecognizer Tapped="OnPlaybackTapped" />
                 </Border.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Label Text="🔊" FontSize="20" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Playback" FontSize="16" VerticalOptions="Center"
+                    <Label Text="🔊" FontSize="{DynamicResource TextSizeTitle}" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Playback" FontSize="{DynamicResource TextSizeSubtitle}" VerticalOptions="Center"
                            TextColor="{DynamicResource ThemeText}" Margin="12,0,0,0" />
-                    <Label Grid.Column="2" Text="›" FontSize="22"
+                    <Label Grid.Column="2" Text="›" FontSize="{DynamicResource TextSizeHeading}"
                            TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                 </Grid>
             </Border>
@@ -55,10 +55,10 @@
                     <TapGestureRecognizer Tapped="OnAppearanceTapped" />
                 </Border.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Label Text="🎨" FontSize="20" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Appearance" FontSize="16" VerticalOptions="Center"
+                    <Label Text="🎨" FontSize="{DynamicResource TextSizeTitle}" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Appearance" FontSize="{DynamicResource TextSizeSubtitle}" VerticalOptions="Center"
                            TextColor="{DynamicResource ThemeText}" Margin="12,0,0,0" />
-                    <Label Grid.Column="2" Text="›" FontSize="22"
+                    <Label Grid.Column="2" Text="›" FontSize="{DynamicResource TextSizeHeading}"
                            TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                 </Grid>
             </Border>
@@ -71,10 +71,10 @@
                     <TapGestureRecognizer Tapped="OnBehaviorTapped" />
                 </Border.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Label Text="⚙️" FontSize="20" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Behavior" FontSize="16" VerticalOptions="Center"
+                    <Label Text="⚙️" FontSize="{DynamicResource TextSizeTitle}" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Behavior" FontSize="{DynamicResource TextSizeSubtitle}" VerticalOptions="Center"
                            TextColor="{DynamicResource ThemeText}" Margin="12,0,0,0" />
-                    <Label Grid.Column="2" Text="›" FontSize="22"
+                    <Label Grid.Column="2" Text="›" FontSize="{DynamicResource TextSizeHeading}"
                            TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                 </Grid>
             </Border>
@@ -87,10 +87,10 @@
                     <TapGestureRecognizer Tapped="OnAboutTapped" />
                 </Border.GestureRecognizers>
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Label Text="ℹ️" FontSize="20" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="About" FontSize="16" VerticalOptions="Center"
+                    <Label Text="ℹ️" FontSize="{DynamicResource TextSizeTitle}" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="About" FontSize="{DynamicResource TextSizeSubtitle}" VerticalOptions="Center"
                            TextColor="{DynamicResource ThemeText}" Margin="12,0,0,0" />
-                    <Label Grid.Column="2" Text="›" FontSize="22"
+                    <Label Grid.Column="2" Text="›" FontSize="{DynamicResource TextSizeHeading}"
                            TextColor="{DynamicResource ThemeTextSecondary}" VerticalOptions="Center" />
                 </Grid>
             </Border>

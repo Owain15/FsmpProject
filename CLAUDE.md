@@ -301,6 +301,18 @@ All UI code (Console and MAUI) must follow these four principles:
 - Errors must be reported, never swallowed — recoverable errors don't block the app
 - Critical errors show actionable messages (what happened, what the user can do)
 
+## Target Screen Sizes
+
+| Form Factor | Width | Orientation | Breakpoint | Platform |
+|---|---|---|---|---|
+| Phone | 360–430dp | Portrait only | <600dp | Android |
+| Desktop | 800dp+ | Any | ≥600dp | Windows |
+
+- **Breakpoint**: 600dp — `ResponsiveHelper.IsPhone(width)` in `FSMP.Core/ResponsiveHelper.cs`
+- **Android**: Locked to portrait via `ScreenOrientation.Portrait` on `MainActivity`
+- **Phone layout**: Sidebar toggles hidden, compact album art (120dp), full-width nav menu
+- **Desktop layout**: Sidebar toggles visible, standard album art (200dp), fixed 220dp nav menu
+
 ## Project Status
 
 - **Stage**: Feature-complete — Console + MAUI apps working, Android build compiles

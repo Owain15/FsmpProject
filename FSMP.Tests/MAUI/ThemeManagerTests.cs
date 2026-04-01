@@ -27,20 +27,13 @@ public partial class ThemeManagerTests
         "ThemeEntryText", "ThemeEntryPlaceholder", "ThemeError",
     };
 
-    private static readonly string[] AvailableThemes = { "Light", "Dark", "Light Blue", "Custom" };
+    private static readonly string[] AvailableThemes = { "Light", "Dark", "Light Blue" };
 
     [Fact]
     public void Configuration_Theme_ShouldDefaultToLight()
     {
         var config = new Configuration();
         config.Theme.Should().Be("Light");
-    }
-
-    [Fact]
-    public void Configuration_CustomThemeColors_ShouldDefaultToNull()
-    {
-        var config = new Configuration();
-        config.CustomThemeColors.Should().BeNull();
     }
 
     [Fact]
@@ -54,42 +47,6 @@ public partial class ThemeManagerTests
 
             deserialized!.Theme.Should().Be(themeName);
         }
-    }
-
-    [Fact]
-    public void Configuration_CustomThemeColors_ShouldRoundTrip_AllKeys()
-    {
-        var colors = new Dictionary<string, string>();
-        foreach (var key in ExpectedThemeColorKeys)
-            colors[key] = "#FF0000";
-
-        var config = new Configuration { CustomThemeColors = colors };
-        var json = JsonSerializer.Serialize(config);
-        var deserialized = JsonSerializer.Deserialize<Configuration>(json);
-
-        deserialized!.CustomThemeColors.Should().HaveCount(ExpectedThemeColorKeys.Length);
-        foreach (var key in ExpectedThemeColorKeys)
-            deserialized.CustomThemeColors.Should().ContainKey(key);
-    }
-
-    [Fact]
-    public void Configuration_SavedCustomThemes_ShouldRoundTrip()
-    {
-        var config = new Configuration
-        {
-            SavedCustomThemes = new List<NamedCustomTheme>
-            {
-                new() { Name = "Sunset", Colors = new Dictionary<string, string> { ["ThemeBackground"] = "#FF4500" } },
-                new() { Name = "Ocean", Colors = new Dictionary<string, string> { ["ThemeBackground"] = "#006994" } },
-            }
-        };
-
-        var json = JsonSerializer.Serialize(config);
-        var deserialized = JsonSerializer.Deserialize<Configuration>(json);
-
-        deserialized!.SavedCustomThemes.Should().HaveCount(2);
-        deserialized.SavedCustomThemes[0].Name.Should().Be("Sunset");
-        deserialized.SavedCustomThemes[1].Colors["ThemeBackground"].Should().Be("#006994");
     }
 
     [Theory]
@@ -108,22 +65,6 @@ public partial class ThemeManagerTests
     {
         // Guard: if ThemeManager adds/removes keys, update ExpectedThemeColorKeys above.
         ExpectedThemeColorKeys.Should().HaveCount(26);
-    }
-
-    [Fact]
-    public void NamedCustomTheme_ShouldSerializeAndDeserialize()
-    {
-        var theme = new NamedCustomTheme
-        {
-            Name = "My Custom Theme",
-            Colors = ExpectedThemeColorKeys.ToDictionary(k => k, _ => "#AABBCC")
-        };
-
-        var json = JsonSerializer.Serialize(theme);
-        var deserialized = JsonSerializer.Deserialize<NamedCustomTheme>(json);
-
-        deserialized!.Name.Should().Be("My Custom Theme");
-        deserialized.Colors.Should().HaveCount(ExpectedThemeColorKeys.Length);
     }
 
     [GeneratedRegex(@"^#[0-9A-Fa-f]{6,8}$")]

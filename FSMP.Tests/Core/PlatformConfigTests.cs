@@ -84,42 +84,6 @@ public class PlatformConfigTests
     }
 
     [Fact]
-    public void Configuration_ThemeAndCustomTheme_ShouldRoundTrip()
-    {
-        var config = new Configuration
-        {
-            Theme = "Custom",
-            CustomThemeColors = new Dictionary<string, string>
-            {
-                ["ThemeBackground"] = "#121212",
-                ["ThemeText"] = "#FFFFFF"
-            },
-            SavedCustomThemes = new List<NamedCustomTheme>
-            {
-                new() { Name = "My Theme", Colors = new Dictionary<string, string> { ["ThemeBackground"] = "#000000" } }
-            }
-        };
-
-        var json = JsonSerializer.Serialize(config);
-        var deserialized = JsonSerializer.Deserialize<Configuration>(json);
-
-        deserialized.Should().NotBeNull();
-        deserialized!.Theme.Should().Be("Custom");
-        deserialized.CustomThemeColors.Should().ContainKey("ThemeBackground");
-        deserialized.SavedCustomThemes.Should().HaveCount(1);
-        deserialized.SavedCustomThemes[0].Name.Should().Be("My Theme");
-    }
-
-    [Fact]
-    public void NamedCustomTheme_ShouldInitializeWithDefaults()
-    {
-        var theme = new NamedCustomTheme();
-
-        theme.Name.Should().BeEmpty();
-        theme.Colors.Should().NotBeNull().And.BeEmpty();
-    }
-
-    [Fact]
     public void Configuration_AllowUnsaveFromTagList_ShouldDefaultToFalse()
     {
         var config = new Configuration();
@@ -127,11 +91,4 @@ public class PlatformConfigTests
         config.AllowUnsaveFromTagList.Should().BeFalse();
     }
 
-    [Fact]
-    public void Configuration_SavedCustomThemes_ShouldDefaultToEmptyList()
-    {
-        var config = new Configuration();
-
-        config.SavedCustomThemes.Should().NotBeNull().And.BeEmpty();
-    }
 }
